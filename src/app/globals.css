@@ -1,0 +1,857 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────
+   DESIGN TOKENS
+───────────────────────────────────────── */
+:root {
+  /* Brand colours */
+  --ink: #0A0D12;
+  --ink2: #1C2333;
+  --ink3: #3A4A5C;
+  --blue: #1246FF;
+  --blue2: #3366FF;
+  --blue-dk: #0D3AE0;
+  --blue-lt: #E8EFFE;
+  --cream: #F5F0E8;
+  --warm: #EDE8DC;
+  --gold: #C8A84B;
+  --green: #0D7C54;
+  --green2: #12B07A;
+  --red: #D42B2B;
+  --red-lt: #FDEAEA;
+  --muted: #6B7689;
+  --pale: #9AAAB8;
+  --divider: #E2DDD4;
+  --surface: #FDFCF9;
+  --bg: #F4F7FB;
+
+  /* Radii */
+  --rad-sm: 8px;
+  --rad: 12px;
+  --rad-lg: 18px;
+  --rad-xl: 24px;
+
+  /* Shadows */
+  --sh: 0 1px 3px rgba(10,13,18,.06), 0 4px 12px rgba(10,13,18,.05);
+  --sh-lg: 0 8px 40px rgba(10,13,18,.12), 0 2px 8px rgba(10,13,18,.06);
+  --sh-blue: 0 4px 24px rgba(18,70,255,.25);
+
+  /* Nav */
+  --nav-w: 252px;
+  --top-h: 58px;
+}
+
+/* ─────────────────────────────────────────
+   RESET & BASE
+───────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--surface);
+  color: var(--ink);
+  overflow-x: hidden;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─────────────────────────────────────────
+   TYPOGRAPHY SCALE
+───────────────────────────────────────── */
+.font-syne       { font-family: 'Syne', sans-serif; }
+.font-serif      { font-family: 'Instrument Serif', serif; }
+.font-dm         { font-family: 'DM Sans', sans-serif; }
+
+h1, h2, h3 {
+  font-family: 'Syne', sans-serif;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+}
+
+/* Display sizes */
+.text-display-xl {
+  font-size: clamp(52px, 7vw, 96px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 0.93;
+}
+.text-display-lg {
+  font-size: clamp(36px, 5vw, 64px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 0.95;
+}
+.text-display-md {
+  font-size: clamp(28px, 3.5vw, 48px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+/* ─────────────────────────────────────────
+   CUSTOM CURSOR (desktop)
+───────────────────────────────────────── */
+@media (pointer: fine) {
+  body.custom-cursor { cursor: none; }
+
+  #cursor-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--blue);
+    border-radius: 50%;
+    position: fixed;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.08s, width 0.2s, height 0.2s, background 0.2s;
+    mix-blend-mode: normal;
+  }
+
+  #cursor-ring {
+    width: 36px;
+    height: 36px;
+    border: 1.5px solid rgba(18, 70, 255, 0.5);
+    border-radius: 50%;
+    position: fixed;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 9998;
+    transition: width 0.25s, height 0.25s, border-color 0.25s, transform 0.12s;
+  }
+
+  body.custom-cursor.cursor-hover #cursor-dot {
+    width: 12px;
+    height: 12px;
+    background: var(--blue-dk);
+  }
+
+  body.custom-cursor.cursor-hover #cursor-ring {
+    width: 52px;
+    height: 52px;
+    border-color: rgba(18, 70, 255, 0.25);
+  }
+}
+
+/* ─────────────────────────────────────────
+   SCROLLBAR
+───────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--divider); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--pale); }
+
+/* ─────────────────────────────────────────
+   SELECTION
+───────────────────────────────────────── */
+::selection {
+  background: rgba(18, 70, 255, 0.15);
+  color: var(--ink);
+}
+
+/* ─────────────────────────────────────────
+   ANIMATIONS (shared keyframes)
+───────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fadeRight {
+  from { opacity: 0; transform: translateX(32px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.8); }
+}
+
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+@keyframes floatYSeat {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50%       { transform: translateY(-6px) rotate(1deg); }
+}
+
+@keyframes scrollLeft {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@keyframes notifSlideIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes countBounce {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes blobPulse {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  33%       { transform: scale(1.05) rotate(3deg); }
+  66%       { transform: scale(0.97) rotate(-2deg); }
+}
+
+/* ─────────────────────────────────────────
+   UTILITY ANIMATIONS
+───────────────────────────────────────── */
+.animate-fade-up   { animation: fadeUp 0.6s ease both; }
+.animate-fade-in   { animation: fadeIn 0.5s ease both; }
+.animate-fade-right { animation: fadeRight 0.6s ease both; }
+.animate-float     { animation: floatY 3s ease-in-out infinite; }
+.animate-pulse-dot { animation: pulse 2s ease-in-out infinite; }
+.animate-scroll-left { animation: scrollLeft 30s linear infinite; }
+.animate-notif     { animation: notifSlideIn 0.4s ease both; }
+
+/* Stagger helpers */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+.delay-600 { animation-delay: 0.6s; }
+.delay-700 { animation-delay: 0.7s; }
+
+/* ─────────────────────────────────────────
+   SCROLL REVEAL
+───────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal.visible.delay-200 { transition-delay: 0.2s; }
+.reveal.visible.delay-400 { transition-delay: 0.4s; }
+
+/* ─────────────────────────────────────────
+   BUTTONS (global variants)
+───────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--rad);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--blue);
+  color: #fff;
+  box-shadow: var(--sh-blue);
+}
+.btn-primary:hover {
+  background: var(--blue-dk);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px rgba(18,70,255,.4);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--ink);
+  border: 2px solid var(--divider);
+}
+.btn-outline:hover {
+  border-color: var(--ink);
+  background: var(--warm);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--muted);
+  border: none;
+}
+.btn-ghost:hover {
+  color: var(--ink);
+  background: var(--bg);
+}
+
+.btn-hero {
+  padding: 15px 32px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: 'Syne', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* ─────────────────────────────────────────
+   CHIPS / BADGES
+───────────────────────────────────────── */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.chip-blue   { background: var(--blue-lt); color: #1447D4; }
+.chip-green  { background: #D1FAE5; color: #065F46; }
+.chip-amber  { background: #FEF3E2; color: #92400E; }
+.chip-red    { background: var(--red-lt); color: #9B1C1C; }
+.chip-gold   { background: rgba(200,168,75,.12); color: #92710A; border: 1px solid rgba(200,168,75,.3); }
+.chip-muted  { background: var(--bg); color: var(--muted); border: 1px solid var(--divider); }
+
+/* ─────────────────────────────────────────
+   CARDS
+───────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border-radius: var(--rad-lg);
+  border: 1px solid var(--divider);
+  overflow: hidden;
+  box-shadow: var(--sh);
+}
+
+.card-hover {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--sh-lg);
+  border-color: transparent;
+}
+
+/* ─────────────────────────────────────────
+   SECTION LAYOUT HELPERS
+───────────────────────────────────────── */
+.section-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+.section-eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--blue);
+  margin-bottom: 14px;
+}
+
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(36px, 5vw, 64px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  color: var(--ink);
+  line-height: 0.95;
+  margin-bottom: 16px;
+}
+
+.section-title em {
+  font-family: 'Instrument Serif', serif;
+  font-weight: 400;
+  color: var(--blue);
+  font-style: italic;
+}
+
+.section-sub {
+  font-size: 17px;
+  color: var(--muted);
+  max-width: 500px;
+  line-height: 1.65;
+  font-weight: 300;
+}
+
+/* ─────────────────────────────────────────
+   FORM ELEMENTS
+───────────────────────────────────────── */
+.inp {
+  width: 100%;
+  padding: 10px 13px;
+  border: 1.5px solid var(--divider);
+  border-radius: var(--rad-sm);
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--ink);
+  background: var(--surface);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+}
+
+.inp:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(18,70,255,.1);
+}
+
+.inp::placeholder {
+  color: var(--pale);
+}
+
+label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink3);
+  display: block;
+  margin-bottom: 5px;
+  letter-spacing: -0.01em;
+}
+
+/* ─────────────────────────────────────────
+   GRAIN TEXTURE OVERLAY
+───────────────────────────────────────── */
+.grain-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─────────────────────────────────────────
+   SEAT GRID ATOMS
+───────────────────────────────────────── */
+.seat {
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.seat::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: 3px;
+  right: 3px;
+  height: 4px;
+  border-radius: 2px 2px 0 0;
+}
+
+.seat-free   { background: #D1FAE5; color: #065F46; }
+.seat-free::before { background: #10B981; }
+.seat-taken  { background: #FEE2E2; color: #991B1B; }
+.seat-taken::before { background: #EF4444; }
+.seat-sel    { background: #DBEAFE; color: #1D4ED8; box-shadow: 0 0 0 2px #1D4ED8; }
+.seat-sel::before { background: #1D4ED8; }
+
+.seat:hover:not(.seat-taken) {
+  transform: translateY(-2px);
+}
+
+/* ─────────────────────────────────────────
+   NOTIFICATION PILL
+───────────────────────────────────────── */
+.notif-pill {
+  position: absolute;
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  padding: 9px 14px;
+  box-shadow: 0 8px 24px rgba(10,13,18,.12);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 190px;
+  animation: notifSlideIn 0.4s ease both;
+}
+
+.notif-pill .np-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────
+   DASHBOARD LAYOUT
+───────────────────────────────────────── */
+.dashboard-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: var(--nav-w);
+  background: var(--surface);
+  border-right: 1px solid var(--divider);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  z-index: 200;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.topbar {
+  height: var(--top-h);
+  background: var(--surface);
+  border-bottom: 1px solid var(--divider);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 12px;
+  flex-shrink: 0;
+  z-index: 100;
+}
+
+/* ─────────────────────────────────────────
+   STATS CARD
+───────────────────────────────────────── */
+.stat-card {
+  background: var(--surface);
+  border-radius: var(--rad);
+  border: 1px solid var(--divider);
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 2px 2px 0 0;
+}
+
+.stat-blue::after  { background: linear-gradient(90deg, var(--blue), #4A7CFF); }
+.stat-green::after { background: linear-gradient(90deg, var(--green), var(--green2)); }
+.stat-amber::after { background: linear-gradient(90deg, #C96A00, #F59E0B); }
+.stat-purple::after{ background: linear-gradient(90deg, #6B3FD4, #A855F7); }
+
+/* ─────────────────────────────────────────
+   RESPONSIVE HELPERS
+───────────────────────────────────────── */
+@media (max-width: 768px) {
+  .section-container {
+    padding: 0 20px;
+  }
+
+  .hide-mobile { display: none !important; }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    transform: translateX(-100%);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+    box-shadow: 4px 0 40px rgba(10,13,18,.15);
+  }
+}
+
+@media (min-width: 769px) {
+  .hide-desktop { display: none !important; }
+}
+
+/* ─────────────────────────────────────────
+   LOADING SHIMMER
+───────────────────────────────────────── */
+.shimmer {
+  background: linear-gradient(90deg, var(--bg) 25%, var(--warm) 50%, var(--bg) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--rad-sm);
+}
+
+/* ─────────────────────────────────────────
+   FOCUS VISIBLE (a11y)
+───────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ─────────────────────────────────────────
+   TABLE
+───────────────────────────────────────── */
+table { width: 100%; border-collapse: collapse; }
+thead tr { border-bottom: 2px solid var(--divider); }
+th {
+  text-align: left;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--pale);
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+td {
+  padding: 11px 12px;
+  font-size: 13px;
+  color: var(--ink3);
+  border-bottom: 1px solid var(--divider);
+  vertical-align: middle;
+}
+
+/* ─────────────────────────────────────────
+   MISC
+───────────────────────────────────────── */
+.divider { height: 1px; background: var(--divider); }
+.hr { height: 1px; background: var(--divider); margin: 12px 0; }
+
+img, video { display: block; max-width: 100%; }
+
+@keyframes shimmer {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.45; }
+}
+
+/* These were duplicated inside 4 component <style> blocks. Now central. */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ═════════════════════════════════════════════════════════════════════════
+   DASHBOARD COMPONENT CLASSES (owner / staff / student)
+   ─────────────────────────────────────────────────────────────────────────
+   These classes back the shared components in components/owner/ui,
+   components/staff/ui, etc. (Card, StatusBadge, StatCard, EmptyState,
+   Toggle, ...). Added so those components render via CSS classes instead
+   of re-deriving the same inline `style={{...}}` object on every render.
+
+   DESIGN: every value below is copied EXACTLY from the existing inline
+   styles in lib/constants/theme.ts and the components that used them — no
+   visual change versus what's on screen today. The --dash-* variables here
+   intentionally mirror theme.ts's exported JS constants (ACCENT, BORDER,
+   TEXT_PRIMARY, etc.) so colors have ONE source of truth in spirit, even
+   though CSS and JS can't literally share a single file. If you ever
+   change a color in theme.ts, change the matching --dash-* variable here
+   too — they're listed in the same order as theme.ts for easy diffing.
+
+   This block only covers patterns already proven out in components/owner/ui.
+   Extend it incrementally as you convert more components — don't try to
+   pre-build classes for styles that don't exist yet.
+═════════════════════════════════════════════════════════════════════════ */
+:root {
+  /* Mirrors lib/constants/theme.ts — keep these two files in sync */
+  --dash-accent:        #0D7C54;
+  --dash-accent-light:  #D1FAE5;
+  --dash-blue:          #1E5CFF;
+  --dash-blue-dark:     #1447D4;
+  --dash-blue-light:    #E8EFFE;
+  --dash-teal:          #0597A7;
+  --dash-purple:        #7C3AED;
+  --dash-amber:         #F59E0B;
+  --dash-red:           #EF4444;
+
+  --dash-text-primary:   #0A0D12;
+  --dash-text-secondary: #6B7689;
+  --dash-text-muted:     #9AAAB8;
+  --dash-border:         #E2DDD4;
+  --dash-bg-card:        #FDFCF9;
+  --dash-bg-page:        #F4F7FB;
+  --dash-bg-hover:       #F0EDE8;
+
+  --dash-font-display: 'Syne', sans-serif;
+  --dash-font-body:    'DM Sans', sans-serif;
+
+  --dash-shadow-sm:     0 2px 8px rgba(10,13,18,.04);
+  --dash-shadow-md:     0 6px 24px rgba(10,13,18,.10);
+  --dash-shadow-accent: 0 2px 10px rgba(13,124,84,.25);
+}
+
+/* ── Card — components/owner/ui/Card.tsx ─────────────────────────────────
+ * Default padding (18px 20px) and the hoverable shadow transition are kept
+ * as inline overrides in the component, since those vary per usage; only
+ * the part that was IDENTICAL on every single Card render moves here. */
+.dash-card {
+  background:    var(--dash-bg-card);
+  border:        1px solid var(--dash-border);
+  border-radius: 14px;
+  box-shadow:    var(--dash-shadow-sm);
+}
+.dash-card--hoverable {
+  transition: box-shadow .15s;
+}
+.dash-card--hoverable:hover {
+  box-shadow: var(--dash-shadow-md);
+}
+
+/* ── StatusBadge / ColorBadge — components/owner/ui/Badge.tsx ──────────── */
+.dash-badge {
+  display:       inline-block;
+  padding:       3px 10px;
+  border-radius: 20px;
+  font-size:     11px;
+  font-weight:   600;
+  white-space:   nowrap;
+}
+
+/* ── StatCard — components/owner/ui/StatCard.tsx ─────────────────────────
+ * Layout (flex, gaps) stays inline since it's structural, not styling —
+ * only the repeated visual treatment (background/border/shadow/typography)
+ * moves to classes. */
+.dash-stat-card {
+  background:    var(--dash-bg-card);
+  border:        1px solid var(--dash-border);
+  border-radius: 14px;
+  box-shadow:    var(--dash-shadow-sm);
+}
+.dash-stat-card__label {
+  font-size:      11px;
+  font-weight:    600;
+  color:          var(--dash-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.dash-stat-card__value {
+  font-size:      26px;
+  font-weight:    800;
+  font-family:    var(--dash-font-display);
+  color:          var(--dash-text-primary);
+  letter-spacing: -0.02em;
+}
+.dash-stat-card__delta-sub {
+  color:       var(--dash-text-muted);
+  font-weight: 400;
+}
+
+/* ── EmptyState — components/owner/ui/EmptyState.tsx ─────────────────────── */
+.dash-empty-state {
+  text-align: center;
+  padding:    48px 0;
+  color:      var(--dash-text-muted);
+}
+.dash-empty-state__icon {
+  font-size:     40px;
+  margin-bottom: 10px;
+}
+.dash-empty-state__title {
+  font-size:     15px;
+  font-weight:   700;
+  color:         var(--dash-text-primary);
+  margin-bottom: 4px;
+}
+.dash-empty-state__subtitle {
+  font-size:     13px;
+  color:         var(--dash-text-secondary);
+  margin-bottom: 16px;
+}
+
+/* ── Toggle — components/owner/ui/Toggle.tsx ─────────────────────────────
+ * The dot's position genuinely depends on the `on` boolean at runtime, so
+ * it's driven by a CSS variable (--toggle-dot-left) set inline by the
+ * component rather than a static class — everything else about the toggle
+ * is static and lives here. */
+.dash-toggle {
+  width:          36px;
+  height:         20px;
+  border-radius:  10px;
+  border:         none;
+  position:       relative;
+  padding:        0;
+  flex-shrink:    0;
+  transition:     background .2s;
+  cursor:         pointer;
+}
+.dash-toggle:disabled {
+  cursor:  not-allowed;
+  opacity: 0.6;
+}
+.dash-toggle__dot {
+  width:          14px;
+  height:         14px;
+  border-radius:  50%;
+  background:     #fff;
+  position:       absolute;
+  top:            3px;
+  left:           var(--toggle-dot-left, 3px);
+  transition:     left .2s;
+  box-shadow:     0 1px 3px rgba(0,0,0,.15);
+}
+
+/* ── Dashboard form input — matches INP_STYLE in lib/constants/theme.ts ─── */
+.dash-input {
+  width:          100%;
+  padding:        10px 12px;
+  border:         1.5px solid var(--dash-border);
+  border-radius:  9px;
+  font-size:      13px;
+  color:          var(--dash-text-primary);
+  font-family:    var(--dash-font-body);
+  background:     var(--dash-bg-card);
+  outline:        none;
+  box-sizing:     border-box;
+}
+.dash-input:focus {
+  border-color: var(--dash-blue);
+  box-shadow:   0 0 0 3px rgba(30,92,255,.1);
+}
