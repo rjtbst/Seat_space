@@ -163,7 +163,7 @@ export default function RefundsPage() {
         eyebrow="Legal"
         title="Refund & Cancellation Policy"
         lastUpdated="20 July 2026"
-        intro="How cancellations and refunds work for seat bookings and membership plans on StudySpace."
+        intro="How cancellations and refunds work for seat bookings and membership plans on seatspace."
         sections={sections}
       />
       <Footer />

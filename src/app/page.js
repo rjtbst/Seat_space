@@ -8,13 +8,13 @@ import ExplorePlatform from '@/components/landing/ExplorePlatform'
 import PricingCta from '@/components/landing/PricingCta'
 
 export const metadata = {
-  title: 'StudySpace \u2014 Fill Every Seat. Run the Whole Library.',
+  title: 'seatspace \u2014 Fill Every Seat. Run the Whole Library.',
   description:
-    'StudySpace helps students discover and book study library seats nearby, and gives owners one place to run seats, staff, payments, memberships and books.',
+    'seatspace helps students discover and book study library seats nearby, and gives owners one place to run seats, staff, payments, memberships and books.',
   alternates: { canonical: '/' },
   openGraph: {
     url: '/',
-    title: 'StudySpace \u2014 Fill Every Seat. Run the Whole Library.',
+    title: 'seatspace \u2014 Fill Every Seat. Run the Whole Library.',
     description:
       'Students find and book seats nearby. Owners run the whole library \u2014 seats, staff, payments, memberships and books \u2014 from one place.',
   },

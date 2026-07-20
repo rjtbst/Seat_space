@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────
-   StudySpace — Site Configuration
+   seatspace — Site Configuration
    Single source of truth for content & tokens
 ───────────────────────────────────────────────── */
 export const STATE_CITY_MAP: Record<string, string[]> = {
@@ -10,19 +10,19 @@ export const STATE_CITY_MAP: Record<string, string[]> = {
 
 
 export const SITE = {
-  name: 'StudySpace',
+  name: 'seatspace',
   tagline: 'Book Your Study Seat',
   description:
     'Find the perfect study library near you, see live seat availability, and reserve your spot — all before you leave home.',
-  url: 'https://StudySpace.in',
+  url: 'https://seatspace.in',
   location: 'Haldwani, UP',
   contact: {
-    email: 'hello@StudySpace.in',
+    email: 'support@seatspace.in',
     whatsapp: '+91-XXXXXXXXXX',
   },
   social: {
-    twitter: 'https://twitter.com/StudySpace',
-    instagram: 'https://instagram.com/StudySpace',
+    twitter: 'https://twitter.com/seatspace',
+    instagram: 'https://instagram.com/seatspace',
   },
 } as const
 
@@ -276,7 +276,7 @@ export interface Testimonial {
 
 export const TESTIMONIALS: Testimonial[] = [
   {
-    text: 'I used to waste 30 minutes every morning checking if my favourite seat was free. StudySpace ended that. Book in 60 seconds the night before.',
+    text: 'I used to waste 30 minutes every morning checking if my favourite seat was free. seatspace ended that. Book in 60 seconds the night before.',
     name: 'Aarav Sharma',
     role: 'UPSC Aspirant, Haldwani',
     color: '#1246FF',

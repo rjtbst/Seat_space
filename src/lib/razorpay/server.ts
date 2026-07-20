@@ -274,7 +274,7 @@ export async function createPlatformSubscriptionPlan(): Promise<
         period: 'monthly',
         interval: 1,
         item: {
-          name: 'StudySpace Platform Subscription',
+          name: 'seatspace Platform Subscription',
           amount: 39900, // ₹399.00 in paise
           currency: 'INR',
           description: 'Monthly platform subscription per library listing',

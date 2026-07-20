@@ -248,7 +248,7 @@ export default function TermsPage() {
         eyebrow="Legal"
         title="Terms of Service"
         lastUpdated="20 July 2026"
-        intro="These Terms govern your use of the StudySpace platform, whether you're booking a study seat, subscribing to a membership plan, or listing a library."
+        intro="These Terms govern your use of the seatspace platform, whether you're booking a study seat, subscribing to a membership plan, or listing a library."
         sections={sections}
       />
       <Footer />

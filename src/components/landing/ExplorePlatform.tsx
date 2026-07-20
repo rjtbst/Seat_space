@@ -184,7 +184,7 @@ export default function ExplorePlatform() {
           </h2>
           <p className="text-[15px] text-muted">
             A management tool only matters if seats are filling. So half of
-            StudySpace is the part that puts your library in front of
+            seatspace is the part that puts your library in front of
             students searching nearby \u2014 the other half is what happens once
             they walk in.
           </p>

@@ -35,7 +35,7 @@ export default function AdminSidebar({ adminName }: { adminName: string }) {
           <p style={{ color: '#fff', fontWeight: 800, fontSize: 15, margin: 0, fontFamily: 'Syne, sans-serif' }}>
             Platform Admin
           </p>
-          <p style={{ color: '#8B95A5', fontSize: 11, margin: 0 }}>StudySpace</p>
+          <p style={{ color: '#8B95A5', fontSize: 11, margin: 0 }}>seatspace</p>
         </div>
       </div>
 

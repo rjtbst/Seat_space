@@ -2,7 +2,7 @@
 'use client'
 
 /**
- * Premium seat map component — redesigned for StudySpace.
+ * Premium seat map component — redesigned for seatspace.
  *
  * Changes from v1:
  * - Larger seats (44px → 48px on desktop, 40px mobile) with better tap targets

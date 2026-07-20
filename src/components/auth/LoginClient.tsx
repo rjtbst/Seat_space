@@ -172,7 +172,7 @@ function LoginContent() {
             <p style={{ fontSize: 14, color: '#6B7689', fontWeight: 300, lineHeight: 1.5, margin: 0 }}>
               {isSignup
                 ? (isOwner ? 'Create your owner account in 60 seconds.' : 'Book your study seat in 60 seconds.')
-                : 'Sign in to your StudySpace account.'}
+                : 'Sign in to your seatspace account.'}
             </p>
           </div>
 

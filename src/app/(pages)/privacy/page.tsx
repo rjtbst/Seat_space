@@ -133,7 +133,7 @@ export default function PrivacyPage() {
         eyebrow="Legal"
         title="Privacy Policy"
         lastUpdated="20 July 2026"
-        intro="This explains what personal information StudySpace collects, why, and how it's protected — for students, library owners, and staff alike."
+        intro="This explains what personal information seatspace collects, why, and how it's protected — for students, library owners, and staff alike."
         sections={sections}
       />
       <Footer />

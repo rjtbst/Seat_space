@@ -26,7 +26,7 @@ export default function Hero() {
             Get paid <span className="text-blue">on schedule</span>.
           </h1>
           <p className="text-[17px] text-muted leading-relaxed max-w-[440px] mb-8">
-            StudySpace is the operating system for a study library — seats,
+            seatspace is the operating system for a study library — seats,
             walk-ins, staff, payments, memberships and books, all running from
             one place. Not a booking widget bolted onto how you already run
             things.

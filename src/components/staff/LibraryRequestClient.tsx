@@ -321,7 +321,7 @@ export default function LibraryRequestClient({
         </div>
 
         <p style={{ textAlign: 'center', marginTop: 16, fontSize: 12, color: '#9AAAB8', lineHeight: 1.6 }}>
-          Can't find your library? Ask the owner to ensure it's registered and active on StudySpace.
+          Can't find your library? Ask the owner to ensure it's registered and active on seatspace.
         </p>
       </div>
 

@@ -10,7 +10,7 @@ export const publicTools: ToolDefinition[] = [
   {
     name: 'searchLibraries',
     description:
-      'Search for study libraries on StudySpace by city, area, or a free-text query. Returns library cards with pricing, amenities, and live seat counts.',
+      'Search for study libraries on seatspace by city, area, or a free-text query. Returns library cards with pricing, amenities, and live seat counts.',
     parameters: {
       type: 'object',
       properties: {
@@ -52,7 +52,7 @@ export const publicTools: ToolDefinition[] = [
   },
   {
     name: 'listAmenities',
-    description: 'List all amenity types StudySpace libraries can offer (e.g. AC, WiFi, Locker).',
+    description: 'List all amenity types seatspace libraries can offer (e.g. AC, WiFi, Locker).',
     parameters: { type: 'object', properties: {} },
     roles: ['guest', 'student', 'owner', 'staff', 'admin'],
     handler: async () => ({ amenities: await getAllAmenities() }),

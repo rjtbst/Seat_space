@@ -6,7 +6,7 @@ import { OwnerProvider } from '@/contexts/OwnerContext'
 import OwnerSidebar from '@/components/owner/OwnerSidebar'
 import { NavProgressBar } from '@/components/owner/NavProgressBar'
 
-export const metadata = { title: 'Owner Dashboard — StudySpace' }
+export const metadata = { title: 'Owner Dashboard — seatspace' }
 
 export default async function OwnerDashboardLayout({ children }: { children: React.ReactNode }) {
   // requireActiveRole (not requireRole): a terminal destination, so it

@@ -86,7 +86,7 @@ function SubscriptionPanel({ library }: { library: OwnerLibrary }) {
       openSubscriptionCheckout({
         subscriptionId: res.data.razorpaySubscriptionId,
         keyId: res.data.keyId,
-        name: 'StudySpace',
+        name: 'seatspace',
         description: '₹399/month platform subscription',
         prefill: res.data.prefill,
         onSuccess: async (paymentId, subscriptionId, signature) => {

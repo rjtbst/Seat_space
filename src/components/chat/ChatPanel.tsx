@@ -56,7 +56,7 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
             <Sparkles size={16} className="text-white" />
           </div>
           <div>
-            <h3 className="font-semibold text-cream text-sm">StudySpace Assistant</h3>
+            <h3 className="font-semibold text-cream text-sm">seatspace Assistant</h3>
             <p className="text-[11px] text-pale">Ask about bookings, plans, or your library</p>
           </div>
         </div>

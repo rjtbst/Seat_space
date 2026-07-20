@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { NAV_LINKS } from '@/lib/config'
 import { useStickyNav } from '@/hooks'
-
+import Image from "next/image";
 function smoothScroll(href) {
   if (!href.startsWith('#')) return false
   const el = document.querySelector(href)
@@ -41,18 +41,16 @@ export default function Navbar() {
         )}
       >
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 flex-1 group">
-          <div className="w-8 h-8 rounded-[9px] bg-blue flex items-center justify-center shadow-blue flex-shrink-0 transition-transform group-hover:scale-105">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <rect x="2" y="2" width="5" height="7" rx="1.5" fill="white" fillOpacity="0.9"/>
-              <rect x="9" y="2" width="5" height="5" rx="1.5" fill="white" fillOpacity="0.6"/>
-              <rect x="2" y="11" width="12" height="3" rx="1.5" fill="white" fillOpacity="0.4"/>
-            </svg>
-          </div>
-          <span className="text-[19px] tracking-[-0.3px] text-ink font-serif">
-            Library<span className="text-blue font-bold" style={{ fontFamily: 'inherit' }}>Space</span>
-          </span>
-        </Link>
+       <Link href="/" className="flex items-center gap-2.5 flex-1 group">
+  <Image
+    src="/logo.png" // or "/logo.svg"
+    alt="LibrarySpace Logo"
+    width={70}
+    height={70}
+    className=" transition-transform duration-200 group-hover:scale-105"
+    priority
+  />
+</Link>
 
         {/* Desktop nav links */}
         <div className="hidden md:flex items-center gap-7">

@@ -81,7 +81,7 @@ export default function StaffSidebar({
               fontSize: 13, fontWeight: 800, fontFamily: 'Syne, sans-serif',
               color: '#0A0D12', letterSpacing: '-0.02em',
             }}>
-              StudySpace
+              seatspace
             </div>
             <div style={{ fontSize: 10, color: '#9AAAB8', fontWeight: 500 }}>
               {isSenior ? 'Senior Staff' : 'Staff Portal'}

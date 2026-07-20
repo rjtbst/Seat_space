@@ -81,7 +81,7 @@ export default function Transformation() {
                 cols={COLS}
                 cellSize={22}
                 gap={5}
-                label="Live seat grid after adopting StudySpace"
+                label="Live seat grid after adopting seatspace"
               />
               <p className="text-[13px] text-muted mt-6 text-center max-w-[420px]">
                 A walk-in gets assigned onto this exact grid — the same seat

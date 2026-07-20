@@ -91,7 +91,7 @@ function SidebarContent({
           }}>📚</div>
           <div>
             <div style={{ fontSize: 14, fontWeight: 800, fontFamily: FONT_DISPLAY, color: '#0A0D12', letterSpacing: '-0.02em' }}>
-              StudySpace
+              seatspace
             </div>
             <div style={{ fontSize: 10, color: '#9AAAB8', fontWeight: 500 }}>Owner Portal</div>
           </div>
@@ -195,7 +195,7 @@ export default function OwnerSidebar() {
           </button>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{ width: 28, height: 28, borderRadius: 8, background: ACCENT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>📚</div>
-            <span style={{ fontSize: 14, fontWeight: 800, fontFamily: FONT_DISPLAY, color: '#0A0D12', letterSpacing: '-0.02em' }}>StudySpace</span>
+            <span style={{ fontSize: 14, fontWeight: 800, fontFamily: FONT_DISPLAY, color: '#0A0D12', letterSpacing: '-0.02em' }}>seatspace</span>
           </div>
           <div style={{ width: 32, height: 32, borderRadius: '50%', background: ACCENT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, color: '#fff', fontWeight: 700 }}>
             {ownerName.charAt(0).toUpperCase()}
