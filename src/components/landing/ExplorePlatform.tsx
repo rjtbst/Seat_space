@@ -43,19 +43,19 @@ const ROLE_TABS: {
     key: 'students',
     label: 'Students',
     icon: GraduationCap,
-    blurb: 'This is what fills your seats \u2014 the search that ends at your front door.',
+    blurb: 'Search nearby, see real seats, book the one you want \u2014 no calls, no walking in to check first.',
   },
   {
     key: 'owners',
     label: 'Library owners',
     icon: Building2,
-    blurb: 'The business outcomes you actually care about.',
+    blurb: 'The business outcomes you actually care about \u2014 seats filled, revenue tracked, nothing left to a register.',
   },
   {
     key: 'staff',
     label: 'Front-desk staff',
     icon: Users,
-    blurb: 'The floor, without a paper register.',
+    blurb: 'The floor, without a paper register \u2014 one map for who\u2019s booked, who\u2019s in, and who just walked up.',
   },
 ]
 
@@ -134,7 +134,7 @@ function StudentPanel() {
           label="A student's live view of seat availability"
         />
         <p className="text-[12.5px] text-pale mt-4 text-center">
-          Live, before they've left home \u2014 no phone call needed.
+          Live, before they've left home — no phone call needed.
         </p>
       </div>
 
@@ -176,17 +176,14 @@ export default function ExplorePlatform() {
     <section id="explore-platform" className="py-20 md:py-28 px-6 md:px-10 bg-warm/40">
       <div className="max-w-[1100px] mx-auto">
         <div className="reveal text-center max-w-[640px] mx-auto mb-12">
-          <span className="chip chip-gold mb-4">More than a dashboard</span>
+          <span className="chip chip-gold mb-4">Pick your side of the counter</span>
           <h2 className="font-syne font-extrabold text-display-md text-ink mb-4">
-            We don&apos;t just help you run the library.
-            <br />
-            We help students find it.
+            One platform. Three different jobs to do.
           </h2>
           <p className="text-[15px] text-muted">
-            A management tool only matters if seats are filling. So half of
-            seatspace is the part that puts your library in front of
-            students searching nearby \u2014 the other half is what happens once
-            they walk in.
+            Tap the tab that's yours. Students search and book, owners run
+            the business behind it, and staff work the floor — all off the
+            same live seat map.
           </p>
         </div>
 

@@ -2,7 +2,14 @@
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import Link from 'next/link'
-import { SITE, STATS, ROLES } from '@/lib/config'
+import { SITE, ROLES } from '@/lib/config'
+
+const CAPABILITIES = [
+  { icon: '🗺️', label: 'Live seat availability' },
+  { icon: '📱', label: 'QR check-in' },
+  { icon: '💳', label: 'Online payments' },
+  { icon: '🏛️', label: 'Multi-library dashboard' },
+] as const
 
 export const metadata = {
   title: 'About',
@@ -35,15 +42,13 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* Stats band */}
+        {/* Capability strip — what's actually built, not invented usage numbers */}
         <section className="border-y border-divider bg-cream/40 py-14 px-6 md:px-10">
           <div className="max-w-[900px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            {STATS.map(s => (
-              <div key={s.label}>
-                <div className="font-syne text-[28px] md:text-[34px] font-extrabold text-ink">
-                  {s.value.toLocaleString('en-IN')}{s.suffix}
-                </div>
-                <div className="text-[12px] text-muted mt-1">{s.label}</div>
+            {CAPABILITIES.map(c => (
+              <div key={c.label}>
+                <div className="text-[26px] md:text-[30px]">{c.icon}</div>
+                <div className="text-[12px] text-muted mt-2">{c.label}</div>
               </div>
             ))}
           </div>

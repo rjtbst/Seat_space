@@ -3,57 +3,64 @@
 import Link from 'next/link'
 import { Check } from 'lucide-react'
 
-const COSTS = [
-  {
-    title: '₹399/month',
-    detail: 'to list a library and appear in student search — flat, not per seat.',
-  },
-  {
-    title: 'A fee on top, not off the top',
-    detail:
-      "added to what the student pays at checkout. You receive exactly the price you set.",
-  },
-  // {
-  //   title: '5% on membership plans',
-  //   detail: 'sold through the platform — lower than the booking fee, on purpose.',
-  // },
+// Every line reflects a real, shipped capability — no "unlimited X" claims
+// that aren't actually enforced/unenforced in the schema, and no channels
+// (like WhatsApp reminders) that don't actually exist yet.
+const INCLUDED = [
+  'No per-seat or per-student fee',
+  'Online bookings and walk-ins, one dashboard',
+  'Membership plans and renewals',
+  'Coupon codes for promotions',
+  'Time-slot based pricing',
+  'Staff accounts with QR check-in',
+  'Multiple libraries, one login',
+  'Book issue and return tracking',
+  'Listed in student search',
 ]
 
 export default function PricingCta() {
   return (
-    <section id="pricing" className="py-20 md:py-28 px-6 md:px-10">
+    <section id="pricing" className="py-20 md:py-16 px-6 md:px-10">
       <div className="max-w-[900px] mx-auto">
         <div className="reveal text-center max-w-[560px] mx-auto mb-12">
+          <span className="chip chip-green mb-4">For library owners — 14-day free trial on your first library</span>
           <h2 className="font-syne font-extrabold text-display-md text-ink mb-4">
             What it costs. Plainly.
           </h2>
           <p className="text-[15px] text-muted">
-            No tiers to compare, no trial that expires partway through your
-            first month.
+            ₹399/month per library, flat, plus a small fee added to what the
+            student pays at checkout — you receive exactly the price you
+            set. No tiers to compare, no card needed for the trial.
           </p>
         </div>
 
-        <div className="reveal delay-200 grid md:grid-cols-2 gap-5 mb-14">
-          {COSTS.map((c) => (
-            <div key={c.title} className="card p-6">
-              <div className="w-8 h-8 rounded-[9px] bg-blue-lt flex items-center justify-center mb-4">
-                <Check size={15} className="text-blue-dk" />
+        <div className="reveal delay-200 card p-7 md:p-8 mb-14">
+          <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3">
+            {INCLUDED.map((item) => (
+              <div key={item} className="flex items-start gap-2.5">
+                <Check size={15} className="text-green mt-0.5 flex-shrink-0" />
+                <span className="text-[13.5px] text-ink-2">{item}</span>
               </div>
-              <h3 className="font-syne font-bold text-[17px] text-ink mb-2">{c.title}</h3>
-              <p className="text-[13.5px] text-muted leading-relaxed">{c.detail}</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         <div className="reveal delay-400 rounded-[24px] bg-ink px-8 py-14 md:py-16 text-center">
-          <p className="font-serif italic text-[26px] md:text-[32px] text-white leading-snug max-w-[620px] mx-auto mb-8">
-            This isn&apos;t just software for running your library. It&apos;s
-            how students find it, too — and everything that happens after
-            they do.
+          <h3 className="font-syne font-extrabold text-[24px] md:text-[30px] text-white mb-3">
+            Ready to modernize your library?
+          </h3>
+          <p className="text-[15px] text-white/70 max-w-[480px] mx-auto mb-8">
+            Simplify operations, get found by students searching nearby, and
+            run the whole thing from one dashboard.
           </p>
-          <Link href="/login?mode=signup" className="btn btn-primary btn-hero">
-            List your library →
-          </Link>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Link href="/login?mode=signup" className="btn btn-primary btn-hero">
+              Start your 14-day free trial →
+            </Link>
+            <Link href="/explore" className="btn btn-outline btn-hero !text-white !border-white/30 hover:!bg-white/10">
+              Explore libraries
+            </Link>
+          </div>
         </div>
       </div>
     </section>

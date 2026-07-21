@@ -14,31 +14,53 @@ export default function Hero() {
   return (
     <section
       id="recognition"
-      className="relative pt-32 pb-20 md:pt-40 md:pb-28 px-6 md:px-10 overflow-hidden"
+      className="relative pt-16 pb-20 md:pt-24 md:pb-12 px-6 md:px-10 overflow-hidden"
     >
       <div className="max-w-[1200px] mx-auto grid lg:grid-cols-[1.05fr_1fr] gap-14 lg:gap-10 items-center">
         {/* Outcome */}
         <div className="reveal">
-          <span className="chip chip-blue mb-5">For study library owners</span>
+          <span className="chip chip-blue mb-5">The platform behind your local study library</span>
           <h1 className="font-syne font-extrabold text-display-lg text-ink mb-5">
-            Fill every seat.
+            Find your seat.
             <br />
-            Get paid <span className="text-blue">on schedule</span>.
+            <span className="text-blue">Run</span> your library.
           </h1>
           <p className="text-[17px] text-muted leading-relaxed max-w-[440px] mb-8">
-            seatspace is the operating system for a study library — seats,
-            walk-ins, staff, payments, memberships and books, all running from
-            one place. Not a booking widget bolted onto how you already run
-            things.
+            seatspace connects students to real study libraries nearby with
+            live seat availability — and gives owners one dashboard to run
+            seats, staff, payments, memberships and books, and grow
+            occupancy without guesswork.
           </p>
-          <div className="flex flex-wrap items-center gap-3">
-            <Link href="/login?mode=signup" className="btn btn-primary btn-hero">
-              List your library →
+
+          {/* Two clear paths — same product, different job to do */}
+          <div className="grid sm:grid-cols-2 gap-3 max-w-[460px]">
+            <Link
+              href="/explore"
+              className="card p-4 hover:border-ink/30 transition-colors"
+            >
+              <div className="text-[12px] font-semibold text-blue-dk uppercase tracking-wide mb-1">
+                I'm a student
+              </div>
+              <div className="text-[13.5px] text-ink-2 leading-snug">
+                Find and book a seat nearby →
+              </div>
             </Link>
-            <a href="#transformation" className="btn btn-outline btn-hero">
-              See what changes
-            </a>
+            <Link
+              href="/login?mode=signup"
+              className="card p-4 hover:border-ink/30 transition-colors"
+            >
+              <div className="text-[12px] font-semibold text-blue-dk uppercase tracking-wide mb-1">
+                I run a library
+              </div>
+              <div className="text-[13.5px] text-ink-2 leading-snug">
+                Start your 14-day free trial →
+              </div>
+            </Link>
           </div>
+          <p className="text-[12.5px] text-pale mt-4">
+            Free to search and book as a student. No credit card required to
+            trial your first library for 14 days.
+          </p>
         </div>
 
         {/* Living seat grid */}
@@ -68,8 +90,8 @@ export default function Hero() {
             </div>
           </div>
           <p className="text-[12px] text-pale mt-3 text-center">
-            This is the same seat grid a student sees, and the same one staff
-            use at the desk — animated here to show how it behaves.
+            This is the same seat grid a student books from, the same one
+            staff use at the desk, and the same one an owner watches fill up.
           </p>
         </div>
       </div>

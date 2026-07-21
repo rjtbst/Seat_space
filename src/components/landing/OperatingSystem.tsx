@@ -46,7 +46,7 @@ export default function OperatingSystem() {
     <section id="operating-system" className="py-20 md:py-28 px-6 md:px-10">
       <div className="max-w-[1100px] mx-auto">
         <div className="reveal text-center max-w-[600px] mx-auto mb-12">
-          <span className="chip chip-gold mb-4">The heart of the platform</span>
+          <span className="chip chip-gold mb-4">For library owners — the heart of the platform</span>
           <h2 className="font-syne font-extrabold text-display-md text-ink mb-4">
             One dashboard. Every part of the business.
           </h2>
@@ -121,7 +121,7 @@ export default function OperatingSystem() {
           </Tile>
 
           {/* Branches */}
-          <Tile eyebrow="Branches" className="md:col-span-3">
+          <Tile eyebrow="Branches" className="">
             <div className="flex items-center gap-2 mb-3">
               <Building2 size={16} className="text-ink-3" />
               <span className="text-[13px] font-semibold text-ink">One login, every location</span>

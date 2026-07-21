@@ -28,6 +28,7 @@ export default function Transformation() {
     <section id="transformation" className="py-20 md:py-28 px-6 md:px-10 bg-warm/40">
       <div className="max-w-[1100px] mx-auto">
         <div className="reveal text-center max-w-[560px] mx-auto mb-12">
+          <span className="chip chip-blue mb-4">For library owners</span>
           <h2 className="font-syne font-extrabold text-display-md text-ink mb-4">
             The room didn&apos;t change.
             <br />

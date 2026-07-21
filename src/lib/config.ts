@@ -11,9 +11,9 @@ export const STATE_CITY_MAP: Record<string, string[]> = {
 
 export const SITE = {
   name: 'seatspace',
-  tagline: 'Book Your Study Seat',
+  tagline: 'Find a seat. Run a library.',
   description:
-    'Find the perfect study library near you, see live seat availability, and reserve your spot — all before you leave home.',
+    'seatspace connects students to real study libraries nearby with live seat availability, and gives owners one dashboard to run seats, staff, payments and books.',
   url: 'https://seatspace.in',
   location: 'Haldwani, UP',
   contact: {
@@ -44,19 +44,16 @@ export const COLORS = {
   surface: '#FDFCF9',
 } as const
 
-/* ─── Navigation ─── */
+/* ─── Navigation ───
+   `type: 'section'` links live on the homepage as in-page anchors. From any
+   other page the navbar routes home first and then scrolls to the section.
+   `type: 'page'` links are real routes and navigate normally. */
 export const NAV_LINKS = [
-  { label: 'How it changes things', href: '#transformation' },
-  { label: 'Explore the platform',  href: '#explore-platform' },
-  { label: 'Pricing',               href: '#pricing' },
-] as const
-
-/* ─── Stats band ─── */
-export const STATS = [
-  { value: 2400,  suffix: '+', label: 'Students active' },
-  { value: 48,    suffix: '',  label: 'Libraries onboarded' },
-  { value: 96,    suffix: '%', label: 'Occupancy rate' },
-  { value: 12000, suffix: '+', label: 'Bookings made' },
+  { label: 'How it works',         href: '#transformation',    type: 'section' },
+  { label: 'Explore the platform', href: '#explore-platform',  type: 'section' },
+  { label: 'Pricing',              href: '#pricing',           type: 'section' },
+  { label: 'About',                href: '/about',             type: 'page' },
+  { label: 'Contact',              href: '/contact',           type: 'page' },
 ] as const
 
 /* ─── Features ─── */
@@ -81,7 +78,7 @@ export const FEATURES: Feature[] = [
     icon: '⚡',
     title: 'Book in 60 Seconds',
     description:
-      'Select library, pick your seat, choose a time slot, pay — done. Confirmation lands on WhatsApp instantly.',
+      'Select library, pick your seat, choose a time slot, pay — your seat is confirmed on the spot.',
     accent: 'green',
   },
   {
@@ -169,7 +166,7 @@ export const ROLES: RoleCard[] = [
       'Instant booking & QR check-in',
       'Membership plans & top-up wallet',
       'Book borrowing with reminders',
-      'WhatsApp booking confirmations',
+      'WhatsApp-verified account, no spam sign-ups',
     ],
     accent: '#1246FF',
     variant: 'student',
@@ -204,114 +201,17 @@ export const ROLES: RoleCard[] = [
   },
 ] as const
 
-/* ─── Pricing ─── */
-export interface PricingPlan {
-  name: string
-  price: string
-  period: string
-  description: string
-  features: string[]
-  cta: string
-  featured?: boolean
-  badge?: string
-}
-
-export const PRICING_PLANS: PricingPlan[] = [
-  {
-    name: 'Basic',
-    price: 'Free',
-    period: 'forever',
-    description: 'For libraries just getting started.',
-    features: [
-      'Up to 1 library',
-      '30 seats max',
-      'Online booking page',
-      'QR check-in',
-      'Email support',
-    ],
-    cta: 'Start free',
-  },
-  {
-    name: 'Growth',
-    price: '₹999',
-    period: '/month',
-    description: 'For serious library businesses.',
-    features: [
-      'Up to 3 libraries',
-      'Unlimited seats',
-      'Membership plan builder',
-      'WhatsApp notifications',
-      'Revenue dashboard',
-      'Book lending module',
-      'Priority support',
-    ],
-    cta: 'Start 14-day trial',
-    featured: true,
-    badge: 'Most Popular',
-  },
-  {
-    name: 'Enterprise',
-    price: '₹2,499',
-    period: '/month',
-    description: 'For chains and franchise networks.',
-    features: [
-      'Unlimited libraries',
-      'Cross-library plans',
-      'Custom domain',
-      'API access',
-      'Dedicated account manager',
-      'Custom integrations',
-    ],
-    cta: 'Contact sales',
-  },
-] as const
-
-/* ─── Testimonials ─── */
-export interface Testimonial {
-  text: string
-  name: string
-  role: string
-  color: string
-}
-
-export const TESTIMONIALS: Testimonial[] = [
-  {
-    text: 'I used to waste 30 minutes every morning checking if my favourite seat was free. seatspace ended that. Book in 60 seconds the night before.',
-    name: 'Aarav Sharma',
-    role: 'UPSC Aspirant, Haldwani',
-    color: '#1246FF',
-  },
-  {
-    text: 'Our occupancy went from 60% to 92% in the first month. The real-time seat grid convinced students — they could see available seats before leaving home.',
-    name: 'Rahul Gupta',
-    role: 'Owner, Silence Study Hub',
-    color: '#0D7C54',
-  },
-  {
-    text: 'The QR check-in is magic. No more paper registers, no students claiming they booked when they didn\'t. Staff love it.',
-    name: 'Mohit Verma',
-    role: 'Staff, Silence Study Hub',
-    color: '#C8A84B',
-  },
-  {
-    text: 'The book due-date reminders are genius. We had chronic late returns before. Now 95% of books come back on time.',
-    name: 'Sunita Devi',
-    role: 'Librarian, Knowledge Park',
-    color: '#6B3FD4',
-  },
-  {
-    text: 'I manage 3 libraries from one dashboard. Revenue, occupancy, today\'s bookings — all in one view. Game changer for multi-branch ops.',
-    name: 'Priya Mishra',
-    role: 'Owner, 3 libraries in Haldwani',
-    color: '#D42B2B',
-  },
-  {
-    text: 'WhatsApp confirmations feel more personal than email. Students actually show up to their sessions now. No-show rate dropped massively.',
-    name: 'Vikas Agarwal',
-    role: 'Owner, EduNest Study Room',
-    color: '#0597A7',
-  },
-] as const
+/* ─── Pricing & testimonials ───
+   Intentionally removed: this file used to hardcode a 3-tier Free / Growth /
+   Enterprise pricing table and six named customer testimonials. Neither was
+   ever rendered anywhere (PricingCta.tsx has always shown the real, single
+   ₹399/month-per-library model instead), and the testimonials were invented
+   quotes attributed to people who don't exist — that's a real liability, not
+   just dead code, so it's gone rather than left to be wired in by accident.
+   The true pricing model lives in PricingCta.tsx and in
+   src/lib/actions/library.ts (first-library 14-day trial, ₹399/month
+   thereafter). If real testimonials are collected later, add a typed
+   Testimonial[] back here with verifiable names/roles. */
 
 /* ─── Demo libraries (hero / map) ─── */
 export const DEMO_LIBRARIES = [
@@ -321,11 +221,16 @@ export const DEMO_LIBRARIES = [
   { name: 'ReadSpace Centre',  area: 'Hapur Road', rating: 4.2, distance: '3.0 km', seats: 0,  open: false, pricePerHr: 15, color: '#EF4444', top: '65%', left: '35%' },
 ] as const
 
-/* ─── Footer links ─── */
+/* ─── Footer links ───
+   Every href below must resolve to a route or homepage anchor that actually
+   exists in src/app — 'Blog' and 'Careers' were removed because no such
+   pages exist yet (add them back once those routes are built). */
 export const FOOTER_LINKS = {
   Product: [
-    { label: 'How it works',        href: '/#transformation' },
+    { label: 'How it works',         href: '/#transformation' },
+    { label: 'The platform',         href: '/#operating-system' },
     { label: 'Explore the platform', href: '/#explore-platform' },
+    { label: 'FAQ',                  href: '/#faq' },
     { label: 'Pricing',              href: '/#pricing' },
   ],
   For: [
@@ -335,8 +240,6 @@ export const FOOTER_LINKS = {
   ],
   Company: [
     { label: 'About',      href: '/about' },
-    { label: 'Blog',       href: '/blog' },
-    { label: 'Careers',    href: '/careers' },
     { label: 'Contact',    href: '/contact' },
   ],
   Legal: [
