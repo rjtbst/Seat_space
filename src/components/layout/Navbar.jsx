@@ -64,7 +64,7 @@ export default function Navbar() {
        <Link href="/" className="flex items-center gap-2.5 flex-1 group">
   <Image
     src="/logo.png" // or "/logo.svg"
-    alt="LibrarySpace Logo"
+    alt="Seatspace Logo"
     width={70}
     height={70}
     className=" transition-transform duration-200 group-hover:scale-105"

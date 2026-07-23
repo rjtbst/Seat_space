@@ -385,10 +385,18 @@ export default function BookSeatClient({
   // after tapping Confirm.
   const subsForCurrentTime = useMemo(() => {
     if (!startTime || !endTime) return eligibleSubs
-    const bookingDate = new Date(`${selectedDate}T00:00:00+05:30`)
+    const startDate = new Date(`${selectedDate}T00:00:00+05:30`)
+    // A booking ending exactly at 00:00 ends on the NEXT calendar day —
+    // same rule resolveServerRange() uses for the actual submission.
+    // Using the start day's date for both start and end here would
+    // silently disagree with the server for a day-of-week restricted
+    // plan: the client would offer a "Fri-only" plan for a booking that
+    // actually ends Saturday, then the server would correctly reject it
+    // at confirm time.
+    const endDate = endTime === '00:00' ? new Date(startDate.getTime() + 86_400_000) : startDate
     return eligibleSubs.filter(s =>
       isWithinPlanTimeWindow(s, startTime, endTime) &&
-      isWithinPlanDaysOfWeek(s, bookingDate, bookingDate),
+      isWithinPlanDaysOfWeek(s, startDate, endDate),
     )
   }, [eligibleSubs, startTime, endTime, selectedDate])
 

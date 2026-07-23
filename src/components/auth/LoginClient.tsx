@@ -23,7 +23,7 @@ function Logo() {
         </svg>
       </div>
       <span style={{ fontSize: 22, fontFamily: 'Instrument Serif, serif', color: '#0A0D12' }}>
-        Library<span style={{ color: '#1246FF', fontFamily: 'Syne, sans-serif', fontWeight: 800 }}>Space</span>
+        Seat<span style={{ color: '#1246FF', fontFamily: 'Syne, sans-serif', fontWeight: 800 }}>Space</span>
       </span>
     </Link>
   )

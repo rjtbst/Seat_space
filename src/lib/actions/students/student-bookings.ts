@@ -57,6 +57,8 @@ import {
 
 /* ─── Shared result type ─────────────────────────────────────────────────── */
 import type { ActionResult, ActionOk, ActionErr } from '@/lib/actions/shared/action-result'
+import { sendWhatsappNotification } from '@/lib/whatsapp/notify'
+import { WA_TEMPLATES, bookingConfirmedParams, newBookingAlertParams, bookingCancelledParams } from '@/lib/whatsapp/templates'
 export type { ActionResult, ActionOk, ActionErr }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -410,7 +412,7 @@ export async function confirmBookingPayment(
   try {
     const { data: bkgDetail } = await supabase
       .from('bookings')
-      .select('library_id, start_time, end_time, seats(row_label, column_number), libraries(name)')
+      .select('library_id, start_time, end_time, seats(row_label, column_number), libraries(name, owner_id)')
       .eq('id', bookingId)
       .maybeSingle()
 
@@ -419,7 +421,9 @@ export async function confirmBookingPayment(
       const library = (bkgDetail as any).libraries
       const seatLabel = seat ? `${seat.row_label}${seat.column_number}` : 'your seat'
       const libName   = library?.name ?? 'the library'
+      const ownerId   = library?.owner_id as string | undefined
       const startIST  = bkgDetail.start_time as string
+      const startDisplay = startIST.slice(0, 16).replace('T', ' at ')
 
       await (supabase as any).from('notifications').insert({
         user_id:    user.id,
@@ -429,9 +433,44 @@ export async function confirmBookingPayment(
         event:      'booking_confirmed',
         status:     'sent',
         title:      'Booking Confirmed ✅',
-        body:       `Seat ${seatLabel} at ${libName} confirmed for ${startIST.slice(0, 16).replace('T', ' at ')}.`,
+        body:       `Seat ${seatLabel} at ${libName} confirmed for ${startDisplay}.`,
         payload:    JSON.stringify({ bookingId, seatLabel, libName, startTime: startIST }),
       })
+
+      // WhatsApp — fire-and-forget, never blocks the confirmed booking.
+      // Combines booking confirmation + payment receipt into one message.
+      const { data: paymentRow } = await supabase
+        .from('payments').select('amount').eq('booking_id', bookingId).eq('status', 'paid').maybeSingle()
+      const amountRupees = Number((paymentRow as any)?.amount ?? 0)
+
+      const { data: studentRow } = await supabase.from('users').select('full_name').eq('id', user.id).maybeSingle()
+      const studentName = (studentRow as any)?.full_name || 'there'
+
+      void sendWhatsappNotification(supabase, {
+        userId: user.id,
+        event: 'booking_confirmed',
+        title: 'Booking confirmed',
+        templateName: WA_TEMPLATES.BOOKING_CONFIRMED,
+        templateParams: bookingConfirmedParams({
+          studentName, seatLabel, libraryName: libName, startTimeDisplay: startDisplay, amountRupees,
+        }),
+        libraryId: bkgDetail.library_id,
+        bookingId,
+      })
+
+      if (ownerId) {
+        void sendWhatsappNotification(supabase, {
+          userId: ownerId,
+          event: 'new_booking_alert',
+          title: 'New booking received',
+          templateName: WA_TEMPLATES.NEW_BOOKING_ALERT,
+          templateParams: newBookingAlertParams({
+            libraryName: libName, seatLabel, startTimeDisplay: startDisplay, amountRupees,
+          }),
+          libraryId: bkgDetail.library_id,
+          bookingId,
+        })
+      }
     }
   } catch (notifErr) {
     // Notification insert failure must never block a confirmed payment
@@ -482,6 +521,38 @@ export async function cancelBooking(bookingId: string): Promise<ActionResult> {
     .eq('id', bookingId)
 
   if (error) return { success: false, error: error.message }
+
+  // WhatsApp: cancellation confirmation — fire-and-forget, never blocks
+  // the cancellation itself (already succeeded above). Refund
+  // completion (if paid) gets its own separate notification once
+  // Razorpay actually processes it — see refund.processed in
+  // app/api/payment/razorpay-webhook/route.ts.
+  try {
+    const { data: cancelDetail } = await supabase
+      .from('bookings').select('library_id, start_time, libraries(name)').eq('id', bookingId).maybeSingle()
+
+    if (cancelDetail) {
+      const library = (cancelDetail as any).libraries
+      const startIST = cancelDetail.start_time as string
+      const { data: studentRow } = await supabase.from('users').select('full_name').eq('id', user.id).maybeSingle()
+
+      void sendWhatsappNotification(supabase, {
+        userId: user.id,
+        event: 'booking_cancelled',
+        title: 'Booking cancelled',
+        templateName: WA_TEMPLATES.BOOKING_CANCELLED,
+        templateParams: bookingCancelledParams({
+          studentName: (studentRow as any)?.full_name || 'there',
+          libraryName: library?.name ?? 'the library',
+          startTimeDisplay: startIST.slice(0, 16).replace('T', ' at '),
+        }),
+        libraryId: cancelDetail.library_id,
+        bookingId,
+      })
+    }
+  } catch (notifErr) {
+    console.warn('[cancelBooking] WhatsApp notification failed:', notifErr)
+  }
 
   // If this booking had already been paid for (status was 'confirmed', not
   // just an unpaid 'held' slot), the escrowed payment now has no booking

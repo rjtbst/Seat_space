@@ -6,6 +6,7 @@ import type { StaffSeatRow } from '@/lib/actions/staff'
 import { staffWalkIn } from '@/lib/actions/staff'
 import { findStudentForWalkIn, staffBookSeatViaSubscription, type WalkInStudentMatch } from '@/lib/actions/owner-staff'
 import { toISTInputValue, inputToDB, fmtIST, fmtInputPreview, validateISTRange } from '@/lib/ist'
+import { describeDaysOfWeek } from '@/lib/booking/subscriptionEntitlement'
 
 const ACCENT       = '#0597A7'
 const ACCENT_LIGHT = '#E0F6F8'
@@ -369,8 +370,22 @@ export default function WalkInClient({
                   onChange={e => setUseSubId(e.target.checked ? membership.subscriptions[0].id : null)}
                   style={{ marginTop: 2 }}
                 />
-                <div style={{ fontSize: 12, fontWeight: 700, color: '#0A5C3E' }}>
-                  Book free — {membership.fullName} has an active membership
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#0A5C3E' }}>
+                    Book free — {membership.fullName} has an active membership
+                  </div>
+                  {membership.subscriptions.length === 1 && (() => {
+                    const s = membership.subscriptions[0]
+                    const restriction = [
+                      s.timeWindowStart && s.timeWindowEnd ? `${s.timeWindowStart.slice(0, 5)}–${s.timeWindowEnd.slice(0, 5)}` : null,
+                      describeDaysOfWeek(s.daysOfWeek),
+                    ].filter(Boolean).join(' · ')
+                    return restriction ? (
+                      <div style={{ fontSize: 10.5, color: '#92400E', fontWeight: 600, marginTop: 2 }}>
+                        🕐 Valid {restriction} only — book as a paid seat if this walk-in falls outside that
+                      </div>
+                    ) : null
+                  })()}
                 </div>
               </label>
               {useSubId && membership.subscriptions.length > 1 && (
@@ -379,11 +394,17 @@ export default function WalkInClient({
                   onChange={e => setUseSubId(e.target.value)}
                   style={{ ...inp, marginTop: 8, fontSize: 12, padding: '7px 10px' }}
                 >
-                  {membership.subscriptions.map(s => (
-                    <option key={s.id} value={s.id}>
-                      {s.planName} ({s.sessionsLimit === null ? 'unlimited' : `${s.sessionsUsed}/${s.sessionsLimit} used`})
-                    </option>
-                  ))}
+                  {membership.subscriptions.map(s => {
+                    const restriction = [
+                      s.timeWindowStart && s.timeWindowEnd ? `${s.timeWindowStart.slice(0, 5)}–${s.timeWindowEnd.slice(0, 5)}` : null,
+                      describeDaysOfWeek(s.daysOfWeek),
+                    ].filter(Boolean).join(' · ')
+                    return (
+                      <option key={s.id} value={s.id}>
+                        {s.planName} ({s.sessionsLimit === null ? 'unlimited' : `${s.sessionsUsed}/${s.sessionsLimit} used`}){restriction ? ` — ${restriction} only` : ''}
+                      </option>
+                    )
+                  })}
                 </select>
               )}
             </div>

@@ -33,6 +33,8 @@ import { verifyWebhookSignature } from '@/lib/razorpay/server'
 import { createServiceSupabaseClient } from '@/lib/supabase/service'
 import { recordWebhookEvent, markWebhookProcessed, markWebhookFailed } from '@/lib/webhooks/idempotency'
 import { alerts } from '@/lib/alerts'
+import { sendWhatsappNotification } from '@/lib/whatsapp/notify'
+import { WA_TEMPLATES, subscriptionPaymentFailedParams } from '@/lib/whatsapp/templates'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -255,6 +257,28 @@ export async function POST(req: NextRequest) {
         await notifyOwner(supabase, ownerId, libraryId, 'subscription_payment_failed',
           'Subscription payment failed',
           `We couldn't charge Rs.399 for your platform subscription. Please ensure your AutoPay mandate is funded - you have ${GRACE_PERIOD_DAYS} days before your library is taken offline.`)
+
+        // WhatsApp — arguably the single highest-value notification in
+        // the whole plan: an owner who misses this in-app and doesn't
+        // fix their AutoPay mandate within the grace period has their
+        // library taken offline.
+        {
+          const { data: ownerRow } = await supabase.from('users').select('full_name').eq('id', ownerId).maybeSingle()
+          const { data: libRow } = await supabase.from('libraries').select('name').eq('id', libraryId).maybeSingle()
+
+          void sendWhatsappNotification(supabase, {
+            userId: ownerId,
+            event: 'subscription_payment_failed',
+            title: 'Subscription payment failed',
+            templateName: WA_TEMPLATES.SUBSCRIPTION_PAYMENT_FAILED,
+            templateParams: subscriptionPaymentFailedParams({
+              ownerName: (ownerRow as any)?.full_name || 'there',
+              amountRupees: 399,
+              libraryName: (libRow as any)?.name ?? 'your library',
+            }),
+            libraryId,
+          })
+        }
 
         console.log('[webhook:subscription] Subscription pending (charge failed, retrying):', razorpaySubId)
         break

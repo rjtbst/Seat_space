@@ -18,6 +18,7 @@ import {
   INP_STYLE,
 } from '@/lib/constants/theme'
 import { Card, PageHeader, Toast, LibraryPicker } from '@/components/owner/ui'
+import { describeDaysOfWeek } from '@/lib/booking/subscriptionEntitlement'
 
 /* ─── Constants ───────────────────────────────────────────────────────────── */
 
@@ -762,8 +763,22 @@ export default function SeatManagerClient({
                       onChange={e => setUseSubId(e.target.checked ? membership.subscriptions[0].id : null)}
                       style={{ marginTop: 2 }}
                     />
-                    <div style={{ fontSize: 12, fontWeight: 700, color: '#0A5C3E' }}>
-                      Book free — {membership.fullName} has an active membership
+                    <div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: '#0A5C3E' }}>
+                        Book free — {membership.fullName} has an active membership
+                      </div>
+                      {membership.subscriptions.length === 1 && (() => {
+                        const s = membership.subscriptions[0]
+                        const restriction = [
+                          s.timeWindowStart && s.timeWindowEnd ? `${s.timeWindowStart.slice(0, 5)}–${s.timeWindowEnd.slice(0, 5)}` : null,
+                          describeDaysOfWeek(s.daysOfWeek),
+                        ].filter(Boolean).join(' · ')
+                        return restriction ? (
+                          <div style={{ fontSize: 10.5, color: '#92400E', fontWeight: 600, marginTop: 2 }}>
+                            🕐 Valid {restriction} only — book as a paid seat if this falls outside that
+                          </div>
+                        ) : null
+                      })()}
                     </div>
                   </label>
                   {useSubId && membership.subscriptions.length > 1 && (
@@ -772,11 +787,17 @@ export default function SeatManagerClient({
                       onChange={e => setUseSubId(e.target.value)}
                       style={{ ...SEL_STYLE, marginTop: 8, fontSize: 12, padding: '7px 10px' }}
                     >
-                      {membership.subscriptions.map(s => (
-                        <option key={s.id} value={s.id}>
-                          {s.planName} ({s.sessionsLimit === null ? 'unlimited' : `${s.sessionsUsed}/${s.sessionsLimit} used`})
-                        </option>
-                      ))}
+                      {membership.subscriptions.map(s => {
+                        const restriction = [
+                          s.timeWindowStart && s.timeWindowEnd ? `${s.timeWindowStart.slice(0, 5)}–${s.timeWindowEnd.slice(0, 5)}` : null,
+                          describeDaysOfWeek(s.daysOfWeek),
+                        ].filter(Boolean).join(' · ')
+                        return (
+                          <option key={s.id} value={s.id}>
+                            {s.planName} ({s.sessionsLimit === null ? 'unlimited' : `${s.sessionsUsed}/${s.sessionsLimit} used`}){restriction ? ` — ${restriction} only` : ''}
+                          </option>
+                        )
+                      })}
                     </select>
                   )}
                 </div>

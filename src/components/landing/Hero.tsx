@@ -19,17 +19,17 @@ export default function Hero() {
       <div className="max-w-[1200px] mx-auto grid lg:grid-cols-[1.05fr_1fr] gap-14 lg:gap-10 items-center">
         {/* Outcome */}
         <div className="reveal">
-          <span className="chip chip-blue mb-5">The platform behind your local study library</span>
+          <span className="chip chip-blue mb-5">Manage your study library. Help students find it.</span>
           <h1 className="font-syne font-extrabold text-display-lg text-ink mb-5">
             Find your seat.
             <br />
             <span className="text-blue">Run</span> your library.
           </h1>
-          <p className="text-[17px] text-muted leading-relaxed max-w-[440px] mb-8">
-            seatspace connects students to real study libraries nearby with
-            live seat availability — and gives owners one dashboard to run
-            seats, staff, payments, memberships and books, and grow
-            occupancy without guesswork.
+          <p className="text-[17px] text-muted leading-relaxed max-w-[440px] mb-2">
+           Students discover and book nearby study libraries with live seat availability.
+          </p>
+           <p className="text-[17px] text-muted leading-relaxed max-w-[440px] mb-8">
+           Library owners manage bookings, memberships, pricing, staff, payments, and daily operations from one dashboard.
           </p>
 
           {/* Two clear paths — same product, different job to do */}
@@ -41,7 +41,7 @@ export default function Hero() {
               <div className="text-[12px] font-semibold text-blue-dk uppercase tracking-wide mb-1">
                 I'm a student
               </div>
-              <div className="text-[13.5px] text-ink-2 leading-snug">
+              <div className="text-[13px] text-ink-2 leading-snug">
                 Find and book a seat nearby →
               </div>
             </Link>
@@ -52,7 +52,7 @@ export default function Hero() {
               <div className="text-[12px] font-semibold text-blue-dk uppercase tracking-wide mb-1">
                 I run a library
               </div>
-              <div className="text-[13.5px] text-ink-2 leading-snug">
+              <div className="text-[13px] text-ink-2 leading-snug">
                 Start your 14-day free trial →
               </div>
             </Link>

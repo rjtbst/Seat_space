@@ -10,6 +10,7 @@ import { z } from 'zod'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { checkRateLimit, getClientIp, RATE_LIMITS } from '@/lib/rate-limit'
 import { homeForRole } from '@/lib/auth/state'
+import { sendOtpViaWhatsapp } from '@/lib/whatsapp/notify'
 import type { ActionResult } from '@/lib/actions/shared/action-result'
 
 const e164Schema = z
@@ -84,12 +85,19 @@ export async function sendWhatsappOtp(rawNumber: string): Promise<ActionResult> 
     return { success: false, error: 'Could not send code. Please try again.' }
   }
 
-  // TODO: wire a real WhatsApp Business Platform / Gupshup / MSG91 send
-  // here, e.g. sendWhatsappTemplateMessage(parsed.data, code). Until a
-  // provider is configured, the code is logged server-side only so
-  // onboarding is testable end-to-end.
-  if (process.env.NODE_ENV !== 'production') {
-    console.log(`[whatsapp-otp] ${parsed.data} -> ${code}`)
+  // Real send via Meta Cloud API. If WHATSAPP_PHONE_NUMBER_ID /
+  // WHATSAPP_ACCESS_TOKEN aren't set yet (e.g. still finishing Meta
+  // Business setup), sendOtpViaWhatsapp() returns ok:false and we fall
+  // back to logging the code server-side so onboarding stays testable
+  // in the meantime — this never blocks signup on WhatsApp being
+  // configured.
+  const sendResult = await sendOtpViaWhatsapp(parsed.data, code)
+  if (!sendResult.ok) {
+    // Logged unconditionally (not just outside production) — visible in
+    // Vercel's function logs, the only way to see the code while
+    // WhatsApp credentials are still being finished/verified in Meta
+    // Business Manager.
+    console.warn(`[whatsapp-otp] send failed for ${parsed.data}: ${sendResult.error}. Code was: ${code}`)
   }
 
   return { success: true, data: undefined }

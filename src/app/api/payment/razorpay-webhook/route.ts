@@ -42,6 +42,8 @@ import { DEFAULT_COMMISSION_BPS } from '@/lib/booking/escrow'
 import { recordWebhookEvent, markWebhookProcessed, markWebhookFailed } from '@/lib/webhooks/idempotency'
 import { alerts } from '@/lib/alerts'
 import { recomputePaymentAfterRefunds } from '@/lib/booking/refund-netting'
+import { sendWhatsappNotification } from '@/lib/whatsapp/notify'
+import { WA_TEMPLATES, refundProcessedParams } from '@/lib/whatsapp/templates'
 
 // Payments.status is a Postgres enum (see payment_status in the schema) —
 // using this alias instead of `string` keeps `.eq('status', currentStatus)`
@@ -302,7 +304,7 @@ export async function POST(req: NextRequest) {
 
         const { data: refundRecord, error: fetchErr } = await supabase
           .from('refunds')
-          .select('id, status, payment_id')
+          .select('id, status, payment_id, amount, student_id, library_id')
           .eq('razorpay_refund_id', razorpayRefundId)
           .maybeSingle()
 
@@ -327,6 +329,27 @@ export async function POST(req: NextRequest) {
           p_webhook_event_id: webhookEventRowId,
           p_metadata: { razorpay_refund_id: razorpayRefundId },
         })
+
+        if ((refundRecord as any).student_id) {
+          const { data: libRow } = await supabase
+            .from('libraries').select('name').eq('id', (refundRecord as any).library_id).maybeSingle()
+          const { data: studentRow } = await supabase
+            .from('users').select('full_name').eq('id', (refundRecord as any).student_id).maybeSingle()
+
+          void sendWhatsappNotification(supabase, {
+            userId: (refundRecord as any).student_id,
+            event: 'refund_processed',
+            title: 'Refund processed',
+            templateName: WA_TEMPLATES.REFUND_PROCESSED,
+            templateParams: refundProcessedParams({
+              studentName: (studentRow as any)?.full_name || 'there',
+              amountRupees: Number((refundRecord as any).amount ?? 0),
+              libraryName: (libRow as any)?.name ?? 'the library',
+            }),
+            libraryId: (refundRecord as any).library_id ?? null,
+          })
+        }
+
         break
       }
 

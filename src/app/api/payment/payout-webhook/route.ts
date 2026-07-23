@@ -32,6 +32,8 @@ import { verifyWebhookSignature } from '@/lib/razorpay/server'
 import { createServiceSupabaseClient } from '@/lib/supabase/service'
 import { recordWebhookEvent, markWebhookProcessed, markWebhookFailed } from '@/lib/webhooks/idempotency'
 import { alerts, raiseAlert } from '@/lib/alerts'
+import { sendWhatsappNotification } from '@/lib/whatsapp/notify'
+import { WA_TEMPLATES, payoutProcessedParams } from '@/lib/whatsapp/templates'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -95,7 +97,7 @@ export async function POST(req: NextRequest) {
 
     const { data: payout, error: fetchErr } = await supabase
       .from('payouts')
-      .select('id, status, owner_id, net_amount_paise, payment_id')
+      .select('id, status, owner_id, net_amount_paise, payment_id, library_id')
       .eq('razorpay_payout_id', razorpayPayoutId)
       .maybeSingle()
 
@@ -135,6 +137,24 @@ export async function POST(req: NextRequest) {
         })
 
         console.log('[webhook:payout] Payout completed:', razorpayPayoutId)
+
+        {
+          const { data: ownerRow } = await supabase.from('users').select('full_name').eq('id', ownerId).maybeSingle()
+
+          void sendWhatsappNotification(supabase, {
+            userId: ownerId,
+            event: 'payout_processed',
+            title: 'Payout received',
+            templateName: WA_TEMPLATES.PAYOUT_PROCESSED,
+            templateParams: payoutProcessedParams({
+              ownerName: (ownerRow as any)?.full_name || 'there',
+              amountRupees: netAmountRupees,
+              utr: payoutEntity.utr ?? '',
+            }),
+            libraryId: (payout as any).library_id ?? null,
+          })
+        }
+
         break
       }
 
