@@ -527,6 +527,6 @@ export default function ExploreClient({
           </Suspense>
         </div>
       )}
-    </div>
+    </div> 
   )
 }
