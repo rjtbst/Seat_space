@@ -37,6 +37,24 @@ interface Props {
 }
 
 const LIMIT = 12
+const LOC_PREF_KEY = 'ls_loc_pref'
+
+function readLocPref(): boolean | null {
+  try {
+    const stored = window.localStorage.getItem(LOC_PREF_KEY)
+    // null = no stored preference yet (first-ever visit) — caller decides
+    // the default in that case.
+    return stored === null ? null : stored === 'on'
+  } catch {
+    return null
+  }
+}
+
+function writeLocPref(enabled: boolean) {
+  try {
+    window.localStorage.setItem(LOC_PREF_KEY, enabled ? 'on' : 'off')
+  } catch { /* ignore quota/availability errors */ }
+}
 
 /* ─── Location mode banner ───────────────────────────────────── */
 function LocationBanner({
@@ -118,30 +136,46 @@ export default function ExploreClient({
   const [showFilters,  setShowFilters]  = useState(false)
 
   // ── Location state ──────────────────────────────────────────
-  // locEnabled tracks whether the user WANTS near-me sorting.
-  // It starts true (Near Me on by default) so we request geo immediately.
-  // Once granted it is never cleared automatically — only by the user toggling.
+  // locEnabled tracks whether the user WANTS near-me sorting. It starts
+  // `true` to match server-rendered output exactly (avoids a hydration
+  // mismatch) -- if the user previously turned Near Me off, that's
+  // corrected a moment later from localStorage, in the effect below.
   const [locEnabled, setLocEnabled] = useState(true)
 
-  // Request geo on first mount so permission fires without the user tapping anything
+  // On mount: apply any saved Near Me preference (localStorage isn't
+  // available during SSR, so this necessarily happens client-side, after
+  // the server-rendered fallback has already painted once) and, unless
+  // the user explicitly turned it off last time, request geo. Previously
+  // this fired unconditionally on every mount -- turning Near Me off and
+  // then reloading the page silently turned it back on and re-navigated
+  // to nearby results, overriding what the user had just chosen.
   useEffect(() => {
+    const pref = readLocPref()
+    if (pref === false) {
+      setLocEnabled(false)
+      return
+    }
     requestGeo()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const totalPages = Math.ceil(total / LIMIT)
 
-  const navigate = useCallback((params: Record<string, string>) => {
+  const navigate = useCallback((params: Record<string, string>, mode: 'push' | 'replace' = 'push') => {
     const sp = new URLSearchParams()
     Object.entries(params).forEach(([k, v]) => { if (v) sp.set(k, v) })
-    startTransition(() => router.push(`${pathname}?${sp.toString()}`))
+    const url = `${pathname}?${sp.toString()}`
+    startTransition(() => {
+      if (mode === 'replace') router.replace(url)
+      else router.push(url)
+    })
   }, [router, pathname])
 
   // ── Reads live geo coords so callers don't need to pass them explicitly ──
   const buildAndNavigate = useCallback((overrides: {
     q?: string; city?: string; open_now?: boolean; amenities?: string[]
     page?: number; lat?: number | null; lng?: number | null
-    locEnabled?: boolean
+    locEnabled?: boolean; mode?: 'push' | 'replace'
   } = {}) => {
     // Decide whether location should be active for this navigation
     const wantLoc = overrides.locEnabled !== undefined ? overrides.locEnabled : locEnabled
@@ -159,7 +193,7 @@ export default function ExploreClient({
       lng:      overrides.lng !== undefined
         ? (overrides.lng != null ? String(overrides.lng) : '')
         : (curLng != null ? String(curLng) : ''),
-    })
+    }, overrides.mode ?? 'push')
   }, [q, city, openNow, selAmenities, locEnabled, geo, navigate])
 
   const handleSearch = useCallback((val: string) => {
@@ -168,25 +202,42 @@ export default function ExploreClient({
     debounce.current = setTimeout(() => buildAndNavigate({ q: val }), 420)
   }, [buildAndNavigate])
 
+  // Tracks whether the *next* geo grant was kicked off by an explicit
+  // click (handleEnableLocation) rather than the silent automatic request
+  // on mount. Both paths call requestGeo() and both eventually land in
+  // the same effect below once geo resolves -- without this flag that
+  // effect can't tell "user just clicked this" from "this happened
+  // quietly in the background", and would use `replace` for both,
+  // erasing the history entry from a deliberate click.
+  const explicitEnableRef = useRef(false)
+
   // ── Location toggle ─────────────────────────────────────────
   // Turning OFF  → keep coords cached in geo, just stop sending them
   // Turning ON   → if already granted use immediately; otherwise request once
+  // Either way this is a direct, deliberate user action, so it pushes a
+  // normal history entry (unlike the automatic on-mount apply below) and
+  // persists the choice so it's remembered on the next visit.
   const handleEnableLocation = useCallback(() => {
     if (locEnabled) {
       // User is turning Near Me OFF — fall back to city/state, don't clear geo cache
+      explicitEnableRef.current = false
       setLocEnabled(false)
+      writeLocPref(false)
       buildAndNavigate({ locEnabled: false, lat: null, lng: null })
       return
     }
     // User is turning Near Me ON
     setLocEnabled(true)
+    writeLocPref(true)
     if (geo.status === 'granted') {
       // Coords already available — apply synchronously, no prompt
       buildAndNavigate({ locEnabled: true, lat: geo.lat, lng: geo.lng })
     } else {
-      // Haven't asked yet (or was denied and user retries) — request permission
+      // Haven't asked yet (or was denied and user retries) — request
+      // permission. Mark this as explicit so the effect below pushes
+      // (not replaces) once it resolves.
+      explicitEnableRef.current = true
       requestGeo()
-      // The effect below will push coords into the URL once granted
     }
   }, [locEnabled, geo, buildAndNavigate, requestGeo])
 
@@ -195,9 +246,20 @@ export default function ExploreClient({
   // locEnabled is intentionally not a dep — we read it via the closure
   // captured at grant-time, which is always true (we only call requestGeo
   // when locEnabled is being set to true).
+  //
+  // Mode depends on how this grant was triggered: the silent automatic
+  // request on mount refines the page the user is already on (city
+  // results → nearby results) and uses `replace` so it doesn't add a
+  // back-button entry that just re-triggers the same transition on its
+  // way "back". An explicit click on the Near Me toggle is a deliberate
+  // action, though, and should behave like one -- `push`, so Back
+  // actually undoes it -- even though the permission grant itself is
+  // just as asynchronous either way.
   useEffect(() => {
     if (geo.status === 'granted' && locEnabled) {
-      buildAndNavigate({ locEnabled: true, lat: geo.lat, lng: geo.lng })
+      const mode = explicitEnableRef.current ? 'push' : 'replace'
+      explicitEnableRef.current = false
+      buildAndNavigate({ locEnabled: true, lat: geo.lat, lng: geo.lng, mode })
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [geo.status])

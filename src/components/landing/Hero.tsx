@@ -14,7 +14,7 @@ export default function Hero() {
   return (
     <section
       id="recognition"
-      className="relative pt-16 pb-20 md:pt-24 md:pb-12 px-6 md:px-10 overflow-hidden"
+      className="relative py-24 md:pt-24 md:pb-12 px-6 md:px-10 overflow-hidden"
     >
       <div className="max-w-[1200px] mx-auto grid lg:grid-cols-[1.05fr_1fr] gap-14 lg:gap-10 items-center">
         {/* Outcome */}
@@ -46,7 +46,7 @@ export default function Hero() {
               </div>
             </Link>
             <Link
-              href="/login?mode=signup"
+              href="/login?mode=signup&role=owner"
               className="card p-4 hover:border-ink/30 transition-colors"
             >
               <div className="text-[12px] font-semibold text-blue-dk uppercase tracking-wide mb-1">

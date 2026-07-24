@@ -79,6 +79,7 @@ export default function AdminObservabilityClient({
         Webhook dead-letters {deadLetters.length > 0 && <span style={{ color: '#991B1B' }}>({deadLetters.length})</span>}
       </h3>
       <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #ECE7DC', overflow: 'hidden', marginBottom: 28 }}>
+        <div className="admin-table-wrap">
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13.5 }}>
           <thead>
             <tr style={{ background: '#FAF8F4', textAlign: 'left' }}>
@@ -109,10 +110,12 @@ export default function AdminObservabilityClient({
             )}
           </tbody>
         </table>
+        </div>
       </div>
 
       <h3 style={{ fontSize: 14, fontWeight: 700, margin: '0 0 12px' }}>Recent alerts</h3>
       <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #ECE7DC', overflow: 'hidden' }}>
+        <div className="admin-table-wrap">
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13.5 }}>
           <thead>
             <tr style={{ background: '#FAF8F4', textAlign: 'left' }}>
@@ -136,6 +139,7 @@ export default function AdminObservabilityClient({
             )}
           </tbody>
         </table>
+        </div>
       </div>
 
       {viewingPayload && (

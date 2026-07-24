@@ -104,12 +104,13 @@ export default function AdminLibrariesClient({
           onChange={e => setSearch(e.target.value)}
           style={{
             marginLeft: 'auto', padding: '7px 14px', borderRadius: 10, border: '1px solid #ECE7DC',
-            fontSize: 13, width: 260,
+            fontSize: 13, width: 260, maxWidth: '100%',
           }}
         />
       </div>
 
       <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #ECE7DC', overflow: 'hidden' }}>
+        <div className="admin-table-wrap">
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13.5 }}>
           <thead>
             <tr style={{ background: '#FAF8F4', textAlign: 'left' }}>
@@ -142,6 +143,7 @@ export default function AdminLibrariesClient({
             )}
           </tbody>
         </table>
+        </div>
       </div>
 
       {cursor && !search && (

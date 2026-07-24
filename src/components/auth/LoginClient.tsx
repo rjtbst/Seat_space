@@ -10,24 +10,27 @@ import {
   signUpWithEmail,
   requestPasswordReset,
 } from '@/lib/actions/auth'
+import { parsePreselectedRole } from '@/lib/auth/state'
+import Image from 'next/image'
 
 // ── Shared helpers ───────────────────────────────────────────────────────────
-function Logo() {
-  return (
-    <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', marginBottom: 40 }}>
-      <div style={{ width: 38, height: 38, borderRadius: 11, background: '#1246FF', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(18,70,255,.35)' }}>
-        <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
-          <rect x="2" y="2" width="5" height="7" rx="1.5" fill="white" fillOpacity="0.9"/>
-          <rect x="9" y="2" width="5" height="5" rx="1.5" fill="white" fillOpacity="0.6"/>
-          <rect x="2" y="11" width="12" height="3" rx="1.5" fill="white" fillOpacity="0.4"/>
-        </svg>
-      </div>
-      <span style={{ fontSize: 22, fontFamily: 'Instrument Serif, serif', color: '#0A0D12' }}>
-        Seat<span style={{ color: '#1246FF', fontFamily: 'Syne, sans-serif', fontWeight: 800 }}>Space</span>
-      </span>
-    </Link>
-  )
-}
+// function Logo() {
+//   return (
+//     <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', marginBottom: 40 }}>
+//       <Image
+//             src="/logo.png"
+//             alt="Seatspace Logo"
+//             width={70}
+//             height={70}
+//             className="transition-transform duration-200 group-hover:scale-105"
+//             priority
+//           />
+//       <span style={{ fontSize: 22, fontFamily: 'Instrument Serif, serif', color: '#0A0D12' }}>
+//         <span style={{ color: '#1246FF', fontFamily: 'Syne, sans-serif', fontWeight: 600 }}>SeatSpace</span>
+//       </span>
+//     </Link>
+//   )
+// }
 
 function Spinner({ color = '#fff' }: { color?: string }) {
   return (
@@ -60,7 +63,12 @@ function LoginContent() {
   const params     = useSearchParams()
   const router     = useRouter()
   const isSignup   = params.get('mode') === 'signup'
-  const isOwner    = params.get('role') === 'owner'
+  // Validated once here (never trust the raw query value past this point) --
+  // this is the single value threaded through Google OAuth and email signup
+  // so the role picked on the landing page is remembered instead of being
+  // re-asked on /onboarding/role.
+  const preselectedRole = parsePreselectedRole(params.get('role'))
+  const isOwner    = preselectedRole === 'owner'
   const redirectTo = params.get('redirect') ?? undefined
 
   const [tab, setTab] = useState<'google' | 'email'>('google')
@@ -77,7 +85,7 @@ function LoginContent() {
   const handleGoogle = () => {
     resetMessages()
     start(async () => {
-      const res = await signInWithGoogle(redirectTo)
+      const res = await signInWithGoogle(redirectTo, preselectedRole ?? undefined)
       if (!res.success) {
         setErrMsg(res.error)
         return
@@ -104,7 +112,7 @@ function LoginContent() {
     e.preventDefault()
     resetMessages()
     start(async () => {
-      const res = await signUpWithEmail(email, password)
+      const res = await signUpWithEmail(email, password, preselectedRole ?? undefined)
       if (!res.success) {
         setErrMsg(res.error)
         return
@@ -114,8 +122,11 @@ function LoginContent() {
         return
       }
       // Confirmation disabled in this Supabase project's config -- session
-      // is already active, go straight into onboarding.
-      router.push('/onboarding/role')
+      // is already active. If a role was picked on the landing page it's
+      // already been saved server-side, so redirectTo skips straight past
+      // /onboarding/role to the profile step; otherwise it falls back to
+      // role selection.
+      router.push(res.data.redirectTo)
       router.refresh()
     })
   }
@@ -161,7 +172,7 @@ function LoginContent() {
       </div>
 
       <div style={{ width: '100%', maxWidth: 420, position: 'relative', zIndex: 1 }}>
-        <Logo />
+        {/* <Logo /> */}
 
         <div style={{ background: '#FDFCF9', border: '1px solid #E2DDD4', borderRadius: 20, padding: '36px 32px', boxShadow: '0 4px 32px rgba(10,13,18,.08)' }}>
           {/* Heading */}

@@ -16,7 +16,7 @@ export const revalidate = 0
 
 export default async function BooksPage() {
   const { user } = await getSupabaseUser()
-  if (!user) redirect('/auth/login?next=/books')
+  if (!user) redirect('/login?redirect=/books')
 
   const profile = await getStudentProfile()
 

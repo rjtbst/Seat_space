@@ -20,7 +20,7 @@ export const revalidate = 0
 
 export default async function BookingsPage() {
   const { user } = await getSupabaseUser()
-  if (!user) redirect('/auth/login?next=/bookings')
+  if (!user) redirect('/login?redirect=/bookings')
 
   const [upcoming, past] = await Promise.all([
     getMyBookings('upcoming'),

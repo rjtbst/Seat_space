@@ -54,7 +54,7 @@ export default function PricingCta() {
             run the whole thing from one dashboard.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <Link href="/login?mode=signup" className="btn btn-primary btn-hero">
+            <Link href="/login?mode=signup&role=owner" className="btn btn-primary btn-hero">
               Start your 14-day free trial →
             </Link>
             <Link href="/explore" className="btn btn-outline btn-hero !text-white !border-white/30 hover:!bg-white/10">

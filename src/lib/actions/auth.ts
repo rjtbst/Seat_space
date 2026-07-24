@@ -9,7 +9,9 @@ import { checkRateLimit, getClientIp, RATE_LIMITS } from '@/lib/rate-limit'
 import {
   computeOnboardingStep,
   pathForStep,
+  parsePreselectedRole,
   type OnboardingRow,
+  type SelfServeRole,
 } from '@/lib/auth/state'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -38,9 +40,65 @@ function siteUrl(): string {
   return process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
 }
 
+// ─── Shared role-write helper ─────────────────────────────────────────────────
+// Used by setRole() (explicit /onboarding/role choice) and by
+// signUpWithEmail()'s immediate-session path (a role already chosen on the
+// landing page). Same "picked exactly once" guard either way, so an
+// existing account's role can never be silently overwritten by a stray
+// `?role=` query param.
+async function persistRole(
+  supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
+  userId: string,
+  role: UserRole,
+  fallbackInsertExtra?: { email?: string | null; phone?: string | null }
+): Promise<ActionResult> {
+  const { data: existing } = await supabase
+    .from('users')
+    .select('role_selected_at')
+    .eq('id', userId)
+    .maybeSingle()
+
+  if (existing?.role_selected_at) {
+    return { success: false, error: 'A role has already been selected for this account.' }
+  }
+
+  const nowIso = new Date().toISOString()
+
+  const { error, data: rows } = await supabase
+    .from('users')
+    .update({ role, role_selected_at: nowIso })
+    .eq('id', userId)
+    .select('id')
+
+  if (error) {
+    console.error('persistRole update error:', error)
+    return { success: false, error: 'Could not save role. Please try again.' }
+  }
+
+  if (!rows || rows.length === 0) {
+    // Safety net: handle_new_user() should always have created this row
+    // already, but if it somehow hasn't, don't leave the user stuck.
+    const { error: insertError } = await supabase.from('users').insert({
+      id: userId,
+      email: fallbackInsertExtra?.email ?? null,
+      phone: fallbackInsertExtra?.phone ?? null,
+      role,
+      role_selected_at: nowIso,
+    })
+
+    if (insertError) {
+      console.error('persistRole insert fallback error:', insertError)
+      return { success: false, error: 'Could not save role. Please try again.' }
+    }
+  }
+
+  return { success: true, data: undefined }
+}
+
 // ─── Google OAuth ─────────────────────────────────────────────────────────────
 export async function signInWithGoogle(
-  redirectAfter?: string
+  redirectAfter?: string,
+  preselectedRole?: SelfServeRole
 ): Promise<ActionResult<{ url: string }>> {
   const supabase = await createServerSupabaseClient()
 
@@ -50,9 +108,16 @@ export async function signInWithGoogle(
   // selection". Hardcoding that default was half of why a returning user
   // with an already-selected role kept getting sent back to pick one
   // again.
-  const callbackUrl = redirectAfter
-    ? `${siteUrl()}/api/auth/callback?next=${encodeURIComponent(redirectAfter)}`
-    : `${siteUrl()}/api/auth/callback`
+  //
+  // `role`, when present, is the choice made on the landing page --
+  // carried through Google's redirect round-trip as a query param (there's
+  // nowhere else to stash it: this call ends in a full-page navigation to
+  // Google and back) so the callback route can apply it before deciding
+  // where a brand-new user lands.
+  const callbackParams = new URLSearchParams()
+  if (redirectAfter) callbackParams.set('next', redirectAfter)
+  if (preselectedRole) callbackParams.set('role', preselectedRole)
+  const callbackUrl = `${siteUrl()}/api/auth/callback${callbackParams.size ? `?${callbackParams}` : ''}`
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
@@ -69,8 +134,9 @@ export async function signInWithGoogle(
 // ─── Email & password: sign up ────────────────────────────────────────────────
 export async function signUpWithEmail(
   rawEmail: string,
-  rawPassword: string
-): Promise<ActionResult<{ needsEmailConfirmation: boolean }>> {
+  rawPassword: string,
+  preselectedRole?: SelfServeRole
+): Promise<ActionResult<{ needsEmailConfirmation: boolean; redirectTo: string }>> {
   const emailParsed = emailSchema.safeParse(rawEmail)
   if (!emailParsed.success) {
     return { success: false, error: emailParsed.error.errors[0].message }
@@ -88,10 +154,19 @@ export async function signUpWithEmail(
     return { success: false, error: 'message' in ipLimit ? ipLimit.message : 'Rate limit exceeded' }
   }
 
+  // The role chosen on the landing page (if any) has to survive an email
+  // confirmation round-trip too -- there's no server-side session to write
+  // it against until the confirmation link is clicked, so it rides along
+  // in the same emailRedirectTo query string the callback route already
+  // knows how to read.
+  const confirmParams = new URLSearchParams()
+  if (preselectedRole) confirmParams.set('role', preselectedRole)
+  const emailRedirectTo = `${siteUrl()}/api/auth/callback${confirmParams.size ? `?${confirmParams}` : ''}`
+
   const { data, error } = await supabase.auth.signUp({
     email: emailParsed.data,
     password: pwParsed.data,
-    options: { emailRedirectTo: `${siteUrl()}/api/auth/callback` },
+    options: { emailRedirectTo },
   })
 
   if (error) {
@@ -103,8 +178,39 @@ export async function signUpWithEmail(
   }
 
   // `data.session` is null when email confirmation is required (the
-  // expected path) -- that's success, not a failure state.
-  return { success: true, data: { needsEmailConfirmation: !data.session } }
+  // expected path) -- that's success, not a failure state. The role
+  // rides along in emailRedirectTo above and gets applied once the
+  // confirmation link is clicked, so /onboarding/role is a reasonable
+  // (if unused) fallback destination for this branch.
+  if (!data.session) {
+    return {
+      success: true,
+      data: { needsEmailConfirmation: true, redirectTo: '/onboarding/role' },
+    }
+  }
+
+  // Confirmation disabled in this Supabase project's config -- session is
+  // already active, so a landing-page role choice can be written right
+  // now instead of asking again on /onboarding/role.
+  if (preselectedRole && data.user) {
+    const roleResult = await persistRole(supabase, data.user.id, preselectedRole, {
+      email: data.user.email,
+      phone: data.user.phone,
+    })
+    if (roleResult.success) {
+      return {
+        success: true,
+        data: { needsEmailConfirmation: false, redirectTo: pathForStep('profile', preselectedRole) },
+      }
+    }
+    // Role write failed (e.g. lost a race) -- fall through to the normal
+    // role-selection screen rather than failing the signup itself.
+  }
+
+  return {
+    success: true,
+    data: { needsEmailConfirmation: false, redirectTo: '/onboarding/role' },
+  }
 }
 
 // ─── Email & password: sign in ────────────────────────────────────────────────
@@ -223,49 +329,18 @@ export async function setRole(
     return { success: false, error: 'Session expired. Please sign in again.' }
   }
 
-  // A role is picked exactly once. Middleware already stops a user from
+  // A role is picked exactly once -- persistRole() enforces that via the
+  // role_selected_at guard. Middleware already stops a user from
   // navigating back to /onboarding/role once role_selected_at is set, but
   // this action is a second, independent check against direct calls
   // (e.g. a replayed request) -- "prevent users from changing roles
   // accidentally" applies at the action level too, not only the page.
-  const { data: existing } = await supabase
-    .from('users')
-    .select('role_selected_at')
-    .eq('id', user.id)
-    .maybeSingle()
-
-  if (existing?.role_selected_at) {
-    return { success: false, error: 'A role has already been selected for this account.' }
-  }
-
-  const nowIso = new Date().toISOString()
-
-  const { error, data: rows } = await supabase
-    .from('users')
-    .update({ role: roleResult.data, role_selected_at: nowIso })
-    .eq('id', user.id)
-    .select('id')
-
-  if (error) {
-    console.error('setRole DB error:', error)
-    return { success: false, error: 'Could not save role. Please try again.' }
-  }
-
-  if (!rows || rows.length === 0) {
-    // Safety net: handle_new_user() should always have created this row
-    // already, but if it somehow hasn't, don't leave the user stuck.
-    const { error: insertError } = await supabase.from('users').insert({
-      id: user.id,
-      email: user.email ?? null,
-      phone: user.phone ?? null,
-      role: roleResult.data,
-      role_selected_at: nowIso,
-    })
-
-    if (insertError) {
-      console.error('setRole insert fallback error:', insertError)
-      return { success: false, error: 'Could not save role. Please try again.' }
-    }
+  const writeResult = await persistRole(supabase, user.id, roleResult.data, {
+    email: user.email,
+    phone: user.phone,
+  })
+  if (!writeResult.success) {
+    return writeResult
   }
 
   return { success: true, data: { redirectTo: pathForStep('profile', roleResult.data) } }

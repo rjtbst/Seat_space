@@ -22,7 +22,7 @@ export const revalidate = 0
 
 export default async function MyBooksPage() {
   const { user } = await getSupabaseUser()
-  if (!user) redirect('/auth/login?next=/my-books')
+  if (!user) redirect('/login?redirect=/my-books')
 
   const issues = await getMyBookIssues()
 

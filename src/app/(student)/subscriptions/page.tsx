@@ -21,7 +21,7 @@ export const revalidate = 0
 
 export default async function SubscriptionsPage() {
   const { user } = await getSupabaseUser()
-  if (!user) redirect('/auth/login?next=/subscriptions')
+  if (!user) redirect('/login?redirect=/subscriptions')
 
   const subscriptions = await getMySubscriptions()
 

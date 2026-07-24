@@ -135,3 +135,22 @@ export function isMandatoryOnboardingGatePath(pathname: string, role: UserRole):
 export function matchesPathOrChild(pathname: string, target: string): boolean {
   return pathname === target || pathname.startsWith(`${target}/`)
 }
+
+/**
+ * Roles a person can pick for themselves before ever having an account --
+ * i.e. from a landing-page "I'm a student" / "I run a library" choice,
+ * carried through signup as a `?role=` query param. Deliberately excludes
+ * 'staff' (invited by an owner, never self-selected) and 'admin'
+ * (hand-provisioned) -- widening this to accept arbitrary role strings
+ * from a URL would let anyone request an admin/staff account by editing
+ * the query string.
+ */
+export type SelfServeRole = 'student' | 'owner'
+const SELF_SERVE_ROLES: readonly SelfServeRole[] = ['student', 'owner']
+
+/** Validates a raw (possibly attacker-controlled) query-param value against
+ *  the roles someone is actually allowed to pre-select for themselves.
+ *  Returns null for anything else, including 'staff'/'admin'/garbage. */
+export function parsePreselectedRole(value: string | null | undefined): SelfServeRole | null {
+  return SELF_SERVE_ROLES.includes(value as SelfServeRole) ? (value as SelfServeRole) : null
+}

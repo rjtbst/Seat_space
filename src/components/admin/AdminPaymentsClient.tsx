@@ -166,6 +166,7 @@ export default function AdminPaymentsClient({
       </div>
 
       <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #ECE7DC', overflow: 'hidden' }}>
+        <div className="admin-table-wrap">
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13.5 }}>
           <thead>
             <tr style={{ background: '#FAF8F4', textAlign: 'left' }}>
@@ -200,6 +201,7 @@ export default function AdminPaymentsClient({
             )}
           </tbody>
         </table>
+        </div>
       </div>
 
       {cursor && !search && (

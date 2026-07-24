@@ -58,7 +58,7 @@ export default function AdminDashboardClient({
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, fontFamily: 'Syne, sans-serif' }}>Platform Dashboard</h1>
         <div style={{ display: 'flex', gap: 6, background: '#fff', borderRadius: 10, padding: 4, border: '1px solid #ECE7DC' }}>
           {(['30', '90'] as const).map(r => (
@@ -75,7 +75,7 @@ export default function AdminDashboardClient({
       </div>
 
       {/* Headline metric grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14, marginBottom: 16 }}>
+      <div className="admin-grid-5" style={{ marginBottom: 16 }}>
         <Card label="Total GMV" value={formatINR(overview.totalGmv)} sub="Gross collected from students" accent={COLORS.gmv} />
         <Card label="Platform Revenue" value={formatINR(overview.totalPlatformRevenue)} sub="Commission + subscriptions" accent={COLORS.commission} />
         <Card label="Owner Payouts" value={formatINR(overview.totalOwnerPayouts)} sub="Paid/owed to library owners" accent={COLORS.owners} />
@@ -83,14 +83,14 @@ export default function AdminDashboardClient({
         <Card label="Pending Approvals" value={String(overview.pendingApprovals)} accent={overview.pendingApprovals > 0 ? '#D97706' : undefined} />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 16 }}>
+      <div className="admin-grid-4" style={{ marginBottom: 16 }}>
         <Card label="Students" value={overview.totalStudents.toLocaleString('en-IN')} accent={COLORS.students} />
         <Card label="Owners" value={overview.totalOwners.toLocaleString('en-IN')} accent={COLORS.owners} />
         <Card label="Staff" value={overview.totalStaff.toLocaleString('en-IN')} accent={COLORS.staff} />
         <Card label="Bookings Today" value={String(overview.bookingsToday)} sub={`${overview.bookingsLast7d} this week · ${overview.bookingsLast30d} this month`} />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 28 }}>
+      <div className="admin-grid-4" style={{ marginBottom: 28 }}>
         <Card label="Active Subscriptions" value={String(overview.activeSubscriptions)} accent="#10B981" />
         <Card label="Past Due Subscriptions" value={String(overview.pastDueSubscriptions)} accent={overview.pastDueSubscriptions > 0 ? '#DC2626' : undefined} />
         <Card label="Pending Refunds" value={String(overview.pendingRefunds)} accent={overview.pendingRefunds > 0 ? '#D97706' : undefined} />
@@ -114,7 +114,7 @@ export default function AdminDashboardClient({
         </ResponsiveContainer>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+      <div className="admin-grid-2">
         {/* Booking trend */}
         <div style={{ background: '#fff', borderRadius: 16, padding: 20, border: '1px solid #ECE7DC' }}>
           <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 14px' }}>Booking trend</h3>

@@ -18,7 +18,7 @@
 // onboarding" and resumes at the correct step either way.
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { computeOnboardingStep, resolveDestination, type OnboardingRow } from '@/lib/auth/state'
+import { resolveDestination, parsePreselectedRole, type OnboardingRow } from '@/lib/auth/state'
 
 function safeNext(next: string, origin: string): string {
   if (!next.startsWith('/')) return origin
@@ -30,6 +30,7 @@ export async function GET(request: NextRequest) {
 
   const code = searchParams.get('code')
   const next = searchParams.get('next')
+  const preselectedRole = parsePreselectedRole(searchParams.get('role'))
   const error = searchParams.get('error')
   const errorDesc = searchParams.get('error_description')
 
@@ -52,14 +53,6 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  // Password recovery (and any other flow with an explicit, real
-  // destination) is honoured as-is -- onboarding-state routing only
-  // applies to the default sign-in flow, where no specific `next` was
-  // requested.
-  if (next && next !== '/onboarding/role') {
-    return NextResponse.redirect(safeNext(next, origin))
-  }
-
   // handle_new_user() has already created the users row by the time we
   // get here (it fires on auth.users insert, which just happened as part
   // of exchangeCodeForSession for a brand-new signup).
@@ -69,6 +62,53 @@ export async function GET(request: NextRequest) {
     .eq('id', data.user.id)
     .maybeSingle()
 
-  const destination = resolveDestination(row as OnboardingRow | null)
+  let onboardingRow = row as OnboardingRow | null
+
+  // A role chosen on the landing page (Google signup) or at signup time
+  // (email confirmation link) arrives here as `?role=`. Only ever applied
+  // to an account that hasn't picked one yet -- an existing user signing
+  // back in with a stray `?role=` in the URL (e.g. a stale/shared link)
+  // must never have their real role silently overwritten.
+  if (preselectedRole && !onboardingRow?.role_selected_at) {
+    const nowIso = new Date().toISOString()
+    const { data: updatedRows, error: roleWriteError } = await supabase
+      .from('users')
+      .update({ role: preselectedRole, role_selected_at: nowIso })
+      .eq('id', data.user.id)
+      .select('role, role_selected_at, full_name, whatsapp_verified_at, onboarded')
+
+    if (!roleWriteError && updatedRows && updatedRows.length > 0) {
+      onboardingRow = updatedRows[0] as OnboardingRow
+    } else if (!onboardingRow) {
+      // Safety net: handle_new_user() row somehow doesn't exist yet.
+      const { data: inserted, error: insertError } = await supabase
+        .from('users')
+        .insert({
+          id: data.user.id,
+          email: data.user.email ?? null,
+          phone: data.user.phone ?? null,
+          role: preselectedRole,
+          role_selected_at: nowIso,
+        })
+        .select('role, role_selected_at, full_name, whatsapp_verified_at, onboarded')
+
+      if (!insertError && inserted && inserted.length > 0) {
+        onboardingRow = inserted[0] as OnboardingRow
+      }
+    }
+    // If the write failed for some other reason, fall through and let the
+    // normal onboarding-state computation below send them to
+    // /onboarding/role as a safe fallback rather than blocking sign-in.
+  }
+
+  // Password recovery (and any other flow with an explicit, real
+  // destination) is honoured as-is -- onboarding-state routing only
+  // applies to the default sign-in flow, where no specific `next` was
+  // requested.
+  if (next && next !== '/onboarding/role') {
+    return NextResponse.redirect(safeNext(next, origin))
+  }
+
+  const destination = resolveDestination(onboardingRow)
   return NextResponse.redirect(`${origin}${destination}`)
 }

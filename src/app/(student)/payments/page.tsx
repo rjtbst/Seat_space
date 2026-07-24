@@ -27,7 +27,7 @@ export const revalidate = 0
 
 export default async function PaymentsPage() {
   const { user } = await getSupabaseUser()
-  if (!user) redirect('/auth/login?next=/payments')
+  if (!user) redirect('/login?redirect=/payments')
 
   const payments = await getMyPayments()
 

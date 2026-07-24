@@ -72,7 +72,7 @@ export default function AdminPayoutsClient({
     <div>
       <h1 style={{ fontSize: 24, fontWeight: 800, margin: '0 0 20px', fontFamily: 'Syne, sans-serif' }}>Payouts & Settlements</h1>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 24 }}>
+      <div className="admin-grid-3" style={{ marginBottom: 24 }}>
         <div style={{ background: '#fff', borderRadius: 14, padding: '16px 18px', border: '1px solid #ECE7DC' }}>
           <p style={{ fontSize: 12, color: '#8B95A5', margin: 0, fontWeight: 600 }}>Held in escrow</p>
           <p style={{ fontSize: 22, fontWeight: 800, margin: '4px 0 0' }}>₹{totalPendingHeld.toFixed(2)}</p>
@@ -98,6 +98,7 @@ export default function AdminPayoutsClient({
 
       <h3 style={{ fontSize: 14, fontWeight: 700, margin: '0 0 12px' }}>Pending settlements by library</h3>
       <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #ECE7DC', overflow: 'hidden', marginBottom: 28 }}>
+        <div className="admin-table-wrap">
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13.5 }}>
           <thead>
             <tr style={{ background: '#FAF8F4', textAlign: 'left' }}>
@@ -120,10 +121,12 @@ export default function AdminPayoutsClient({
             )}
           </tbody>
         </table>
+        </div>
       </div>
 
       <h3 style={{ fontSize: 14, fontWeight: 700, margin: '0 0 12px' }}>Payout history</h3>
       <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #ECE7DC', overflow: 'hidden' }}>
+        <div className="admin-table-wrap">
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13.5 }}>
           <thead>
             <tr style={{ background: '#FAF8F4', textAlign: 'left' }}>
@@ -150,6 +153,7 @@ export default function AdminPayoutsClient({
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   )

@@ -81,8 +81,8 @@ export default function AdminLibraryDetailClient({ library }: { library: AdminLi
     <div>
       <Link href="/admin/libraries" style={{ color: '#8B95A5', fontSize: 13, textDecoration: 'none' }}>← Back to libraries</Link>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: 12, marginBottom: 20 }}>
-        <div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'space-between', alignItems: 'flex-start', marginTop: 12, marginBottom: 20 }}>
+        <div style={{ minWidth: 0 }}>
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, fontFamily: 'Syne, sans-serif' }}>{library.name}</h1>
           <p style={{ color: '#8B95A5', fontSize: 13, margin: '4px 0 0' }}>{library.address}</p>
         </div>
@@ -98,9 +98,9 @@ export default function AdminLibraryDetailClient({ library }: { library: AdminLi
       {error && <div style={{ background: '#FEE2E2', color: '#991B1B', padding: '10px 14px', borderRadius: 10, marginBottom: 16, fontSize: 13.5 }}>{error}</div>}
       {success && <div style={{ background: '#D1FAE5', color: '#065F46', padding: '10px 14px', borderRadius: 10, marginBottom: 16, fontSize: 13.5 }}>{success} (refresh to see updated state)</div>}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 20 }}>
-        <div style={{ background: '#fff', borderRadius: 16, padding: 24, border: '1px solid #ECE7DC' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
+      <div className="admin-detail-grid">
+        <div style={{ background: '#fff', borderRadius: 16, padding: 24, border: '1px solid #ECE7DC', minWidth: 0 }}>
+          <div className="admin-grid-2" style={{ marginBottom: 20 }}>
             <Field label="Owner" value={`${library.ownerName ?? '—'} (${library.ownerPhone ?? 'no phone'})`} />
             <Field label="Location" value={`${library.area}, ${library.city}`} />
             <Field label="Seats" value={library.seatCount} />
@@ -132,7 +132,7 @@ export default function AdminLibraryDetailClient({ library }: { library: AdminLi
           {library.photoUrls.length > 0 && (
             <div style={{ marginTop: 20 }}>
               <p style={{ fontSize: 11.5, color: '#A6AEBA', margin: '0 0 8px', fontWeight: 600, textTransform: 'uppercase' }}>Photos</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: 8 }}>
                 {library.photoUrls.map((url, i) => (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img key={i} src={url} alt={`${library.name} photo ${i + 1}`} style={{ width: '100%', height: 90, objectFit: 'cover', borderRadius: 8 }} />

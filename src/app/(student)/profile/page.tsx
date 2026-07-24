@@ -27,7 +27,7 @@ export const revalidate = 0
 
 export default async function ProfilePage() {
   const { user } = await getSupabaseUser()
-  if (!user) redirect('/auth/login?next=/profile')
+  if (!user) redirect('/login?redirect=/profile')
 
   const [profile, stats, upcoming] = await Promise.all([
     getStudentProfile(),
@@ -36,7 +36,7 @@ export default async function ProfilePage() {
   ])
 
   // Redundant guard — getStudentProfile() returns null only if unauthenticated
-  if (!profile) redirect('/auth/login?next=/profile')
+  if (!profile) redirect('/login?redirect=/profile')
 
   return (
     <ProfileClient
