@@ -13,6 +13,7 @@
  * loop/UI only needs to happen once.
  */
 import { useEffect, useRef, useState, useTransition } from 'react'
+import jsQR from 'jsqr'
 import { fmtIST } from '@/lib/ist'
 import type { ActionResult } from '@/lib/actions/auth'
 
@@ -47,8 +48,9 @@ export default function ScannerView({
 }: ScannerViewProps) {
   const videoRef                      = useRef<HTMLVideoElement>(null)
   const streamRef                     = useRef<MediaStream | null>(null)
-  const detectorRef                   = useRef<any>(null)
+  const canvasRef                     = useRef<HTMLCanvasElement | null>(null)
   const rafRef                        = useRef<number>(0)
+  const scanningRef                   = useRef(false)
 
   const [scanState, setScanState]     = useState<ScanState>('idle')
   const [booking,   setBooking]       = useState<BookingPreview | null>(null)
@@ -73,17 +75,14 @@ export default function ScannerView({
         await videoRef.current.play()
       }
 
-      // Use BarcodeDetector if available (Chrome 83+, Safari 17+)
-      if ('BarcodeDetector' in window) {
-        const detector = new (window as any).BarcodeDetector({ formats: ['qr_code'] })
-        detectorRef.current = detector
-        scanLoop(detector)
-      } else {
-        // No native API — show manual fallback
-        setHasCam(false)
-        setScanState('idle')
-        stopCamera()
+      if (!canvasRef.current) {
+        canvasRef.current = document.createElement('canvas')
       }
+
+      // jsQR works on every browser (unlike the native BarcodeDetector API,
+      // which is missing on most Android Chrome builds and all of iOS Safari)
+      scanningRef.current = true
+      scanLoop()
     } catch {
       setHasCam(false)
       setScanState('idle')
@@ -91,32 +90,51 @@ export default function ScannerView({
     }
   }
 
-  const scanLoop = (detector: any) => {
-    rafRef.current = requestAnimationFrame(async () => {
-      if (!videoRef.current || videoRef.current.readyState < 2) {
-        scanLoop(detector)
+  const scanLoop = () => {
+    rafRef.current = requestAnimationFrame(() => {
+      const video  = videoRef.current
+      const canvas = canvasRef.current
+      if (!scanningRef.current || !video || !canvas) return
+
+      if (video.readyState < 2 || video.videoWidth === 0) {
+        scanLoop()
         return
       }
+
+      const ctx = canvas.getContext('2d', { willReadFrequently: true })
+      if (!ctx) {
+        scanLoop()
+        return
+      }
+
+      canvas.width  = video.videoWidth
+      canvas.height = video.videoHeight
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+
       try {
-        const barcodes = await detector.detect(videoRef.current)
-        if (barcodes.length > 0) {
-          const raw = barcodes[0].rawValue as string
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+          inversionAttempts: 'dontInvert',
+        })
+        if (code && code.data) {
           stopCamera()
-          await resolveBookingId(raw)
+          resolveBookingId(code.data)
           return
         }
-      } catch { /* detector can throw on empty frame */ }
-      scanLoop(detector)
+      } catch { /* frame not ready / decode hiccup — just retry */ }
+
+      scanLoop()
     })
   }
 
   const stopCamera = () => {
+    scanningRef.current = false
     cancelAnimationFrame(rafRef.current)
     streamRef.current?.getTracks().forEach(t => t.stop())
     streamRef.current = null
   }
 
-  // Clean up on unmount
+  // Clean up on unmount (e.g. navigating away mid-scan)
   useEffect(() => () => stopCamera(), [])
 
   const resolveBookingId = async (rawId: string) => {
