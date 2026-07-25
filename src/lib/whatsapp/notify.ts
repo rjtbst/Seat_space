@@ -15,6 +15,7 @@
 
 import { sendWhatsappTemplate } from '@/lib/whatsapp/client'
 import { WA_TEMPLATES, otpVerificationParams } from '@/lib/whatsapp/templates'
+import { ENABLE_WHATSAPP } from '@/lib/feature-flags'
 
 type NotifyArgs = {
   userId: string
@@ -38,6 +39,16 @@ export async function sendWhatsappNotification(
   supabase: any,
   args: NotifyArgs,
 ): Promise<void> {
+  // Bypass active (see lib/feature-flags.ts): skip before touching the
+  // DB or the Graph API at all. Every call site already treats this as
+  // fire-and-forget, so callers (webhooks, cron, booking actions) don't
+  // need their own ENABLE_WHATSAPP checks -- this one covers all of
+  // them. Logged at a quiet level since this is expected, not an error.
+  if (!ENABLE_WHATSAPP) {
+    console.debug(`[whatsapp-notify] skipped ${args.event} for user ${args.userId}: WhatsApp disabled (ENABLE_WHATSAPP=false)`)
+    return
+  }
+
   try {
     const { data: userRow } = await supabase
       .from('users')
@@ -105,6 +116,15 @@ export async function sendOtpViaWhatsapp(
   toNumber: string,
   code: string,
 ): Promise<{ ok: boolean; error?: string }> {
+  // Bypass active: the `whatsapp` onboarding step is skipped entirely
+  // (see computeOnboardingStep in lib/auth/state.ts), so this shouldn't
+  // normally be reached -- kept as a direct-call safety net all the
+  // same. Behaves exactly like "Meta not configured yet" already did:
+  // ok:false, and the caller (sendWhatsappOtp) falls back to logging
+  // the code server-side rather than blocking the flow.
+  if (!ENABLE_WHATSAPP) {
+    return { ok: false, error: 'WhatsApp integration disabled (ENABLE_WHATSAPP=false)' }
+  }
   const result = await sendWhatsappTemplate(toNumber, WA_TEMPLATES.OTP_VERIFICATION, otpVerificationParams(code))
   return result.ok ? { ok: true } : { ok: false, error: result.error }
 }

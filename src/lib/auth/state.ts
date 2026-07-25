@@ -20,6 +20,7 @@
 // ─────────────────────────────────────────────────────────────────────────
 
 import type { Enums } from '@/lib/supabase/types'
+import { ENABLE_WHATSAPP } from '@/lib/feature-flags'
 
 export type UserRole = Enums<'user_role'>
 
@@ -51,13 +52,22 @@ export type OnboardingStep =
  * prevent_role_self_elevation trigger is the only way to grant that
  * role), never through self-serve onboarding, so they're always treated
  * as complete regardless of the other columns.
+ *
+ * The `whatsapp` gate itself is skipped entirely while ENABLE_WHATSAPP
+ * is off (see lib/feature-flags.ts) -- WhatsApp Business verification
+ * is an external dependency outside this app's control, and it must
+ * never block sign-up/login. This is the single choke point every
+ * caller (middleware, guards, server actions, the callback route) goes
+ * through, so gating it here is enough to bypass the requirement
+ * everywhere at once. Flip ENABLE_WHATSAPP back to true to restore the
+ * gate -- nothing else in this function needs to change.
  */
 export function computeOnboardingStep(row: OnboardingRow | null | undefined): OnboardingStep {
   if (!row) return 'role'
   if (row.role === 'admin') return 'complete'
   if (!row.role_selected_at) return 'role'
   if (!row.full_name || row.full_name.trim() === '') return 'profile'
-  if (!row.whatsapp_verified_at) return 'whatsapp'
+  if (ENABLE_WHATSAPP && !row.whatsapp_verified_at) return 'whatsapp'
   return 'complete'
 }
 

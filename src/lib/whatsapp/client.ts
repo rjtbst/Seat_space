@@ -14,6 +14,8 @@
 // Business Manager (WhatsApp Manager > Message Templates) before this
 // will successfully send anything.
 
+import { ENABLE_WHATSAPP } from '@/lib/feature-flags'
+
 const GRAPH_VERSION = process.env.WHATSAPP_GRAPH_API_VERSION ?? 'v21.0'
 
 export type WhatsappSendResult =
@@ -31,6 +33,14 @@ export async function sendWhatsappTemplate(
   bodyParams: string[],
   languageCode = 'en',
 ): Promise<WhatsappSendResult> {
+  // Second line of defence behind lib/whatsapp/notify.ts's own check --
+  // notify.ts is the only current caller, but this guarantees no Graph
+  // API request ever leaves the process while the bypass is active, even
+  // if a future call site imports this module directly.
+  if (!ENABLE_WHATSAPP) {
+    return { ok: false, error: 'WhatsApp integration disabled (ENABLE_WHATSAPP=false)' }
+  }
+
   const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID
   const accessToken = process.env.WHATSAPP_ACCESS_TOKEN
 

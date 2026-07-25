@@ -37,6 +37,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServiceSupabaseClient } from '@/lib/supabase/service'
 import { sendWhatsappNotification } from '@/lib/whatsapp/notify'
 import { WA_TEMPLATES, holdExpiringSoonParams, checkinReminderParams, subscriptionExpiringSoonParams, trialExpiringSoonParams } from '@/lib/whatsapp/templates'
+import { ENABLE_WHATSAPP } from '@/lib/feature-flags'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -71,6 +72,13 @@ async function alreadyNotified(
 export async function POST(req: NextRequest) {
   if (!isAuthorized(req)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // Bypass active (see lib/feature-flags.ts): sendWhatsappNotification()
+  // already no-ops per-candidate, but skipping the whole sweep here
+  // avoids the wasted candidate-row queries below while WhatsApp is off.
+  if (!ENABLE_WHATSAPP) {
+    return NextResponse.json({ skipped: true, reason: 'ENABLE_WHATSAPP=false' })
   }
 
   const supabase = createServiceSupabaseClient()

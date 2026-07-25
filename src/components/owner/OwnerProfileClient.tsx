@@ -5,6 +5,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { updateProfile } from '@/lib/actions/auth'
 import { STATE_CITY_MAP } from '@/lib/config'
+import { ENABLE_WHATSAPP_CLIENT } from '@/lib/feature-flags'
 
 const ACCENT       = '#0D7C54'
 const ACCENT_LIGHT = '#D1FAE5'
@@ -18,11 +19,16 @@ const ACCENT_DARK  = '#0A5E3F'
 // from before the Google/email + WhatsApp-verification auth refactor,
 // which no longer describes how sign-up actually works.
 function Steps() {
-  const steps = [
-    { label: 'Role',     done: true },
-    { label: 'Profile',  done: false, active: true },
-    { label: 'WhatsApp', done: false },
-  ]
+  const steps = ENABLE_WHATSAPP_CLIENT
+    ? [
+        { label: 'Role',     done: true },
+        { label: 'Profile',  done: false, active: true },
+        { label: 'WhatsApp', done: false },
+      ]
+    : [
+        { label: 'Role',     done: true },
+        { label: 'Profile',  done: false, active: true },
+      ]
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0, marginBottom: 32 }}>
       {steps.map((s, i) => (
@@ -160,7 +166,9 @@ export default function OwnerProfileClient() {
             Set up your owner profile
           </h1>
           <p style={{ fontSize: 14, color: '#6B7689', fontWeight: 300, lineHeight: 1.5, margin: 0 }}>
-            Step 2 of 3 — you'll verify a WhatsApp number next, then head to your dashboard to add your library.
+            {ENABLE_WHATSAPP_CLIENT
+              ? "Step 2 of 3 — you'll verify a WhatsApp number next, then head to your dashboard to add your library."
+              : 'Step 2 of 2 — next you\'ll head to your dashboard to add your library.'}
           </p>
         </div>
 
@@ -276,7 +284,7 @@ export default function OwnerProfileClient() {
                   animation: 'spin .65s linear infinite', flexShrink: 0,
                 }} />
               )}
-              {isPending ? 'Saving...' : 'Continue to WhatsApp Verification →'}
+              {isPending ? 'Saving...' : ENABLE_WHATSAPP_CLIENT ? 'Continue to WhatsApp Verification →' : 'Continue →'}
             </button>
 
           </form>
