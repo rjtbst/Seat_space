@@ -46,8 +46,12 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
 
   return (
     <div
-      className="fixed bottom-24 right-6 z-50 w-[360px] sm:w-[400px] flex flex-col rounded-2xl overflow-hidden shadow-xl border border-divider bg-surface"
-      style={{ maxHeight: 'calc(100vh - 180px)', height: '560px' }}
+      // bottom-[156px] keeps this sitting just above the repositioned
+      // launcher button (now at bottom-[92px] + its own 56px height + a
+      // gap) so the panel doesn't open underneath/behind the mobile tab
+      // bar; lg: reverts to the original desktop position.
+      className="fixed bottom-[156px] lg:bottom-24 right-6 z-50 w-[360px] sm:w-[400px] flex flex-col rounded-2xl overflow-hidden shadow-xl border border-divider bg-surface max-w-[calc(100vw-2rem)]"
+      style={{ maxHeight: 'calc(100vh - 240px)', height: '560px' }}
     >
       {/* Header */}
       <div className="bg-ink px-4 py-3.5 flex items-center justify-between shrink-0">

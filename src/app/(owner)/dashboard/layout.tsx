@@ -43,7 +43,7 @@ export default async function OwnerDashboardLayout({ children }: { children: Rea
 
         <style>{`
           @media (max-width: 767px) {
-            .dashboard-main { margin-left: 0 !important; padding-top: 56px !important; padding-bottom: 64px !important; }
+            .dashboard-main { margin-left: 0 !important; padding-top: 56px !important; padding-bottom: calc(58px + env(safe-area-inset-bottom, 0px) + 16px) !important; }
           }
           @keyframes shimmer { 0%,100% { opacity:1 } 50% { opacity:.45 } }
           @keyframes pulse { 0%,100% { opacity:1; transform:scale(1) } 50% { opacity:.6; transform:scale(1.2) } }

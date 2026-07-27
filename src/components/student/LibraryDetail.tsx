@@ -729,9 +729,15 @@ export default function LibraryDetail({
             <p className="text-[11px] font-semibold text-[#9AACBE] uppercase tracking-widest mb-3">
               Choose Time
             </p>
-            <div className="grid grid-cols-3 gap-3 mb-3">
-              {/* Date */}
-              <div>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-3">
+              {/* Date — spans both mobile columns so Start/End each get a
+                  full half-width row below instead of squeezing into a
+                  third of the screen. TimePicker renders 3 native
+                  <select> elements (hour/min/AM-PM) side by side, which
+                  needs ~140px minimum; a 3-way equal split on a ~360px
+                  phone only gives ~100px, causing the controls to
+                  overflow/overlap as seen in the screenshot. */}
+              <div className="col-span-2 md:col-span-1">
                 <label className="text-[11px] font-semibold text-[#6E7F94] uppercase tracking-wider block mb-1.5">
                   Date
                 </label>
@@ -1005,15 +1011,29 @@ export default function LibraryDetail({
       )}
 
       {/* ── Stats row ─────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-3 gap-3 mb-5">
+      <div className="grid grid-cols-3 gap-3 mb-5 items-stretch">
         {[
           { icon: Users,    label: 'Free Seats', value: isOpen ? `${freeSeats}` : '—' },
           { icon: Calendar, label: 'Today',      value: status.todayHoursLabel },
           { icon: Star,     label: 'Rating',     value: `${library.rating.toFixed(1)}/5` },
         ].map(({ icon: Icon, label, value }) => (
-          <div key={label} className="bg-white border border-[#E4EAF2] rounded-xl p-3 text-center">
-            <Icon className="w-4 h-4 text-[#9AACBE] mx-auto mb-1" />
-            <div className="text-[15px] font-bold text-[#0D1117]">{value}</div>
+          <div key={label} className="bg-white border border-[#E4EAF2] rounded-xl p-3 text-center flex flex-col items-center justify-center">
+            <Icon className="w-4 h-4 text-[#9AACBE] mb-1" />
+            {/* WebkitLineClamp (not Tailwind's line-clamp utility, to
+                avoid depending on whether that core utility is enabled in
+                this project's Tailwind version) caps a long value like
+                the "Today" hours string to 2 lines with an ellipsis,
+                instead of letting it wrap to 5+ lines and force the
+                Free Seats/Rating cards in the same grid row to stretch
+                to match — that mismatch was the actual bug: a short "8"
+                sitting inside a card that was only tall because its
+                neighbor's text was long. */}
+            <div
+              className="text-[13px] font-bold text-[#0D1117] leading-tight"
+              style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+            >
+              {value}
+            </div>
             <div className="text-[10px] text-[#9AACBE] mt-0.5">{label}</div>
           </div>
         ))}

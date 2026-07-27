@@ -4,6 +4,7 @@
 import {
   useState, useCallback, useTransition, useRef, useEffect, lazy, Suspense,
 } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter, usePathname } from 'next/navigation'
 import type { LibraryCard } from '@/lib/actions/students/student-discovery'
 import LibraryCardTile from './LibraryCard'
@@ -134,6 +135,10 @@ export default function ExploreClient({
   const [openNow,      setOpenNow]      = useState(initialFilters.open_now)
   const [selAmenities, setSelAmenities] = useState<string[]>(initialFilters.amenities)
   const [showFilters,  setShowFilters]  = useState(false)
+  // Guards the createPortal() call below — document doesn't exist during
+  // SSR, so the portal target is only resolved once mounted client-side.
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
 
   // ── Location state ──────────────────────────────────────────
   // locEnabled tracks whether the user WANTS near-me sorting. It starts
@@ -400,46 +405,27 @@ export default function ExploreClient({
           )}
         </div>
 
-        {/* Expanded filter panel */}
-        {showFilters && (
-          <div className="pt-2 border-t border-[#F4F7FB] space-y-3 animate-in slide-in-from-top-1 duration-150">
-            <div>
-              <p className="text-[10px] font-bold text-[#9AACBE] uppercase tracking-wider mb-1.5">City</p>
-              <select
-                value={city}
-                onChange={(e) => { setCity(e.target.value); buildAndNavigate({ city: e.target.value }) }}
-                className="w-full px-3 py-2 bg-[#F4F7FB] border border-[#E4EAF2] rounded-lg text-[13px] text-[#0D1117] focus:outline-none focus:border-[#1246FF] appearance-none cursor-pointer"
-              >
-                <option value="">All Cities</option>
-                {/* Prioritise profile city at top */}
-                {profileCity && (
-                  <option value={profileCity}>{profileCity} (My City)</option>
-                )}
-                {cities
-                  .filter(c => c !== profileCity)
-                  .map(c => <option key={c} value={c}>{c}</option>)
-                }
-              </select>
-            </div>
-            {allAmenities.length > 0 && (
-              <div>
-                <p className="text-[10px] font-bold text-[#9AACBE] uppercase tracking-wider mb-1.5">Amenities</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {allAmenities.map((a) => (
-                    <button key={a} onClick={() => toggleAmenity(a)}
-                      className={cn(
-                        'px-2.5 py-1 rounded-full border text-[11px] font-medium transition-all',
-                        selAmenities.includes(a)
-                          ? 'bg-[#1246FF] border-[#1246FF] text-white'
-                          : 'bg-white border-[#E4EAF2] text-[#6E7F94] hover:border-[#1246FF]',
-                      )}>
-                      {a}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+        {/* Filter bottom-sheet — was previously an inline block here that
+            pushed the library list down to a sliver of the screen when
+            open, because it lived inside this header's flex-shrink-0 box
+            within a fixed-height flex column shared with the list. Moving
+            it to a portal means it overlays the screen instead of
+            competing with the list for space, and it's no longer
+            clipped/misplaced by any transformed ancestor (e.g. the page
+            transition wrapper) since it renders directly under <body>. */}
+        {mounted && showFilters && createPortal(
+          <FilterSheet
+            onClose={() => setShowFilters(false)}
+            city={city}
+            setCity={(v) => { setCity(v); buildAndNavigate({ city: v }) }}
+            cities={cities}
+            profileCity={profileCity}
+            allAmenities={allAmenities}
+            selAmenities={selAmenities}
+            toggleAmenity={toggleAmenity}
+            resultCount={total}
+          />,
+          document.body,
         )}
 
         {/* Only show denied error — never show "enable location" nagging here */}
@@ -528,5 +514,107 @@ export default function ExploreClient({
         </div>
       )}
     </div> 
+  )
+}
+
+/* ── Filter bottom-sheet ──────────────────────────────────────────────
+   Portaled to document.body from the main component above. Slides up
+   from the bottom (native app "filters" pattern) instead of the old
+   inline panel that pushed the library list down to a sliver of the
+   screen. Backdrop tap or the X closes it; changes apply immediately
+   (same behavior as before — each control already calls
+   buildAndNavigate/toggleAmenity directly), so there's no separate
+   "Apply" step to get wrong. */
+function FilterSheet({
+  onClose, city, setCity, cities, profileCity, allAmenities, selAmenities, toggleAmenity, resultCount,
+}: {
+  onClose: () => void
+  city: string
+  setCity: (v: string) => void
+  cities: string[]
+  profileCity: string | null
+  allAmenities: string[]
+  selAmenities: string[]
+  toggleAmenity: (a: string) => void
+  resultCount: number
+}) {
+  // Lock background scroll while the sheet is open — otherwise the list
+  // underneath can scroll behind the backdrop, which feels broken on touch.
+  useEffect(() => {
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
+  }, [])
+
+  return (
+    <div className="fixed inset-0 z-[200] flex flex-col justify-end">
+      <div
+        className="absolute inset-0 bg-black/40"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Filters"
+        className="relative bg-white rounded-t-2xl safe-bottom max-h-[80vh] flex flex-col animate-in slide-in-from-bottom duration-200"
+      >
+        <div className="flex items-center justify-between px-4 py-3 border-b border-[#F4F7FB] flex-shrink-0">
+          <span className="w-8" />
+          <div className="w-9 h-1 rounded-full bg-[#E4EAF2] absolute left-1/2 -translate-x-1/2 top-2" />
+          <h2 className="text-[15px] font-bold text-[#0D1117]">Filters</h2>
+          <button onClick={onClose} className="tap-target press w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#F4F7FB]" aria-label="Close filters">
+            <X className="w-4 h-4 text-[#6E7F94]" />
+          </button>
+        </div>
+
+        <div className="overflow-y-auto px-4 py-4 space-y-4">
+          <div>
+            <p className="text-[10px] font-bold text-[#9AACBE] uppercase tracking-wider mb-1.5">City</p>
+            <select
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              className="w-full px-3 py-2.5 bg-[#F4F7FB] border border-[#E4EAF2] rounded-lg text-[13px] text-[#0D1117] focus:outline-none focus:border-[#1246FF] appearance-none cursor-pointer"
+            >
+              <option value="">All Cities</option>
+              {profileCity && (
+                <option value={profileCity}>{profileCity} (My City)</option>
+              )}
+              {cities
+                .filter(c => c !== profileCity)
+                .map(c => <option key={c} value={c}>{c}</option>)
+              }
+            </select>
+          </div>
+          {allAmenities.length > 0 && (
+            <div>
+              <p className="text-[10px] font-bold text-[#9AACBE] uppercase tracking-wider mb-1.5">Amenities</p>
+              <div className="flex flex-wrap gap-1.5">
+                {allAmenities.map((a) => (
+                  <button key={a} onClick={() => toggleAmenity(a)}
+                    className={cn(
+                      'press px-3 py-1.5 rounded-full border text-[12px] font-medium transition-all tap-target',
+                      selAmenities.includes(a)
+                        ? 'bg-[#1246FF] border-[#1246FF] text-white'
+                        : 'bg-white border-[#E4EAF2] text-[#6E7F94] hover:border-[#1246FF]',
+                    )}>
+                    {a}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="flex-shrink-0 p-4 border-t border-[#F4F7FB]">
+          <button
+            onClick={onClose}
+            className="press w-full py-3 rounded-xl bg-[#1246FF] text-white text-[14px] font-bold"
+          >
+            Show {resultCount} {resultCount === 1 ? 'library' : 'libraries'}
+          </button>
+        </div>
+      </div>
+    </div>
   )
 }

@@ -34,7 +34,7 @@ export default function MobileTabBar() {
     <nav
       aria-label="Primary"
       className={cn(
-        'lg:hidden fixed bottom-0 left-0 right-0 z-[120]',
+        'lg:hidden fixed bottom-0 left-0 right-0 z-[120] min-h-[58px]',
         'bg-white/95 backdrop-blur-md border-t border-[#E4EAF2]',
         'flex items-stretch safe-bottom',
       )}

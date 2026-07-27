@@ -33,6 +33,7 @@ export default function OwnerMobileTabBar() {
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 120,
         display: 'flex', background: 'rgba(253,252,249,.95)',
         backdropFilter: 'blur(10px)', borderTop: '1px solid #E2DDD4',
+        height: 58, // fixed so layout.tsx's padding-bottom can clear it precisely
       }}
     >
       {TAB_ITEMS.map((item) => {

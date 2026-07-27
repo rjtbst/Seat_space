@@ -199,7 +199,7 @@ export default function StudentShell({
         {/* pb-16 reserves space for MobileTabBar (h ~56px + safe-area) so
             the last item in any list is never hidden behind it; lg:pb-0
             removes that reservation once the tab bar itself is hidden. */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden pb-16 lg:pb-0">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden pb-[calc(58px+env(safe-area-inset-bottom,0px)+16px)] lg:pb-0">
           <PageTransition>{children}</PageTransition>
         </main>
       </div>
