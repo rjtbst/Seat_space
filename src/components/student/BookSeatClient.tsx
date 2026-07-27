@@ -436,11 +436,25 @@ export default function BookSeatClient({
       return h * 60 + m
     })()
 
-    // Default start: now (rounded up to next 15 min) if we're inside the slot today,
-    // otherwise slot start
+    // If today's whole slot window has already ended (e.g. it's 8pm and
+    // this slot runs 9am–5pm), defaulting to the slot's nominal start
+    // (9am) silently hands back a start time that's already hours in the
+    // past, which immediately trips "cannot be in the past" for a reason
+    // the person never caused. Roll forward to tomorrow instead.
+    if (selectedDate === nowDate && nowMins >= slotEndMins) {
+      const tomorrow = new Date(new Date(nowDate + 'T00:00:00+05:30').getTime() + 86_400_000)
+        .toLocaleString('sv-SE', { timeZone: 'Asia/Kolkata' }).slice(0, 10)
+      setSelectedDate(tomorrow)
+      return // the date change re-fires this effect with the new date
+    }
+
+    // Default start: now (+10 min lead time, not just rounded up to the
+    // next 15-min mark with zero buffer — "right now" can already read as
+    // "in the past" by the time the request reaches the server a moment
+    // later) if we're inside the slot today, otherwise slot start
     let defaultStartMins = slotStartMins
     if (selectedDate === nowDate && nowMins > slotStartMins && nowMins < slotEndMins) {
-      defaultStartMins = Math.ceil(nowMins / 15) * 15
+      defaultStartMins = Math.ceil((nowMins + 10) / 15) * 15
     }
 
     // Default end: start + 2h, capped at slot end

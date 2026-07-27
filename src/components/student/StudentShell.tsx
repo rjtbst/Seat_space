@@ -70,7 +70,7 @@ export default function StudentShell({
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#F4F7FB]">
+    <div className="flex h-dvh overflow-hidden bg-[#F4F7FB]">
       {/* StudentNavProgressBar needs Suspense because it reads useSearchParams */}
       <Suspense fallback={null}>
         <StudentNavProgressBar />
