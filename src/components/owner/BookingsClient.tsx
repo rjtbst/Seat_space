@@ -111,7 +111,7 @@ export default function BookingsClient({
       {/* Slot tabs */}
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20 }}>
         {slotTabs.map(slot => (
-          <button key={slot} onClick={() => setActiveSlot(slot)} style={{
+          <button className="press" key={slot} onClick={() => setActiveSlot(slot)} style={{
             padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600,
             border: `1.5px solid ${activeSlot === slot ? BLUE : '#E2DDD4'}`,
             background: activeSlot === slot ? BLUE_LIGHT : '#FDFCF9',
@@ -185,7 +185,7 @@ export default function BookingsClient({
                     </td>
                     <td style={{ padding: '11px 14px' }}>
                       {b.status === 'confirmed' && (
-                        <button
+                        <button className="press"
                           disabled={isPending}
                           onClick={() => handleCheckIn(b.id)}
                           style={{

@@ -48,6 +48,8 @@ export default function IssueTab({ libraryId, catalog, onIssued }: Props) {
 
   const debounceRef   = useRef<ReturnType<typeof setTimeout> | null>(null)
   const lookupRef     = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const searchRequestId = useRef(0)
+  const lookupRequestId = useRef(0)
 
   // Debounced book search
   const handleQuery = useCallback((val: string) => {
@@ -57,8 +59,10 @@ export default function IssueTab({ libraryId, catalog, onIssued }: Props) {
     if (debounceRef.current) clearTimeout(debounceRef.current)
     if (val.trim().length < 2) { setResults([]); return }
     debounceRef.current = setTimeout(async () => {
+      const requestId = ++searchRequestId.current
       setSearching(true)
       const res = await searchBooks(libraryId, val)
+      if (requestId !== searchRequestId.current) return
       setResults(res)
       setSearching(false)
     }, 350)
@@ -82,8 +86,15 @@ export default function IssueTab({ libraryId, catalog, onIssued }: Props) {
     const cleaned = val.replace(/\D/g, '')
     if (cleaned.length < 10) return
     lookupRef.current = setTimeout(async () => {
+      const requestId = ++lookupRequestId.current
       setLookingUp(true)
       const res = await lookupMemberByPhone(val, libraryId)
+      // Without this guard, a slower lookup for a phone number the staff
+      // member already edited/corrected could resolve after the newer
+      // one and show a DIFFERENT member's details against the number
+      // currently in the field — a real risk when issuing a book, not
+      // just a cosmetic glitch.
+      if (requestId !== lookupRequestId.current) return
       setLookingUp(false)
       if (res.success && res.data) {
         setMemberLookup(res.data)
@@ -205,7 +216,7 @@ export default function IssueTab({ libraryId, catalog, onIssued }: Props) {
             boxShadow: '0 4px 16px rgba(10,13,18,.08)',
           }}>
             {results.map((book, i) => (
-              <button
+              <button className="press"
                 key={book.bookId}
                 onClick={() => handleSelect(book)}
                 style={{
@@ -248,7 +259,7 @@ export default function IssueTab({ libraryId, catalog, onIssued }: Props) {
                 <div style={{ fontSize: 11, color: '#9AAAB8', marginTop: 2 }}>{selected.author}</div>
               )}
             </div>
-            <button
+            <button className="press"
               onClick={() => { setSelected(null); setQuery('') }}
               style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9AAAB8', fontSize: 16, padding: 0 }}
             >
@@ -282,7 +293,7 @@ export default function IssueTab({ libraryId, catalog, onIssued }: Props) {
         <label style={labelStyle}>Borrower Type</label>
         <div style={{ display: 'flex', gap: 8 }}>
           {(['guest', 'member'] as BorrowerMode[]).map(mode => (
-            <button
+            <button className="press"
               key={mode}
               onClick={() => {
                 setBorrowerMode(mode)
@@ -394,7 +405,7 @@ export default function IssueTab({ libraryId, catalog, onIssued }: Props) {
         </div>
       )}
 
-      <button
+      <button className="press"
         onClick={handleSubmit}
         disabled={loading || success || !selected || availCopies.length === 0}
         style={{

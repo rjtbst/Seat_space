@@ -141,6 +141,13 @@ export default function ExtendBookingModal({ bookingId, onClose }: Props) {
   const [success, setSuccess]       = useState(false)
 
   const previewTimer = useRef<ReturnType<typeof setTimeout>>()
+  // Same fix as BookSeatClient.tsx/LibraryDetail.tsx: without this, an
+  // older (now-stale) end-time selection's response can land after a
+  // newer one and overwrite the correct extension price — here that
+  // means showing the wrong extra charge for extending an already-paid
+  // booking, which is worth guarding even though the debounce makes it
+  // rare in practice.
+  const previewRequestId = useRef(0)
 
   // ── Load booking details ─────────────────────────────────
   useEffect(() => {
@@ -205,11 +212,13 @@ export default function ExtendBookingModal({ bookingId, onClose }: Props) {
 
     setPreviewLoading(true)
     previewTimer.current = setTimeout(async () => {
+      const requestId = ++previewRequestId.current
       const res = await getBookingPricePreview(
         b.library_id,
         b.end_time,     // from current end (extension window start)
         newEndIST,
       )
+      if (requestId !== previewRequestId.current) return
       setPreviewLoading(false)
       if (res.success === false) {
         setError(res.error)

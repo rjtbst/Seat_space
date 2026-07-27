@@ -113,14 +113,14 @@ function ConfirmRow({
         <button
           onClick={onCancel}
           disabled={isPending}
-          className="flex-1 py-2 rounded-lg border border-[var(--divider)] bg-white text-[var(--ink3)] text-[12px] font-semibold cursor-pointer"
+          className="press flex-1 py-2 rounded-lg border border-[var(--divider)] bg-white text-[var(--ink3)] text-[12px] font-semibold cursor-pointer"
         >
           Cancel
         </button>
         <button
           onClick={onConfirm}
           disabled={isPending}
-          className={`flex-[2] py-2 rounded-lg border-none text-white text-[13px] font-bold cursor-pointer transition-opacity
+          className={`press flex-[2] py-2 rounded-lg border-none text-white text-[13px] font-bold cursor-pointer transition-opacity
             ${danger ? 'bg-[var(--red)]' : 'bg-[var(--green)]'}
             ${isPending ? 'opacity-70' : 'opacity-100'}`}
         >
@@ -179,7 +179,7 @@ function StaffRow({
             onClick={onConfirmRemove}
             disabled={isPending}
             title="Remove staff"
-            className="
+            className="press 
               w-[30px] h-[30px] rounded-[7px] border border-[var(--divider)] bg-[var(--surface)]
               text-[var(--pale)] text-[14px] cursor-pointer shrink-0 flex items-center justify-center
               transition-all duration-100
@@ -250,7 +250,7 @@ function RequestCard({
             <button
               onClick={onConfirmReject}
               disabled={isPending}
-              className={`flex-1 py-[9px] rounded-[9px] border border-[var(--divider)] bg-[var(--surface)]
+              className={`press flex-1 py-[9px] rounded-[9px] border border-[var(--divider)] bg-[var(--surface)]
                 text-[var(--muted)] text-[13px] font-semibold cursor-pointer transition-opacity
                 ${isPending ? 'opacity-70' : ''}`}
             >
@@ -259,7 +259,7 @@ function RequestCard({
             <button
               onClick={onAccept}
               disabled={isPending}
-              className={`flex-[2] py-[9px] rounded-[9px] border-none bg-[var(--green)] text-white text-[13px]
+              className={`press flex-[2] py-[9px] rounded-[9px] border-none bg-[var(--green)] text-white text-[13px]
                 font-bold cursor-pointer shadow-[0_2px_10px_rgba(13,124,84,.25)] transition-opacity
                 ${isPending ? 'opacity-70' : ''}`}
             >
@@ -426,7 +426,7 @@ export default function StaffManagementClient({
               <button
                 key={lib.id}
                 onClick={() => { setActiveLibId(lib.id); resetLibState() }}
-                className={`
+                className={`press 
                   px-4 py-1.5 rounded-full text-[12px] font-semibold border-[1.5px] cursor-pointer
                   transition-all duration-100
                   ${isActive
@@ -459,7 +459,7 @@ export default function StaffManagementClient({
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`
+              className={`press 
                 px-[18px] py-2 text-[13px] font-semibold border-none cursor-pointer
                 flex items-center gap-1.5 transition-colors duration-100
                 ${i === 0 ? 'border-r border-[var(--divider)]' : ''}
@@ -560,10 +560,10 @@ export default function StaffManagementClient({
                   const rc = ROLE_CLASSES[r]
                   const borderClass = rc.select.split(' ').find(c => c.startsWith('border-'))
                   return (
-                    <button
+                    <button 
                       key={r}
                       onClick={() => setRoleInput(r)}
-                      className={`
+                      className={` press 
                         flex-1 py-[7px] px-1 rounded-lg border-[1.5px] text-[11px] font-bold
                         cursor-pointer font-[var(--font-dm)] transition-all duration-100
                         ${roleInput === r
@@ -583,7 +583,7 @@ export default function StaffManagementClient({
             <button
               onClick={handleAdd}
               disabled={phone.length < 10 || isPending}
-              className={`
+              className={`press 
                 w-full py-[11px] rounded-[9px] border-none text-white text-[14px] font-bold
                 font-[var(--font-syne)] transition-all duration-100
                 ${phone.length === 10

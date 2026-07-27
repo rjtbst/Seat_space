@@ -37,6 +37,7 @@ export default function LibraryRequestClient({
   const [isPending, startTransition]     = useTransition()
   const [submitted, setSubmitted]        = useState(false)
   const debounceRef                      = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const searchRequestId                  = useRef(0)
 
   // Debounced search
   useEffect(() => {
@@ -45,7 +46,9 @@ export default function LibraryRequestClient({
 
     setSearching(true)
     debounceRef.current = setTimeout(async () => {
+      const requestId = ++searchRequestId.current
       const res = await searchLibraries(query)
+      if (requestId !== searchRequestId.current) return
       setResults(res)
       setSearching(false)
     }, 400)
@@ -109,7 +112,7 @@ export default function LibraryRequestClient({
           }}>
             💡 Share your registered phone number with the library owner to help them find your request quickly.
           </div>
-          <button
+          <button className="press"
             onClick={() => router.push('/staff')}
             style={{
               width: '100%', padding: '12px 0', borderRadius: 10,
@@ -211,7 +214,7 @@ export default function LibraryRequestClient({
                       Searching…
                     </div>
                   ) : results.map(lib => (
-                    <button
+                    <button className="press"
                       key={lib.id}
                       onMouseDown={() => handleSelect(lib)}
                       style={{
@@ -251,7 +254,7 @@ export default function LibraryRequestClient({
                   <div style={{ fontSize: 13, fontWeight: 600, color: GREEN }}>{selected.name}</div>
                   <div style={{ fontSize: 11, color: '#6B7689' }}>{[selected.area, selected.city].filter(Boolean).join(', ')}</div>
                 </div>
-                <button
+                <button className="press"
                   onClick={() => { setSelected(null); setQuery('') }}
                   style={{ marginLeft: 'auto', border: 'none', background: 'none', cursor: 'pointer', color: '#9AAAB8', fontSize: 16, padding: '0 4px' }}
                 >
@@ -291,7 +294,7 @@ export default function LibraryRequestClient({
           )}
 
           {/* Submit */}
-          <button
+          <button className="press"
             onClick={handleSubmit}
             disabled={!selected || isPending}
             style={{

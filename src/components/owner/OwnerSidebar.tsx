@@ -6,6 +6,7 @@ import { signOut } from '@/lib/actions/auth'
 import { useOwner } from '@/contexts/OwnerContext'
 import { ACCENT, ACCENT_LIGHT, FONT_DISPLAY, FONT_BODY } from '@/lib/constants/theme'
 import { useIsMobile } from '@/hooks/useIsMobile'
+import OwnerMobileTabBar from './OwnerMobileTabBar'
 
 const NAV = [
   { href: '/dashboard',              icon: '📊', label: 'Dashboard'        },
@@ -215,6 +216,8 @@ export default function OwnerSidebar() {
         }}>
           <SidebarContent ownerName={ownerName} pathname={pathname} isMobile onClose={() => setDrawerOpen(false)} />
         </div>
+
+        <OwnerMobileTabBar />
       </>
     )
   }

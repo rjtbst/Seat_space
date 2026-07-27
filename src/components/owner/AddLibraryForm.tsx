@@ -415,7 +415,7 @@ export default function AddLibraryForm({
                   const selected = form.amenityIds.includes(id)
                   const emoji    = AMENITY_EMOJI[name] ?? '✦'
                   return (
-                    <button
+                    <button className="press"
                       key={id} type="button"
                       onClick={() => toggleAmenity(id)}
                       style={{
@@ -489,7 +489,7 @@ export default function AddLibraryForm({
 
             {/* Buttons */}
             <div style={{ display: 'flex', gap: 10 }}>
-              <button
+              <button className="press"
                 type="button" onClick={() => router.back()}
                 style={{
                   flex: 1, padding: '13px 0', borderRadius: 10, fontSize: 14, fontWeight: 600,
@@ -499,7 +499,7 @@ export default function AddLibraryForm({
               >
                 ← Back
               </button>
-              <button
+              <button className="press"
                 type="submit"
                 onClick={() => { if (!valid) setAttempted(true) }}
                 disabled={isPending}

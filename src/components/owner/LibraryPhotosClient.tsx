@@ -262,7 +262,7 @@ export default function LibraryPhotosClient() {
               ) : cover ? (
                 <>
                   <img src={cover.previewUrl} alt="cover" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  <button
+                  <button className="press"
                     onClick={e => { e.stopPropagation(); remove(cover, false) }}
                     style={{ position: 'absolute', top: 8, right: 8, width: 28, height: 28, borderRadius: '50%', background: '#C5282C', border: 'none', color: '#fff', fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   >×</button>
@@ -306,7 +306,7 @@ export default function LibraryPhotosClient() {
                       Make cover
                     </span>
                   </div>
-                  <button
+                  <button className="press"
                     onClick={e => { e.stopPropagation(); remove(photo, true, idx) }}
                     style={{ position: 'absolute', top: 4, right: 4, width: 20, height: 20, borderRadius: '50%', background: '#C5282C', border: 'none', color: '#fff', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}
                   >×</button>
@@ -363,7 +363,7 @@ export default function LibraryPhotosClient() {
           <div style={{ height: 1, background: '#E2DDD4', margin: '4px 0 20px' }} />
 
           <div style={{ display: 'flex', gap: 10 }}>
-            <button
+            <button className="press"
               type="button"
               onClick={() => router.push(`/onboarding/add-library?id=${libraryId}`)}
               style={{
@@ -374,7 +374,7 @@ export default function LibraryPhotosClient() {
             >
               ← Back
             </button>
-            <button
+            <button className="press"
               onClick={() => startTransition(() => router.push(`/onboarding/go-live?id=${libraryId}`))}
               disabled={!canContinue || isPending}
               style={{

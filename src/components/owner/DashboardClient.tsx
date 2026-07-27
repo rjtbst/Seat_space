@@ -231,7 +231,7 @@ function BookingsTable({
                 </div>
               </div>
               {canCheckIn && (
-                <button
+                <button className="press"
                   onClick={() => onCheckIn(b.id)}
                   style={{
                     width: '100%', padding: '7px 0', borderRadius: 8, fontSize: 12, fontWeight: 600,
@@ -293,7 +293,7 @@ function BookingsTable({
                 </td>
                 <td style={{ padding: '10px 12px' }}>
                   {canCheckIn && (
-                    <button
+                    <button className="press"
                       onClick={() => onCheckIn(b.id)}
                       style={{
                         padding: '4px 10px', borderRadius: 7, fontSize: 12, fontWeight: 600,
@@ -335,7 +335,7 @@ function QuickActions() {
       <div style={{ fontSize: 14, fontWeight: 700, color: TEXT_PRIMARY, marginBottom: 12 }}>Quick Actions</div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {actions.map(a => (
-          <button
+          <button className="press"
             key={a.href}
             onClick={() => navigate(a.href)}
             style={{
@@ -429,7 +429,7 @@ export default function DashboardClient({
             {libraryName} · {fmtISTDate()}
           </div>
         </div>
-        <button
+        <button className="press"
           onClick={() => navigate('/onboarding/add-library')}
           style={{
             padding: isMobile ? '8px 12px' : '9px 16px',
@@ -510,7 +510,7 @@ export default function DashboardClient({
                 <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600, background: BLUE_LIGHT, color: BLUE }}>
                   {s.today_bookings} total
                 </span>
-                <button
+                <button className="press"
                   onClick={() => navigate('/dashboard/bookings')}
                   style={{
                     padding: '5px 12px', borderRadius: 7, fontSize: 12, fontWeight: 600,

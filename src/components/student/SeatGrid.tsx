@@ -32,15 +32,15 @@ interface Props {
 function SeatSkeleton() {
   const rowConfig = [5, 6, 6, 5, 4]
   return (
-    <div className="space-y-2 animate-pulse py-2">
+    <div className="space-y-2 py-2">
       {rowConfig.map((count, i) => (
         <div key={i} className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-[#EEF1F7] flex-shrink-0" />
+          <div className="w-6 h-6 rounded-md bone-shimmer flex-shrink-0" />
           <div className="flex gap-1.5">
             {Array.from({ length: count }).map((_, j) => (
               <div
                 key={j}
-                className="w-10 h-10 rounded-xl bg-[#EEF1F7] flex-shrink-0"
+                className="w-10 h-10 rounded-xl bone-shimmer flex-shrink-0"
                 style={{ animationDelay: `${(i * count + j) * 40}ms` }}
               />
             ))}

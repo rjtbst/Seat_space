@@ -262,7 +262,7 @@ export default function StaffSeatManagerClient({
           </div>
         </div>
         <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-          <button
+          <button className="press"
             onClick={handleManualRefresh}
             disabled={isRefreshing}
             title="Refresh seat status"
@@ -282,7 +282,7 @@ export default function StaffSeatManagerClient({
               ↻
             </span>
           </button>
-          <button
+          <button className="press"
             onClick={() => setShowAddRow(v => !v)}
             style={{
               padding: '8px 14px', borderRadius: 9, fontSize: 13, fontWeight: 600,
@@ -362,7 +362,7 @@ export default function StaffSeatManagerClient({
                     return (
                       <div key={seat.id} style={{ display: 'flex', alignItems: 'center' }}>
                         {idx === 4 && <div style={{ width: 8 }} />}
-                        <button
+                        <button className="press"
                           onClick={() => {
                             setSelected(seat.id === selected?.id ? null : seat)
                             setConfirmForceFree(false)
@@ -440,7 +440,7 @@ export default function StaffSeatManagerClient({
             </div>
 
             {/* Toggle switch */}
-            <button
+            <button className="press"
               onClick={handleToggle}
               disabled={isPending}
               aria-label="Toggle seat active"
@@ -465,7 +465,7 @@ export default function StaffSeatManagerClient({
             }}>
               {selected.is_active ? 'Active' : 'Inactive'}
             </span>
-            <button
+            <button className="press"
               onClick={() => { setSelected(null); setConfirmForceFree(false) }}
               style={{
                 padding: '5px 12px', borderRadius: 8, fontSize: 11, fontWeight: 600,
@@ -516,7 +516,7 @@ export default function StaffSeatManagerClient({
                   border: '1.5px solid #E2DDD4', overflow: 'hidden', width: 'fit-content',
                 }}>
                   {(['offline', 'online'] as const).map(mode => (
-                    <button
+                    <button className="press"
                       key={mode}
                       onClick={() => setBookForm(f => ({ ...f, bookingMode: mode }))}
                       style={{
@@ -667,7 +667,7 @@ export default function StaffSeatManagerClient({
                 </div>
               )}
 
-              <button
+              <button className="press"
                 onClick={handleManualBook}
                 disabled={isPending || !bookForm.userName || !bookForm.userPhone}
                 style={{
@@ -695,7 +695,7 @@ export default function StaffSeatManagerClient({
                 Cancels the active booking and marks the seat as free. Payment record is kept for audit.
               </div>
               {!confirmForceFree ? (
-                <button
+                <button className="press"
                   onClick={() => setConfirmForceFree(true)}
                   style={{
                     width: '100%', padding: '10px 0', borderRadius: 9,
@@ -715,7 +715,7 @@ export default function StaffSeatManagerClient({
                     Are you sure? This will cancel the booking.
                   </div>
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <button
+                    <button className="press"
                       onClick={() => setConfirmForceFree(false)}
                       disabled={isPending}
                       style={{
@@ -727,7 +727,7 @@ export default function StaffSeatManagerClient({
                     >
                       Cancel
                     </button>
-                    <button
+                    <button className="press"
                       onClick={handleForceFree}
                       disabled={isPending}
                       style={{
@@ -829,7 +829,7 @@ export default function StaffSeatManagerClient({
             </div>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button
+            <button className="press"
               onClick={() => { setShowAddRow(false); setNewRowLabel('') }}
               style={{
                 flex: 1, padding: '10px 0', borderRadius: 9, fontSize: 13,
@@ -840,7 +840,7 @@ export default function StaffSeatManagerClient({
             >
               Cancel
             </button>
-            <button
+            <button className="press"
               onClick={handleAddRow}
               disabled={!newRowLabel || isPending}
               style={{

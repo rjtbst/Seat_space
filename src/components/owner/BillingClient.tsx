@@ -278,7 +278,7 @@ function PayoutSetupPanel({ initial }: { initial: PayoutSetupView | null }) {
     <Card>
       <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 6px' }}>Payout details</h3>
       <p style={{ fontSize: 12.5, color: '#8B95A5', margin: '0 0 16px' }}>
-        Where your booking earnings (after the platform's 7% commission) get sent once a booking is complete.
+        Where your booking earnings get sent once a booking is complete — you receive your full listed price; the platform's fee is added on top of what the student pays, not deducted from your payout.
       </p>
 
       {error && <div style={{ background: '#FDEAEA', color: '#9B1C1C', padding: '8px 12px', borderRadius: 8, fontSize: 12.5, marginBottom: 12 }}>{error}</div>}

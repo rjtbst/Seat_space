@@ -122,11 +122,11 @@ function PlanCard({
         {confirmArchive ? (
           <>
             <span style={{ fontSize: 12, color: '#9B1C1C', alignSelf: 'center', flex: 1 }}>Archive this plan?</span>
-            <button onClick={() => setConfirmArchive(false)} style={{
+            <button className="press" onClick={() => setConfirmArchive(false)} style={{
               padding: '6px 12px', borderRadius: 7, fontSize: 12, fontWeight: 600,
               border: `1.5px solid ${BORDER}`, background: BG_CARD, color: '#3A4A5C', cursor: 'pointer', fontFamily: FONT_BODY,
             }}>Cancel</button>
-            <button disabled={archiving} onClick={() => onArchive(plan.id)} style={{
+            <button className="press" disabled={archiving} onClick={() => onArchive(plan.id)} style={{
               padding: '6px 12px', borderRadius: 7, fontSize: 12, fontWeight: 700,
               border: 'none', background: '#C5282C', color: '#fff', cursor: 'pointer',
               fontFamily: FONT_BODY, opacity: archiving ? 0.7 : 1,
@@ -136,14 +136,14 @@ function PlanCard({
           </>
         ) : (
           <>
-            <button onClick={() => onEdit(plan)} style={{
+            <button className="press" onClick={() => onEdit(plan)} style={{
               flex: 1, padding: '7px 0', borderRadius: 8, fontSize: 12, fontWeight: 600,
               border: `1.5px solid ${BORDER}`, background: BG_CARD, color: '#3A4A5C',
               cursor: 'pointer', fontFamily: FONT_BODY,
             }}>
               ✏️ Edit
             </button>
-            <button onClick={() => setConfirmArchive(true)} style={{
+            <button className="press" onClick={() => setConfirmArchive(true)} style={{
               flex: 1, padding: '7px 0', borderRadius: 8, fontSize: 12, fontWeight: 600,
               border: '1.5px solid #FCA5A5', background: '#FEE2E2', color: '#9B1C1C',
               cursor: 'pointer', fontFamily: FONT_BODY,
@@ -281,7 +281,7 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
         title="Plan Builder"
         subtitle="Create membership plans — assign per-library or share across all"
         action={
-          <button
+          <button className="press"
             onClick={() => { if (showForm) { handleCancelForm() } else { setShowForm(true) } }}
             style={{
               padding: '9px 16px', borderRadius: 9, fontSize: 13, fontWeight: 700,
@@ -330,7 +330,7 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
             title="No plans yet"
             subtitle="Create membership plans so students can subscribe to your library"
             action={
-              <button
+              <button className="press"
                 onClick={() => setShowForm(true)}
                 style={{
                   padding: '10px 22px', borderRadius: 9, fontSize: 13, fontWeight: 700,
@@ -399,7 +399,7 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
 
           {/* Restricted hours — makes plans like "9 to 12" or "12 to 5" possible */}
           <div style={{ marginBottom: 16 }}>
-            <button
+            <button className="press"
               type="button"
               onClick={() => setForm(f => ({ ...f, time_window_enabled: !f.time_window_enabled }))}
               style={{
@@ -449,7 +449,7 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
 
           {/* Restricted days — makes plans like "Weekday Pass" or "Weekend Pass" possible; composes with restricted hours above */}
           <div style={{ marginBottom: 16 }}>
-            <button
+            <button className="press"
               type="button"
               onClick={() => setForm(f => ({ ...f, days_of_week_enabled: !f.days_of_week_enabled }))}
               style={{
@@ -484,7 +484,7 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
                   {DAY_OPTIONS.map(d => {
                     const checked = form.days_of_week.includes(d.value)
                     return (
-                      <button key={d.value} type="button" onClick={() => toggleDayOfWeek(d.value)} style={{
+                      <button className="press" key={d.value} type="button" onClick={() => toggleDayOfWeek(d.value)} style={{
                         width: 44, padding: '8px 0', borderRadius: 8, textAlign: 'center', cursor: 'pointer',
                         border: `1.5px solid ${checked ? PURPLE : BORDER}`,
                         background: checked ? PURPLE : '#F9F8F5',
@@ -513,7 +513,7 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
               ] as const).map(opt => {
                 const active = form.scope === opt.value
                 return (
-                  <button key={opt.value} type="button" onClick={() => setScope(opt.value)} style={{
+                  <button className="press" key={opt.value} type="button" onClick={() => setScope(opt.value)} style={{
                     padding: '12px 14px', borderRadius: 10, textAlign: 'left', cursor: 'pointer',
                     border: `${active ? 2 : 1.5}px solid ${active ? BLUE : BORDER}`,
                     background: active ? BLUE_LIGHT : '#F9F8F5',
@@ -536,7 +536,7 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
               {libraries.map(lib => {
                 const checked = form.library_ids.includes(lib.id)
                 return (
-                  <button key={lib.id} type="button"
+                  <button className="press" key={lib.id} type="button"
                     onClick={() => form.scope !== 'cross' && toggleLibrary(lib.id)}
                     style={{
                       display: 'flex', alignItems: 'center', gap: 12,
@@ -574,12 +574,12 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
           <ErrorBanner error={error} />
 
           <div style={{ display: 'flex', gap: 10 }}>
-            <button onClick={handleCancelForm} style={{
+            <button className="press" onClick={handleCancelForm} style={{
               flex: 1, padding: '11px 0', borderRadius: 9, fontSize: 13, fontWeight: 600,
               border: `1.5px solid ${BORDER}`, background: BG_CARD, color: '#3A4A5C',
               cursor: 'pointer', fontFamily: FONT_BODY,
             }}>Cancel</button>
-            <button onClick={handleSubmit} disabled={isPending} style={{
+            <button className="press" onClick={handleSubmit} disabled={isPending} style={{
               flex: 2, padding: '11px 0', borderRadius: 9, fontSize: 14, fontWeight: 700,
               border: 'none', background: ACCENT, color: '#fff',
               cursor: isPending ? 'not-allowed' : 'pointer', fontFamily: FONT_DISPLAY,

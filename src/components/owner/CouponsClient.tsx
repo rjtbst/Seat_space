@@ -103,7 +103,7 @@ export default function CouponsClient({
         title="Coupons"
         subtitle="Create discount codes for your membership plans — share manually over WhatsApp or email with loyal students."
         action={
-          <button
+          <button className="press"
             onClick={() => setFormOpen(o => !o)}
             style={{
               padding: '9px 16px', borderRadius: 9, border: 'none',
@@ -198,7 +198,7 @@ export default function CouponsClient({
             </Field>
           </div>
 
-          <button
+          <button className="press"
             onClick={handleCreate}
             disabled={pending}
             style={{

@@ -29,6 +29,7 @@ import {
   useState, useCallback, useEffect, useRef, useTransition,
 } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import {
   ArrowLeft, Star, MapPin, Clock, Wifi, Wind, Volume2, Zap,
   Car, Coffee, ChevronLeft, ChevronRight, Users, Calendar,
@@ -186,6 +187,16 @@ export default function LibraryDetail({
   const [seatError,      setSeatError]      = useState<string>('')
   const step2RangeRef = useRef<{ startIST: string; endIST: string } | null>(null)
 
+  // Tracks the booking row created by THIS student's own in-progress pay
+  // flow (set the moment initiateBooking() returns, cleared once the flow
+  // finishes either way). The realtime handler below watches every
+  // booking change on this library -- without this, the student's own
+  // held-booking INSERT (and the confirmed-booking UPDATE right after
+  // payment) fire the exact same "someone else took this seat" path as a
+  // real conflict, deselecting their seat and showing an error for a
+  // booking they just successfully paid for.
+  const myPendingBookingIdRef = useRef<string | null>(null)
+
   // Pay state
   const [payLoading, setPayLoading] = useState(false)
   const [payError,   setPayError]   = useState<string>('')
@@ -285,6 +296,20 @@ export default function LibraryDetail({
           const range = step2RangeRef.current
           if (!range) return
 
+          // This change is the student's own booking -- either the held
+          // row from initiateBooking (and its confirmed-payment update
+          // right after), or a subscription-covered booking created
+          // directly as confirmed. Either way it's not a competing
+          // booking, and REPLICA IDENTITY FULL on this table means
+          // user_id is present on both INSERT and UPDATE/DELETE payloads,
+          // so this check works for all of them -- not just the ones we
+          // could pre-track a bookingId for. Surfacing "your seat was
+          // just taken" for a seat you just successfully paid for is a
+          // false alarm, not a real conflict.
+          const changedRow = (payload.new ?? payload.old) as { id?: string; user_id?: string } | null
+          if (changedRow?.user_id && changedRow.user_id === profile?.id) return
+          if (changedRow?.id && changedRow.id === myPendingBookingIdRef.current) return
+
           // Skip changes that can't affect the currently selected window —
           // see BookSeatClient.tsx for the full rationale. Without this,
           // every booking change anywhere in the library re-fetches for
@@ -312,7 +337,7 @@ export default function LibraryDetail({
       .subscribe()
 
     return () => { supabase.removeChannel(channel) }
-  }, [bookingOpen, library.id])
+  }, [bookingOpen, library.id, profile?.id])
 
   /* ── Helpers ─────────────────────────────────────────────────────────── */
 
@@ -341,6 +366,12 @@ export default function LibraryDetail({
   }
 
   const previewTimer = useRef<ReturnType<typeof setTimeout>>()
+  // Same fix as BookSeatClient.tsx's refreshPreview: without this, a
+  // response from an older (now-stale) time selection can resolve AFTER
+  // a newer one and silently overwrite the correct price with a wrong
+  // one. Only the response matching the most recently fired request is
+  // ever applied.
+  const previewRequestId = useRef(0)
   const refreshPreview = useCallback((
     slot: SlotConfig | null,
     date: string,
@@ -355,6 +386,7 @@ export default function LibraryDetail({
     if (em - sm < 30) { setPricePreview(null); return }
 
     previewTimer.current = setTimeout(async () => {
+      const requestId = ++previewRequestId.current
       setPreviewLoading(true)
       const endMins = timeToMinutes(end)
       const endDate = endMins === 0
@@ -362,6 +394,7 @@ export default function LibraryDetail({
             .toLocaleString('sv-SE', { timeZone: 'Asia/Kolkata' }).slice(0, 10)
         : date
       const res = await getBookingPricePreview(library.id, `${date}T${start}`, `${endDate}T${end}`)
+      if (requestId !== previewRequestId.current) return
       setPreviewLoading(false)
       if (res.success === false) {
         setTimeError(res.error)
@@ -373,15 +406,22 @@ export default function LibraryDetail({
     }, 500)
   }, [library.id])
 
+  const seatsRequestId = useRef(0)
   function fetchSeats() {
     if (!startTime || !endTime || !selectedSlot) return
     const err = validateTimes()
     if (err) return
     const range = resolveRange()
     step2RangeRef.current = range
+    const requestId = ++seatsRequestId.current
     setSeatsLoading(true)
     setSelectedSeatId(null)
     getSeatAvailability(library.id, range.startIST, range.endIST).then((data) => {
+      // Discard if a newer time-window change has fired another fetch
+      // since this one started — otherwise a slow response for an old
+      // window can land after a fast one for the current window and
+      // show stale (wrong) seat availability right before payment.
+      if (requestId !== seatsRequestId.current) return
       setSeats(data)
       setSeatsLoading(false)
     })
@@ -440,6 +480,7 @@ export default function LibraryDetail({
       }
 
       const { bookingId, amount, razorpayOrderId, razorpayKeyId, libraryName, testMode } = initRes.data
+      myPendingBookingIdRef.current = bookingId
 
       // TEST_MODE: bypass Razorpay, confirm directly
       if (testMode) {
@@ -451,6 +492,7 @@ export default function LibraryDetail({
           razorpaySignature: 'test_signature_bypass',
         })
         if (confirmRes.success === false) {
+          myPendingBookingIdRef.current = null
           setPayError(confirmRes.error)
           setPayLoading(false)
           return
@@ -478,14 +520,15 @@ export default function LibraryDetail({
             razorpaySignature: signature,
           })
           if (confirmRes.success === false) {
+            myPendingBookingIdRef.current = null
             setPayError(confirmRes.error)
             setPayLoading(false)
             return
           }
           router.push(`/library/${library.id}/book/confirm?booking=${bookingId}`)
         },
-        onDismiss: () => setPayLoading(false),
-        onError:   (msg) => { setPayError(msg); setPayLoading(false) },
+        onDismiss: () => { myPendingBookingIdRef.current = null; setPayLoading(false) },
+        onError:   (msg) => { myPendingBookingIdRef.current = null; setPayError(msg); setPayLoading(false) },
       })
     })
   }
@@ -525,7 +568,16 @@ export default function LibraryDetail({
         style={{ background: library.images.length === 0 ? GRADS[0] : undefined }}
       >
         {library.images.length > 0
-          ? <img src={library.images[imgIdx % library.images.length]} alt={library.name} className="w-full h-full object-cover" />
+          ? (
+            <Image
+              src={library.images[imgIdx % library.images.length]}
+              alt={library.name}
+              fill
+              className="object-cover"
+              priority
+              sizes="(max-width: 640px) 100vw, 768px"
+            />
+          )
           : '📚'}
         {library.images.length > 1 && (
           <>
@@ -720,7 +772,7 @@ export default function LibraryDetail({
                 <div>
                   <div className="text-[11px] text-[#6E7F94]">Estimated total</div>
                   {previewLoading
-                    ? <div className="mt-1 h-3.5 w-24 rounded bg-[#DDE4EE] animate-pulse" />
+                    ? <div className="mt-1 h-3.5 w-24 rounded bone-shimmer" />
                     : pricePreview
                       ? <div className="text-[11px] text-[#9AACBE]">
                           {durationH.toFixed(1)} hr × ₹{pricePreview.hourlyRate}/hr

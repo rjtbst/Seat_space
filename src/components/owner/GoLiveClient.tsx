@@ -79,7 +79,7 @@ function CheckRow({
         <div style={{ fontSize: 12, color: '#6B7689', marginTop: 2 }}>{detail}</div>
       </div>
       {!ok && action && (
-        <button
+        <button className="press"
           onClick={onAction}
           style={{
             padding: '5px 12px', borderRadius: 7, fontSize: 12, fontWeight: 600,
@@ -302,7 +302,7 @@ export default function GoLiveClient() {
           <p style={{ fontSize: 15, color: '#6B7689', lineHeight: 1.6, marginBottom: 28 }}>
             <strong>{summary?.name}</strong> has been submitted to the platform admin for approval. You'll be notified as soon as it's reviewed — this usually takes 1–2 business days.
           </p>
-          <button
+          <button className="press"
             onClick={() => router.push('/dashboard')}
             style={{
               width: '100%', padding: '14px 0', borderRadius: 10, fontSize: 15,
@@ -356,7 +356,7 @@ export default function GoLiveClient() {
             ))}
           </div>
 
-          <button
+          <button className="press"
             onClick={() => router.push('/dashboard')}
             style={{
               width: '100%', padding: '14px 0', borderRadius: 10, fontSize: 15,
@@ -506,7 +506,7 @@ export default function GoLiveClient() {
               <div style={{ height: 1, background: '#E2DDD4', margin: '4px 0 20px' }} />
 
               <div style={{ display: 'flex', gap: 10 }}>
-                <button
+                <button className="press"
                   type="button"
                   onClick={() => router.back()}
                   style={{
@@ -517,7 +517,7 @@ export default function GoLiveClient() {
                 >
                   ← Back
                 </button>
-                <button
+                <button className="press"
                   onClick={handlePublish}
                   disabled={!criticalOk || isPending || subPending}
                   style={{
@@ -582,7 +582,7 @@ export default function GoLiveClient() {
             <p style={{ fontSize: 13.5, color: '#6B7689', lineHeight: 1.6, marginBottom: 22 }}>
               Please complete payment to make this library active. Your library is saved as a draft and won't be lost — it just won't be visible to students until your ₹399/month subscription is set up.
             </p>
-            <button
+            <button className="press"
               onClick={() => { setShowSubscriptionModal(false); handleStartSubscription() }}
               disabled={subPending}
               style={{
@@ -596,7 +596,7 @@ export default function GoLiveClient() {
               {subPending && <span style={{ width: 15, height: 15, border: '2px solid rgba(255,255,255,.35)', borderTopColor: '#fff', borderRadius: '50%', display: 'inline-block', animation: 'spin .65s linear infinite' }} />}
               {subPending ? 'Opening checkout…' : 'Subscribe — ₹399/month'}
             </button>
-            <button
+            <button className="press"
               onClick={() => setShowSubscriptionModal(false)}
               style={{
                 width: '100%', padding: '10px 0', borderRadius: 10, fontSize: 13.5,

@@ -394,7 +394,7 @@ export default function StaffProfileClient() {
               </div>
             )}
 
-            <button
+            <button className="press"
               type="submit"
               disabled={isPending}
               style={{

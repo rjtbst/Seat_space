@@ -19,7 +19,11 @@ export function Bone({
 }) {
   return (
     <div
-      className={cn('bg-[#E4EAF2] animate-pulse', rounded, className)}
+      // Shimmer instead of opacity-pulse: a moving highlight reads as
+      // "content is actively arriving" (Instagram/LinkedIn-style), while
+      // animate-pulse reads as "something is wrong/stuck" past ~1s.
+      // prefers-reduced-motion is handled globally in globals.css.
+      className={cn('bone-shimmer', rounded, className)}
       style={{
         width:  typeof width === 'number' ? `${width}px` : width,
         height: typeof height === 'number' ? `${height}px` : height,

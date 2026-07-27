@@ -31,6 +31,8 @@ import { cn } from '@/lib/utils'
 import { getInitials, avatarGradient } from '@/lib/utils'
 import NotificationBell from './NotificationBell'
 import { StudentNavProgressBar } from './NavProgressBar'
+import MobileTabBar from './MobileTabBar'
+import PageTransition from '@/components/shared/PageTransition'
 
 const NAV_ITEMS = [
   { href: '/explore',        icon: Building2,    label: 'Find Libraries'    },
@@ -179,8 +181,9 @@ export default function StudentShell({
         {/* Top header */}
         <header className="h-[58px] bg-white border-b border-[#E4EAF2] flex items-center px-5 gap-3 flex-shrink-0 z-[100]">
           <button
-            className="lg:hidden text-[#6E7F94] p-1.5 rounded-lg hover:bg-[#F4F7FB] transition-colors"
+            className="tap-target press lg:hidden text-[#6E7F94] p-1.5 rounded-lg hover:bg-[#F4F7FB] transition-colors"
             onClick={() => setSidebarOpen(true)}
+            aria-label="Open menu"
           >
             <Menu className="w-5 h-5" />
           </button>
@@ -193,10 +196,15 @@ export default function StudentShell({
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden">
-          {children}
+        {/* pb-16 reserves space for MobileTabBar (h ~56px + safe-area) so
+            the last item in any list is never hidden behind it; lg:pb-0
+            removes that reservation once the tab bar itself is hidden. */}
+        <main className="flex-1 overflow-y-auto overflow-x-hidden pb-16 lg:pb-0">
+          <PageTransition>{children}</PageTransition>
         </main>
       </div>
+
+      <MobileTabBar />
     </div>
   )
 }

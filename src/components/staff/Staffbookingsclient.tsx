@@ -251,7 +251,7 @@ export default function StaffBookingsClient({
 
                 {/* Check-in button */}
                 {canCheckIn && (
-                  <button
+                  <button className="press"
                     disabled={isPending}
                     onClick={() => handleCheckIn(b.id, b.studentName)}
                     style={{
@@ -289,7 +289,7 @@ function SlotTab({
   const ACCENT       = '#0597A7'
   const ACCENT_LIGHT = '#E0F6F8'
   return (
-    <button
+    <button className="press"
       onClick={onClick}
       style={{
         padding:      '5px 12px',

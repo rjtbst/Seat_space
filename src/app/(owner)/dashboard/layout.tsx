@@ -5,6 +5,7 @@ import { getFirstLibraryId, getOwnerLibraries } from '@/lib/actions/owner'
 import { OwnerProvider } from '@/contexts/OwnerContext'
 import OwnerSidebar from '@/components/owner/OwnerSidebar'
 import { NavProgressBar } from '@/components/owner/NavProgressBar'
+import PageTransition from '@/components/shared/PageTransition'
 
 export const metadata = { title: 'Owner Dashboard — seatspace' }
 
@@ -37,12 +38,12 @@ export default async function OwnerDashboardLayout({ children }: { children: Rea
         <div style={{ flex: 1, marginLeft: 'clamp(0px, 240px, 240px)', minHeight: '100vh', overflowX: 'hidden' }}
           className="dashboard-main"
         >
-          {children}
+          <PageTransition>{children}</PageTransition>
         </div>
 
         <style>{`
           @media (max-width: 767px) {
-            .dashboard-main { margin-left: 0 !important; padding-top: 56px !important; }
+            .dashboard-main { margin-left: 0 !important; padding-top: 56px !important; padding-bottom: 64px !important; }
           }
           @keyframes shimmer { 0%,100% { opacity:1 } 50% { opacity:.45 } }
           @keyframes pulse { 0%,100% { opacity:1; transform:scale(1) } 50% { opacity:.6; transform:scale(1.2) } }

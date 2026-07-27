@@ -5,6 +5,7 @@ import { getStaffLibrary } from '@/lib/actions/staff'
 
 import StaffSidebar from '@/components/staff/Staffsidebar'
 import { StaffNavProgressBar } from '@/components/staff/NavProgressBar'
+import PageTransition from '@/components/shared/PageTransition'
 
 export default async function StaffLayout({ children }: { children: React.ReactNode }) {
 
@@ -40,7 +41,7 @@ export default async function StaffLayout({ children }: { children: React.ReactN
       <Suspense fallback={null}>
         <StaffNavProgressBar />
       </Suspense>
-      <main>{children}</main>
+      <main><PageTransition>{children}</PageTransition></main>
       <StaffSidebar role={staffRole} staffName={profile.full_name} />
     </div>
   )

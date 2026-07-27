@@ -562,12 +562,27 @@ export async function cancelBooking(bookingId: string): Promise<ActionResult> {
   // balance-checked RPC the admin refund flow uses (create_refund_if_within_
   // balance), rather than inserting a `refunds` row directly — this closes
   // a gap where the two insertion paths could otherwise double-refund past
-  // the payment's original amount. Per the cancellation policy, the
-  // student gets back 95% of what they paid (the platform's already-
-  // computed 5% commission is retained as a cancellation fee) — this uses
-  // the commission split that was actually persisted on the payment at
-  // capture time (payments.owner_payout_amount), not a value recomputed
-  // against today's commission rate, exactly like the escrow split itself.
+  // the payment's original amount.
+  //
+  // Cancellation policy: the student is refunded owner_payout_amount (the
+  // library's listed price) and forfeits the platform fee as a
+  // cancellation charge. This uses the split actually persisted on the
+  // payment at capture time, not one recomputed against today's rate,
+  // exactly like the escrow split itself.
+  //
+  // NEEDS A PRODUCT DECISION, DO NOT RE-HARDCODE "95%/5%" BELOW: this used
+  // to be phrased as a flat "95% refund, 5% retained" policy, which was
+  // only ever true back when the commission was a flat 5% deducted FROM
+  // the gross amount. Since the fee-on-top migration (see
+  // lib/booking/escrow.ts), owner_payout_amount is the library's full
+  // listed price and the fee is added ON TOP of it — so the actual
+  // percentage refunded now depends on the fee rate at capture time (7%
+  // today → refund is ~93.5% of gross, not 95%), and will keep drifting if
+  // DEFAULT_COMMISSION_BPS ever changes again. If "flat 95%/5% regardless
+  // of fee rate" is the real intended policy, this needs to compute
+  // refundAmount = grossAmount * 0.95 explicitly instead of reusing
+  // owner_payout_amount. Left as-is (refunding owner_payout_amount, whatever
+  // percentage that happens to be) until that's confirmed either way.
   // Best-effort: a failure here must not block the cancellation, which has
   // already succeeded above.
   if (status === 'confirmed') {
@@ -608,7 +623,7 @@ export async function cancelBooking(bookingId: string): Promise<ActionResult> {
           p_payment_id: (payment as any).id,
           p_amount: refundAmount,
           p_refund_type: isFullRefund ? 'full' : 'partial',
-          p_reason: 'Student cancelled a paid booking — 95% refund per cancellation policy, auto-flagged for admin review',
+          p_reason: 'Student cancelled a paid booking — owner\'s listed price refunded, platform fee forfeited as a cancellation charge, auto-flagged for admin review',
           p_admin_notes: '',
           p_initiated_by: null,
           p_booking_id: bookingId,

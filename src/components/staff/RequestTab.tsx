@@ -127,7 +127,7 @@ export default function RequestsTab({ libraryId, requests, catalog, onApproved, 
                   overflow:     'hidden',
                 }}>
                   {/* Header row */}
-                  <button
+                  <button className="press"
                     onClick={() => setExpanded(isOpen ? null : req.requestId)}
                     style={{
                       width:       '100%',
@@ -181,7 +181,7 @@ export default function RequestsTab({ libraryId, requests, catalog, onApproved, 
                         />
                       </div>
                       <div style={{ display: 'flex', gap: 8 }}>
-                        <button
+                        <button className="press"
                           onClick={() => handleApprove(req)}
                           disabled={isLoading || isRejecting || !hasAvail}
                           style={{
@@ -200,7 +200,7 @@ export default function RequestsTab({ libraryId, requests, catalog, onApproved, 
                         >
                           {isLoading ? '…' : '✓ Approve'}
                         </button>
-                        <button
+                        <button className="press"
                           onClick={() => handleReject(req)}
                           disabled={isLoading || isRejecting}
                           style={{

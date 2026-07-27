@@ -128,7 +128,7 @@ function IssueCard({
             <div style={{ fontSize: 11, color: '#9AAAB8', marginTop: 1, fontFamily: 'DM Sans, sans-serif' }}>{issue.author}</div>
           )}
         </div>
-        <button
+        <button className="press"
           onClick={onReturn}
           disabled={returning || done}
           style={{

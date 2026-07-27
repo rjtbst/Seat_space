@@ -237,7 +237,7 @@ export default function WalkInClient({
                       return (
                         <div key={seat.id} style={{ display: 'flex', alignItems: 'center' }}>
                           {idx === 4 && <div style={{ width: 6 }} />}
-                          <button
+                          <button className="press"
                             onClick={() => {
                               if (!isFree) return
                               setSelected(seat.id === selected?.id ? null : seat)
@@ -298,7 +298,7 @@ export default function WalkInClient({
             <div style={{ fontSize: 14, fontWeight: 700, color: '#0A0D12', fontFamily: 'Syne, sans-serif' }}>
               Seat {selected.rowLabel}{selected.colNumber}
             </div>
-            <button
+            <button className="press"
               onClick={() => { setSelected(null); resetForm() }}
               style={{
                 border: 'none', background: 'none', fontSize: 18,
@@ -334,7 +334,7 @@ export default function WalkInClient({
             </div>
           </div>
 
-          <button
+          <button className="press"
             onClick={handleCheckMembership}
             disabled={checkingPhone || form.guestPhone.length < 10}
             style={{
@@ -487,7 +487,7 @@ export default function WalkInClient({
             </div>
           )}
 
-          <button
+          <button className="press"
             onClick={useSubId ? handleBookWithSubscription : handleBook}
             disabled={isPending || !form.guestName || !form.guestPhone}
             style={{

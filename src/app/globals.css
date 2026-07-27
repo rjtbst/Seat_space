@@ -58,6 +58,11 @@
 html {
   scroll-behavior: smooth;
   font-size: 16px;
+  /* Prevents the blue/grey flash Android shows on tap, and stops the
+     iOS "rubber band" from dragging the whole page instead of a
+     scrollable panel — both read as "not a real app" immediately. */
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
 }
 
 body {
@@ -68,6 +73,7 @@ body {
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior-y: contain;
 }
 
 /* ─────────────────────────────────────────
@@ -855,3 +861,83 @@ img, video { display: block; max-width: 100%; }
   border-color: var(--dash-blue);
   box-shadow:   0 0 0 3px rgba(30,92,255,.1);
 }
+/* ─────────────────────────────────────────
+   APP-LIKE FEEL — SAFE AREAS, TOUCH, MOTION
+   Foundational layer used everywhere, not
+   tied to any one page.
+───────────────────────────────────────── */
+
+/* Reserve room for iOS home-indicator / notch on any element that sits
+   at the physical edge of the screen (bottom tab bars, sticky action
+   bars, sheets). Falls back to 0 on devices without a safe-area inset. */
+.safe-top    { padding-top:    max(env(safe-area-inset-top), 0px); }
+.safe-bottom { padding-bottom: max(env(safe-area-inset-bottom), 0px); }
+.safe-left   { padding-left:   max(env(safe-area-inset-left), 0px); }
+.safe-right  { padding-right:  max(env(safe-area-inset-right), 0px); }
+
+/* Apple/Google's own HIG minimum hit target is 44x44 (iOS) / 48x48
+   (Android). Apply to any tappable element that's visually smaller than
+   that so thumbs don't mis-tap — the element's box grows via padding,
+   not its visible size, so it doesn't change layout/appearance. */
+.tap-target {
+  position: relative;
+}
+.tap-target::before {
+  content: '';
+  position: absolute;
+  inset: 50%;
+  width: max(100%, 44px);
+  height: max(100%, 44px);
+  transform: translate(-50%, -50%);
+}
+
+/* Native apps give immediate, physical-feeling feedback the instant a
+   finger lands — before any network request resolves. A CSS-only
+   active-state scale reads as "responsive" even on a slow connection,
+   and costs nothing (no JS, no re-render). */
+.press {
+  transition: transform .15s cubic-bezier(.4,0,.2,1), opacity .15s ease;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.press:active {
+  transform: scale(0.96);
+  opacity: 0.85;
+}
+@media (hover: hover) {
+  /* Only apply hover-lift on devices that actually have a mouse —
+     touch devices firing :hover on tap causes a stuck/sticky visual state. */
+  .press-hover:hover { transform: translateY(-1px); }
+}
+
+/* Respect the OS-level "reduce motion" accessibility setting. Every
+   custom transition/animation in this app should be wrapped by this,
+   so users who get motion-sick or use reduce-motion aren't fighting
+   the UI. Framer Motion components read this via useReducedMotion()
+   in PageTransition.tsx; this covers plain CSS transitions/animations. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Skeleton shimmer used by <Bone /> — single source of truth so every
+   loading.tsx across the app animates identically instead of each
+   route inventing its own timing. */
+@keyframes bone-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.bone-shimmer {
+  background: linear-gradient(90deg, #EEF1F5 25%, #F7F9FB 37%, #EEF1F5 63%);
+  background-size: 400% 100%;
+  animation: bone-shimmer 1.6s ease-in-out infinite;
+}
+
+/* Hide scrollbars on horizontally-scrolling chip rows / carousels while
+   keeping them scrollable — matches native segmented-control feel. */
+.scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-none::-webkit-scrollbar { display: none; }

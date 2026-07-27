@@ -63,7 +63,7 @@ export default function StaffBooksClient({ data }: { data: StaffBooksPageData })
                         : tab.id === 'active'   ? overdueCount
                         : 0
           return (
-            <button
+            <button className="press"
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               style={{

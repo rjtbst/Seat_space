@@ -17,7 +17,10 @@
  *    escrow_status to 'eligible'.
  * 4. A daily cron (/api/cron/run-payouts) sweeps 'eligible' payments and
  *    fires one RazorpayX Payout per booking to the owner's registered bank
- *    account or UPI VPA, net of the platform's 5% commission.
+ *    account or UPI VPA. Under the fee-on-top model (see
+ *    lib/booking/escrow.ts), this payout is the owner's full listed price
+ *    with nothing deducted — the platform's fee was already charged to the
+ *    student separately, on top of that price, at checkout.
  *
  * PLATFORM SUBSCRIPTION FLOW (₹399/mo per library, UPI AutoPay)
  * ────────────────────────────────────────────────────────────

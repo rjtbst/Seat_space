@@ -36,6 +36,11 @@ export default function CityBookSearchClient({ city }: Props) {
   const [errMsg,        setErrMsg]        = useState('')
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // Same stale-response guard as the price-preview fetches: without this,
+  // results for an earlier keystroke's query can land after a later
+  // one's and silently replace the correct results with results for a
+  // query the person already moved past.
+  const searchRequestId = useRef(0)
 
   const handleSearch = useCallback((q: string) => {
     setQuery(q)
@@ -46,9 +51,11 @@ export default function CityBookSearchClient({ city }: Props) {
       return
     }
     debounceRef.current = setTimeout(async () => {
+      const requestId = ++searchRequestId.current
       setSearching(true)
       setSearched(false)
       const res = await searchBooksInCity(q, cityOverride || city)
+      if (requestId !== searchRequestId.current) return
       setResults(res)
       setSearching(false)
       setSearched(true)

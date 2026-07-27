@@ -19,9 +19,9 @@ const sections: LegalSection[] = [
         <p>
           You can cancel a confirmed booking yourself, instantly, any time up until{' '}
           <strong>20 minutes before</strong> its start time. Doing so refunds{' '}
-          <strong>95% of what you paid</strong> — the remaining 5% covers the
-          platform fee already processed for that booking, and isn't refundable on
-          a self-cancellation.
+          <strong>the library's listed price for that booking</strong> — the
+          platform fee already charged on top of it for that booking isn't
+          refundable on a self-cancellation.
         </p>
         <p>
           Refunds are raised automatically the moment you cancel, then reviewed and
@@ -46,9 +46,9 @@ const sections: LegalSection[] = [
         </p>
         <p>
           Approved late-cancellation refunds are typically for a smaller portion of
-          the booking than the standard 95%, reflecting the seat time already reserved
-          or used. You'll see the outcome and amount in your bookings page once it's
-          reviewed.
+          the booking than the standard self-cancellation refund above, reflecting
+          the seat time already reserved or used. You'll see the outcome and amount
+          in your bookings page once it's reviewed.
         </p>
       </>
     ),
@@ -93,7 +93,7 @@ const sections: LegalSection[] = [
         If a library owner or staff member cancels your confirmed booking (for
         example, the seat becomes unavailable), you'll receive a{' '}
         <strong>full refund</strong> regardless of timing — this isn't a
-        self-cancellation and the 5% fee retention in Section 1 doesn't apply.
+        self-cancellation and the platform-fee retention in Section 1 doesn't apply.
       </p>
     ),
   },
@@ -162,7 +162,7 @@ export default function RefundsPage() {
       <LegalPageShell
         eyebrow="Legal"
         title="Refund & Cancellation Policy"
-        lastUpdated="20 July 2026"
+        lastUpdated="27 July 2026"
         intro="How cancellations and refunds work for seat bookings and membership plans on seatspace."
         sections={sections}
       />

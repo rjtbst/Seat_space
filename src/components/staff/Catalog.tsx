@@ -112,7 +112,7 @@ export default function CatalogTab({ libraryId, isSenior, catalog, onCatalogChan
           style={{ ...inputStyle, flex: 1 }}
         />
         {isSenior && (
-          <button
+          <button className="press"
             onClick={() => { setShowAdd(!showAdd); setAddError(null) }}
             style={{
               background:   showAdd ? '#F4F7FB' : ACCENT,
@@ -176,7 +176,7 @@ export default function CatalogTab({ libraryId, isSenior, catalog, onCatalogChan
             </div>
           )}
 
-          <button
+          <button className="press"
             onClick={handleAddBook}
             disabled={adding}
             style={{
@@ -247,7 +247,7 @@ export default function CatalogTab({ libraryId, isSenior, catalog, onCatalogChan
                 {/* Senior staff actions */}
                 {isSenior && (
                   <div style={{ marginTop: 10, display: 'flex', gap: 7 }}>
-                    <button
+                    <button className="press"
                       onClick={() => handleAddCopy(book)}
                       disabled={!!busy}
                       style={{
@@ -259,7 +259,7 @@ export default function CatalogTab({ libraryId, isSenior, catalog, onCatalogChan
                     >
                       {busy === 'addCopy' ? '…' : '+ Copy'}
                     </button>
-                    <button
+                    <button className="press"
                       onClick={() => handleDelete(book)}
                       disabled={!!busy || book.issuedCopies > 0}
                       style={{

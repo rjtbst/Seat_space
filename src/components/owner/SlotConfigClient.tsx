@@ -106,7 +106,7 @@ export default function SlotConfigClient({
         title="Slot Configuration"
         subtitle={`${libraryName} · Set time slots and pricing`}
         action={
-          <button onClick={openAdd} style={{
+          <button className="press" onClick={openAdd} style={{
             padding: '9px 16px', borderRadius: 9, fontSize: 13, fontWeight: 700,
             background: ACCENT, color: '#fff', border: 'none', cursor: 'pointer',
             fontFamily: FONT_DISPLAY, boxShadow: '0 2px 10px rgba(13,124,84,.25)',
@@ -131,7 +131,7 @@ export default function SlotConfigClient({
             title="No slots configured yet"
             subtitle="Add your first time slot to define when students can book"
             action={
-              <button onClick={openAdd} style={{
+              <button className="press" onClick={openAdd} style={{
                 padding: '9px 20px', borderRadius: 9, fontSize: 13, fontWeight: 700,
                 background: ACCENT, color: '#fff', border: 'none', cursor: 'pointer', fontFamily: FONT_DISPLAY,
               }}>
@@ -170,7 +170,7 @@ export default function SlotConfigClient({
                       <Toggle on={slot.is_active} onChange={v => handleToggle(slot, v)} disabled={isPending} />
                     </td>
                     <td style={{ padding: '13px 16px' }}>
-                      <button onClick={() => openEdit(slot)} style={{
+                      <button className="press" onClick={() => openEdit(slot)} style={{
                         padding: '5px 12px', borderRadius: 7, fontSize: 12, fontWeight: 600,
                         border: `1.5px solid ${BORDER}`, background: BG_CARD, color: '#3A4A5C',
                         cursor: 'pointer', fontFamily: FONT_BODY,
@@ -193,7 +193,7 @@ export default function SlotConfigClient({
             <div style={{ fontSize: 15, fontWeight: 700, color: TEXT_PRIMARY }}>
               {editing ? `Edit Slot — ${editing.start} – ${editing.end}` : 'Add New Slot'}
             </div>
-            <button onClick={() => { setShowForm(false); setEditing(null) }} style={{
+            <button className="press" onClick={() => { setShowForm(false); setEditing(null) }} style={{
               width: 28, height: 28, borderRadius: '50%', border: `1.5px solid ${BORDER}`,
               background: BG_CARD, color: TEXT_SECONDARY, cursor: 'pointer', fontSize: 16,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -223,7 +223,7 @@ export default function SlotConfigClient({
               {DAYS.map((day, idx) => {
                 const on = form.days.includes(idx)
                 return (
-                  <button key={day} type="button" onClick={() => toggleDay(idx)} style={{
+                  <button className="press" key={day} type="button" onClick={() => toggleDay(idx)} style={{
                     width: 40, height: 40, borderRadius: 9, fontSize: 12, fontWeight: 600,
                     cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
                     border: `1.5px solid ${on ? BLUE : BORDER}`,
@@ -269,12 +269,12 @@ export default function SlotConfigClient({
           <ErrorBanner error={error} />
 
           <div style={{ display: 'flex', gap: 10 }}>
-            <button onClick={() => { setShowForm(false); setEditing(null) }} style={{
+            <button className="press" onClick={() => { setShowForm(false); setEditing(null) }} style={{
               flex: 1, padding: '11px 0', borderRadius: 9, fontSize: 13, fontWeight: 600,
               border: `1.5px solid ${BORDER}`, background: BG_CARD, color: '#3A4A5C',
               cursor: 'pointer', fontFamily: FONT_BODY,
             }}>Cancel</button>
-            <button onClick={handleSave} disabled={isPending} style={{
+            <button className="press" onClick={handleSave} disabled={isPending} style={{
               flex: 2, padding: '11px 0', borderRadius: 9, fontSize: 14, fontWeight: 700,
               border: 'none', background: ACCENT, color: '#fff',
               cursor: isPending ? 'not-allowed' : 'pointer', fontFamily: FONT_DISPLAY,

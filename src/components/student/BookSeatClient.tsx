@@ -350,6 +350,14 @@ export default function BookSeatClient({
   // Track the range for realtime re-fetch
   const step2RangeRef = useRef<{ startIST: string; endIST: string } | null>(null)
 
+  // Same rationale as LibraryDetail.tsx: tracks this student's own
+  // in-flight booking so the realtime handler below doesn't mistake it
+  // for a real conflict. Lower exposure here since the realtime channel
+  // unsubscribes once step leaves 2 (handlePay only runs from step 3),
+  // but a user going Back to step 2 while their own hold from a prior
+  // attempt is still live would hit the exact same false alarm otherwise.
+  const myPendingBookingIdRef = useRef<string | null>(null)
+
   /* ── Step 3 state ── */
   const [step3Error, setStep3Error]     = useState<string>('')
   const [payLoading, setPayLoading]     = useState(false)
@@ -480,6 +488,17 @@ export default function BookSeatClient({
           const range = step2RangeRef.current
           if (!range) return
 
+          // This change is the student's own booking -- either the held
+          // row from initiateBooking (and its confirmed-payment update
+          // right after), or a subscription-covered booking created
+          // directly as confirmed elsewhere in the app. REPLICA IDENTITY
+          // FULL on this table means user_id is present on every event
+          // type, so this covers all of them, not just the ones we could
+          // pre-track a bookingId for.
+          const changedRow = (payload.new ?? payload.old) as { id?: string; user_id?: string } | null
+          if (changedRow?.user_id && changedRow.user_id === profile?.id) return
+          if (changedRow?.id && changedRow.id === myPendingBookingIdRef.current) return
+
           // ── Skip irrelevant changes ──────────────────────────────────
           // Without this check, EVERY booking change anywhere in this
           // library (any seat, any day, any time slot) triggered a full
@@ -523,7 +542,7 @@ export default function BookSeatClient({
       .subscribe()
 
     return () => { supabase.removeChannel(channel) }
-  }, [step, library.id])
+  }, [step, library.id, profile?.id])
 
   /* ─── Client-side time validation ─── */
   const validateTimes = useCallback((
@@ -556,6 +575,16 @@ export default function BookSeatClient({
 
   /* ─── Live price preview (debounced 500ms) ─── */
   const previewTimer = useRef<ReturnType<typeof setTimeout>>()
+  // Bumped on every new request; a response is only applied if it's still
+  // the most recent one requested. Without this, a request from an older
+  // (now-stale) time selection that happens to resolve AFTER a newer one
+  // — plausible on a slow/flaky connection — would silently overwrite the
+  // correct, current price with a wrong one. This is exactly the failure
+  // mode react-query's useQuery prevents automatically; this is the same
+  // fix applied by hand since this fetch is tightly coupled to validation
+  // state (validateTimes/step1Error) that isn't safe to restructure here
+  // without being able to run and test the full booking flow.
+  const previewRequestId = useRef(0)
 
   const refreshPreview = useCallback((
     slot: SlotConfig | null,
@@ -569,6 +598,7 @@ export default function BookSeatClient({
     if (err) { setPricePreview(null); return }
 
     previewTimer.current = setTimeout(async () => {
+      const requestId = ++previewRequestId.current
       setPreviewLoading(true)
       const endMins = timeToMinutes(end)
       const endDateForServer = endMins === 0
@@ -576,6 +606,10 @@ export default function BookSeatClient({
             .toLocaleString('sv-SE', { timeZone: 'Asia/Kolkata' }).slice(0, 10)
         : date
       const res = await getBookingPricePreview(library.id, `${date}T${start}`, `${endDateForServer}T${end}`)
+      // A newer request has been fired since this one started — its
+      // result (or its own in-flight state) is what should be shown, not
+      // this now-stale response. Silently drop it.
+      if (requestId !== previewRequestId.current) return
       setPreviewLoading(false)
       if (res.success === false) {
         setStep1Error(res.error)
@@ -686,6 +720,7 @@ export default function BookSeatClient({
       }
 
       const { bookingId, amount, razorpayOrderId, razorpayKeyId, libraryName, testMode } = initRes.data
+      myPendingBookingIdRef.current = bookingId
 
       // ── TEST_MODE: skip Razorpay, confirm directly with synthetic IDs ──
       if (testMode) {
@@ -697,6 +732,7 @@ export default function BookSeatClient({
           razorpaySignature: 'test_signature_bypass',
         })
         if (confirmRes.success === false) {
+          myPendingBookingIdRef.current = null
           setStep3Error(confirmRes.error)
           setPayLoading(false)
           return
@@ -725,6 +761,7 @@ export default function BookSeatClient({
           })
 
           if (confirmRes.success === false) {
+            myPendingBookingIdRef.current = null
             setStep3Error(confirmRes.error)
             setPayLoading(false)
             return
@@ -732,8 +769,8 @@ export default function BookSeatClient({
 
           router.push(`/library/${library.id}/book/confirm?booking=${bookingId}`)
         },
-        onDismiss: () => { setPayLoading(false) },
-        onError:   (errMsg) => { setStep3Error(errMsg); setPayLoading(false) },
+        onDismiss: () => { myPendingBookingIdRef.current = null; setPayLoading(false) },
+        onError:   (errMsg) => { myPendingBookingIdRef.current = null; setStep3Error(errMsg); setPayLoading(false) },
       })
     })
   }
@@ -840,7 +877,7 @@ export default function BookSeatClient({
                     type="button"
                     onClick={() => handleSlotSelect(slot.id)}
                     className={[
-                      'w-full flex items-center justify-between rounded-xl border px-4 py-3.5 text-left transition-all',
+                      'press w-full flex items-center justify-between rounded-xl border px-4 py-3.5 text-left transition-all',
                       active
                         ? 'border-[#1E5CFF] bg-[rgba(30,92,255,0.05)] shadow-[0_0_0_1px_#1E5CFF]'
                         : 'border-[#DDE4EE] bg-white hover:border-[#1E5CFF]',
@@ -943,7 +980,7 @@ export default function BookSeatClient({
               <div>
                 <div className="text-[11px] text-[#6E7F94]">Estimated total</div>
                 {previewLoading
-                  ? <div className="mt-1 h-4 w-32 rounded-md bg-[#DDE4EE] animate-pulse" />
+                  ? <div className="mt-1 h-4 w-32 rounded-md bone-shimmer" />
                   : pricePreview
                     ? (
                       <div className="text-[11px] text-[#9AACBE] mt-0.5">
@@ -967,7 +1004,7 @@ export default function BookSeatClient({
             type="button"
             onClick={goToStep2}
             disabled={!!step1Error || !startTime || !endTime || previewLoading || (!pricePreview && !step1Error)}
-            className="w-full py-3.5 rounded-xl bg-[#1E5CFF] text-white text-[14px] font-bold flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(30,92,255,.3)] hover:bg-[#1447D4] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
+            className="press w-full py-3.5 rounded-xl bg-[#1E5CFF] text-white text-[14px] font-bold flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(30,92,255,.3)] hover:bg-[#1447D4] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
           >
             {previewLoading
               ? <><Loader2 className="w-4 h-4 animate-spin" /> Calculating price…</>
@@ -1052,7 +1089,7 @@ export default function BookSeatClient({
             type="button"
             onClick={goToStep3}
             disabled={!selectedSeatId || seatsLoading}
-            className="w-full py-3.5 rounded-xl bg-[#1E5CFF] text-white text-[14px] font-bold flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(30,92,255,.3)] hover:bg-[#1447D4] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
+            className="press w-full py-3.5 rounded-xl bg-[#1E5CFF] text-white text-[14px] font-bold flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(30,92,255,.3)] hover:bg-[#1447D4] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
           >
             Continue to Payment
             <ArrowRight className="w-4 h-4" />
@@ -1060,7 +1097,7 @@ export default function BookSeatClient({
           <button
             type="button"
             onClick={handleBack}
-            className="w-full py-3 rounded-xl bg-white border border-[#DDE4EE] text-[13px] font-medium text-[#6E7F94] hover:bg-[#F4F7FB] transition-colors"
+            className="press w-full py-3 rounded-xl bg-white border border-[#DDE4EE] text-[13px] font-medium text-[#6E7F94] hover:bg-[#F4F7FB] transition-colors"
           >
             Back
           </button>
@@ -1194,8 +1231,8 @@ export default function BookSeatClient({
             disabled={payLoading || isPending || (!useSubId && !pricePreview)}
             className={
               useSubId
-                ? "w-full py-3.5 rounded-xl bg-[#0D7C54] text-white text-[14px] font-bold flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(13,124,84,.3)] hover:bg-[#0A5C3E] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                : "w-full py-3.5 rounded-xl bg-[#1E5CFF] text-white text-[14px] font-bold flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(30,92,255,.3)] hover:bg-[#1447D4] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                ? "press w-full py-3.5 rounded-xl bg-[#0D7C54] text-white text-[14px] font-bold flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(13,124,84,.3)] hover:bg-[#0A5C3E] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                : "press w-full py-3.5 rounded-xl bg-[#1E5CFF] text-white text-[14px] font-bold flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(30,92,255,.3)] hover:bg-[#1447D4] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             }
           >
             {payLoading || isPending
@@ -1210,7 +1247,7 @@ export default function BookSeatClient({
             type="button"
             onClick={handleBack}
             disabled={payLoading || isPending}
-            className="w-full py-3 rounded-xl bg-white border border-[#DDE4EE] text-[13px] font-medium text-[#6E7F94] hover:bg-[#F4F7FB] transition-colors disabled:opacity-50"
+            className="press w-full py-3 rounded-xl bg-white border border-[#DDE4EE] text-[13px] font-medium text-[#6E7F94] hover:bg-[#F4F7FB] transition-colors disabled:opacity-50"
           >
             Back
           </button>

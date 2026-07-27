@@ -1,6 +1,7 @@
 'use client'
 import { useState, useTransition, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+
 import type { OwnerLibrary } from '@/lib/actions/owner'
 import {
   toggleLibraryActive,
@@ -241,7 +242,7 @@ function EditModal({ lib, idx, onClose, onUpdated, showToast }: EditModalProps) 
               </div>
               <div style={{ fontSize: 12, color: TEXT_MUTED, marginTop: 2 }}>{lib.name}</div>
             </div>
-            <button
+            <button className="press"
               onClick={onClose}
               style={{
                 width: 32, height: 32, borderRadius: '50%', border: `1.5px solid ${BORDER}`,
@@ -254,7 +255,7 @@ function EditModal({ lib, idx, onClose, onUpdated, showToast }: EditModalProps) 
           {/* tabs */}
           <div style={{ display: 'flex', gap: 4, paddingBottom: 0 }}>
             {(['info', 'amenities', 'photos'] as EditTab[]).map(t => (
-              <button key={t} style={TAB_STYLE(tab === t)} onClick={() => setTab(t)}>
+              <button className="press" key={t} style={TAB_STYLE(tab === t)} onClick={() => setTab(t)}>
                 {{ info: '✏️ Info', amenities: '🏷️ Amenities', photos: '📸 Photos' }[t]}
               </button>
             ))}
@@ -322,7 +323,7 @@ function EditModal({ lib, idx, onClose, onUpdated, showToast }: EditModalProps) 
                     {allAmenities.map(a => {
                       const on = selected.has(a.id)
                       return (
-                        <button
+                        <button className="press"
                           key={a.id}
                           onClick={() => toggleAmenity(a.id)}
                           style={{
@@ -364,7 +365,7 @@ function EditModal({ lib, idx, onClose, onUpdated, showToast }: EditModalProps) 
                       onChange={e => handleAddPhoto(e, true)} />
                     <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }}
                       onChange={e => handleAddPhoto(e, false)} />
-                    <button
+                    <button className="press"
                       onClick={() => coverInputRef.current?.click()}
                       disabled={isPending}
                       style={{
@@ -375,7 +376,7 @@ function EditModal({ lib, idx, onClose, onUpdated, showToast }: EditModalProps) 
                     >
                       🖼 Upload Cover Photo
                     </button>
-                    <button
+                    <button className="press"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isPending}
                       style={{
@@ -408,10 +409,12 @@ function EditModal({ lib, idx, onClose, onUpdated, showToast }: EditModalProps) 
                             background: '#F0F0F0', aspectRatio: '16/9',
                           }}
                         >
-                          <img
+                          <Image
                             src={photo.image_url}
                             alt=""
-                            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                            fill
+                            sizes="(max-width: 640px) 50vw, 240px"
+                            style={{ objectFit: 'cover' }}
                           />
                           {/* cover badge */}
                           {photo.is_cover && (
@@ -437,7 +440,7 @@ function EditModal({ lib, idx, onClose, onUpdated, showToast }: EditModalProps) 
                             onMouseLeave={e => (e.currentTarget.style.opacity = '0')}
                           >
                             {!photo.is_cover && (
-                              <button
+                              <button className="press"
                                 onClick={() => handleSetCover(photo.id)}
                                 disabled={isPending}
                                 style={{
@@ -448,7 +451,7 @@ function EditModal({ lib, idx, onClose, onUpdated, showToast }: EditModalProps) 
                                 Set Cover
                               </button>
                             )}
-                            <button
+                            <button className="press"
                               onClick={() => handleDeletePhoto(photo.id)}
                               disabled={isPending}
                               style={{
@@ -475,7 +478,7 @@ function EditModal({ lib, idx, onClose, onUpdated, showToast }: EditModalProps) 
           display: 'flex', justifyContent: 'flex-end', gap: 10,
           background: '#FAFAFA', flexShrink: 0,
         }}>
-          <button
+          <button className="press"
             onClick={onClose}
             style={{
               padding: '9px 18px', borderRadius: 8, fontSize: 13, fontWeight: 600,
@@ -488,7 +491,7 @@ function EditModal({ lib, idx, onClose, onUpdated, showToast }: EditModalProps) 
 
           {/* only show Save for tabs that have a save action */}
           {tab === 'info' && (
-            <button
+            <button className="press"
               onClick={handleInfoSave}
               disabled={isPending || !name.trim()}
               style={{
@@ -502,7 +505,7 @@ function EditModal({ lib, idx, onClose, onUpdated, showToast }: EditModalProps) 
             </button>
           )}
           {tab === 'amenities' && amenitiesLoaded && (
-            <button
+            <button className="press"
               onClick={handleAmenitiesSave}
               disabled={isPending}
               style={{
@@ -667,7 +670,7 @@ export default function MyLibrariesClient({ libraries: initial }: { libraries: O
             {subMessage && (
               <p style={{ fontSize: 12.5, color: ACCENT, lineHeight: 1.5, marginBottom: 18 }}>{subMessage}</p>
             )}
-            <button
+            <button className="press"
               onClick={() => handleStartSubscription(subscriptionModalLibId)}
               disabled={subPending || !!subMessage}
               style={{
@@ -682,7 +685,7 @@ export default function MyLibrariesClient({ libraries: initial }: { libraries: O
               {subPending && <span style={{ width: 15, height: 15, border: '2px solid rgba(255,255,255,.35)', borderTopColor: '#fff', borderRadius: '50%', display: 'inline-block', animation: 'spin .65s linear infinite' }} />}
               {subMessage ? 'Confirming…' : subPending ? 'Opening checkout…' : 'Subscribe — ₹399/month'}
             </button>
-            <button
+            <button className="press"
               onClick={() => setSubscriptionModalLibId(null)}
               disabled={subPending}
               style={{
@@ -713,7 +716,7 @@ export default function MyLibrariesClient({ libraries: initial }: { libraries: O
         title="My Libraries"
         subtitle="All your registered libraries"
         action={
-          <button
+          <button className="press"
             onClick={() => navigate('/onboarding/add-library')}
             style={{
               padding: '9px 16px', borderRadius: 9, fontSize: 13, fontWeight: 700,
@@ -757,7 +760,7 @@ export default function MyLibrariesClient({ libraries: initial }: { libraries: O
               title="No libraries yet"
               subtitle="Add your first library to get started"
               action={
-                <button
+                <button className="press"
                   onClick={() => navigate('/onboarding/add-library')}
                   style={{
                     padding: '10px 20px', borderRadius: 9, fontSize: 14, fontWeight: 700,
@@ -821,7 +824,7 @@ export default function MyLibrariesClient({ libraries: initial }: { libraries: O
                         ? 'Subscription expired — renew to go live again'
                         : 'Platform subscription payment pending to make this library active'}
                     </span>
-                    <button
+                    <button className="press"
                       onClick={() => setSubscriptionModalLibId(lib.id)}
                       style={{
                         padding: '5px 12px', borderRadius: 8, fontSize: 12, fontWeight: 700,
@@ -875,7 +878,7 @@ export default function MyLibrariesClient({ libraries: initial }: { libraries: O
               {/* Action buttons */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
                 {/* ← NEW Edit button */}
-                <button
+                <button className="press"
                   onClick={() => setEditLib({ lib, idx })}
                   style={{
                     padding: '7px 14px', borderRadius: 8, fontSize: 12, fontWeight: 700,
@@ -885,13 +888,13 @@ export default function MyLibrariesClient({ libraries: initial }: { libraries: O
                 >
                   ✏️ Edit
                 </button>
-                <button onClick={() => navigate(`/dashboard/seat-manager?lib=${lib.id}`)} style={NAV_BTN_STYLE}>
+                <button className="press" onClick={() => navigate(`/dashboard/seat-manager?lib=${lib.id}`)} style={NAV_BTN_STYLE}>
                   Seat Manager
                 </button>
-                <button onClick={() => navigate(`/dashboard/slot-config?lib=${lib.id}`)} style={NAV_BTN_STYLE}>
+                <button className="press" onClick={() => navigate(`/dashboard/slot-config?lib=${lib.id}`)} style={NAV_BTN_STYLE}>
                   Slot Config
                 </button>
-                <button
+                <button className="press"
                   onClick={() => navigate(`/dashboard?lib=${lib.id}`)}
                   style={{
                     padding: '7px 14px', borderRadius: 8, fontSize: 12, fontWeight: 700,

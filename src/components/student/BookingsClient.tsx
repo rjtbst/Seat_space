@@ -1,9 +1,10 @@
 // components/student/BookingsClient.tsx
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { AnimatePresence, motion } from 'framer-motion'
 import { cancelBooking } from '@/lib/actions/students/student-bookings'
 import type { StudentBooking } from '@/lib/actions/students/student-bookings'
 import {
@@ -161,6 +162,22 @@ export default function BookingsClient({
   const [qrBooking, setQrBooking] = useState<StudentBooking | null>(null)
   const [pendingCancelId, setPendingCancelId] = useState<string | null>(null)
 
+  // Optimistic local mirror of the server props. A cancel updates this
+  // instantly (status flips to 'cancelled' and the card slides from
+  // "upcoming" to "past" before the server has responded) instead of
+  // sitting in a dimmed/disabled state until router.refresh() re-fetches
+  // everything. If the server rejects the cancellation we roll this back
+  // to the last known-good props and surface the error — the person never
+  // sees a state that wasn't actually true, they just don't have to wait
+  // for the round trip to see the state they just caused.
+  const [localUpcoming, setLocalUpcoming] = useState(upcoming)
+  const [localPast, setLocalPast]         = useState(past)
+
+  // Re-sync whenever the server gives us fresh props (e.g. after
+  // router.refresh() reconciles in the background, or on next page load).
+  useEffect(() => { setLocalUpcoming(upcoming) }, [upcoming])
+  useEffect(() => { setLocalPast(past) }, [past])
+
   function handleCancel(id: string) {
     setPendingCancelId(id)
   }
@@ -169,17 +186,35 @@ export default function BookingsClient({
     const id = pendingCancelId
     if (!id) return
     setPendingCancelId(null)
+
+    const target = localUpcoming.find((b) => b.id === id)
+    if (!target) return
+
+    // Snapshot for rollback, then apply the optimistic update immediately.
+    const prevUpcoming = localUpcoming
+    const prevPast     = localPast
+    setLocalUpcoming((cur) => cur.filter((b) => b.id !== id))
+    setLocalPast((cur) => [{ ...target, status: 'cancelled' }, ...cur])
     setCancelling(id)
+    toast.success('Booking cancelled')
+
     startTransition(async () => {
       const result = await cancelBooking(id)
       setCancelling(null)
-      if (result.success === false) { toast.error(result.error); return }
-      toast.success('Booking cancelled')
+      if (result.success === false) {
+        // Roll back — the cancellation didn't actually happen.
+        setLocalUpcoming(prevUpcoming)
+        setLocalPast(prevPast)
+        toast.error(result.error)
+        return
+      }
+      // Reconcile quietly with the server in the background; the UI
+      // already reflects the right state so this won't cause a flash.
       router.refresh()
     })
   }
 
-  const list = tab === 'upcoming' ? upcoming : past
+  const list = tab === 'upcoming' ? localUpcoming : localPast
 
   return (
     <div className="p-5 md:p-7 max-w-2xl mx-auto">
@@ -187,7 +222,7 @@ export default function BookingsClient({
       <div className="mb-5">
         <h1 className="text-[20px] font-bold text-[#0D1117]">My Bookings</h1>
         <p className="text-[13px] text-[#9AACBE] mt-0.5">
-          {upcoming.length} upcoming · {past.length} past
+          {localUpcoming.length} upcoming · {localPast.length} past
         </p>
       </div>
 
@@ -209,7 +244,7 @@ export default function BookingsClient({
               'ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full',
               tab === t ? 'bg-[#E8EFFE] text-[#1246FF]' : 'bg-[#F4F7FB] text-[#9AACBE]',
             )}>
-              {t === 'upcoming' ? upcoming.length : past.length}
+              {t === 'upcoming' ? localUpcoming.length : localPast.length}
             </span>
           </button>
         ))}
@@ -240,14 +275,21 @@ export default function BookingsClient({
         </div>
       ) : (
         <div className="space-y-3">
-          {list.map((b) => (
-            <div
-              key={b.id}
-              className={cn(cancelling === b.id && 'opacity-50 pointer-events-none')}
-            >
-              <BookingCard booking={b} onCancel={handleCancel} onShowQR={setQrBooking} />
-            </div>
-          ))}
+          <AnimatePresence initial={false}>
+            {list.map((b) => (
+              <motion.div
+                key={b.id}
+                layout
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.97 }}
+                transition={{ duration: 0.18, ease: [0.4, 0, 0.2, 1] }}
+                className={cn(cancelling === b.id && 'pointer-events-none')}
+              >
+                <BookingCard booking={b} onCancel={handleCancel} onShowQR={setQrBooking} />
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       )}
 

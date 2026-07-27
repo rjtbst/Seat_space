@@ -97,7 +97,7 @@ export default function StaffStateBanner({ request }: { request: MyStaffRequest 
           </div>
 
           {/* Cancel */}
-          <button
+          <button className="press"
             onClick={handleCancel}
             disabled={isPending}
             style={{
@@ -145,7 +145,7 @@ export default function StaffStateBanner({ request }: { request: MyStaffRequest 
           </p>
         </div>
 
-        <button
+        <button className="press"
           onClick={() => router.push('/staff/request')}
           style={{
             width: '100%', padding: '13px 0', borderRadius: 10,

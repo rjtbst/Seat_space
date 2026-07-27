@@ -127,7 +127,7 @@ export default function LocationPicker({ lat, lng, onChange }: Props) {
           <button
             type="button"
             onClick={clear}
-            className="w-8 h-8 rounded-lg bg-white border border-[#E4EAF2] flex items-center justify-center hover:border-[#C5282C] hover:bg-[#FEE2E2] transition-colors flex-shrink-0"
+            className="press w-8 h-8 rounded-lg bg-white border border-[#E4EAF2] flex items-center justify-center hover:border-[#C5282C] hover:bg-[#FEE2E2] transition-colors flex-shrink-0"
           >
             <X className="w-3.5 h-3.5 text-[#6E7F94]" />
           </button>
@@ -141,7 +141,7 @@ export default function LocationPicker({ lat, lng, onChange }: Props) {
             <button
               type="button"
               onClick={requestGeo}
-              className={`${btn} bg-[#1246FF] text-white hover:bg-[#0E38CC] flex-1`}
+              className={`press ${btn} bg-[#1246FF] text-white hover:bg-[#0E38CC] flex-1`}
             >
               <Navigation className="w-3.5 h-3.5" />
               Use My Location
@@ -149,7 +149,7 @@ export default function LocationPicker({ lat, lng, onChange }: Props) {
             <button
               type="button"
               onClick={() => { setMode('map-input'); setError('') }}
-              className={`${btn} bg-[#F4F7FB] text-[#0D1117] border border-[#E4EAF2] hover:border-[#1246FF] flex-1`}
+              className={`press ${btn} bg-[#F4F7FB] text-[#0D1117] border border-[#E4EAF2] hover:border-[#1246FF] flex-1`}
             >
               <Link2 className="w-3.5 h-3.5" />
               Paste Maps Link
@@ -189,7 +189,7 @@ export default function LocationPicker({ lat, lng, onChange }: Props) {
             <button
               type="button"
               onClick={() => { setMode('idle'); setError(''); setMapsLink('') }}
-              className={`${btn} bg-[#F4F7FB] text-[#6E7F94] border border-[#E4EAF2]`}
+              className={`press ${btn} bg-[#F4F7FB] text-[#6E7F94] border border-[#E4EAF2]`}
             >
               Cancel
             </button>
@@ -197,7 +197,7 @@ export default function LocationPicker({ lat, lng, onChange }: Props) {
               type="button"
               onClick={handleMapsLink}
               disabled={!mapsLink.trim()}
-              className={`${btn} bg-[#1246FF] text-white hover:bg-[#0E38CC] disabled:opacity-50 disabled:cursor-not-allowed flex-1`}
+              className={`press ${btn} bg-[#1246FF] text-white hover:bg-[#0E38CC] disabled:opacity-50 disabled:cursor-not-allowed flex-1`}
             >
               <MapPin className="w-3.5 h-3.5" />
               Set Location

@@ -193,7 +193,7 @@ export default function StaffDashboardClient({
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
         {quickActions.map(a => (
-          <button
+          <button className="press"
             key={a.href}
             onClick={() => router.push(a.href)}
             style={{
@@ -225,7 +225,7 @@ export default function StaffDashboardClient({
 
       {/* Pending check-ins CTA */}
       {stats.pendingCheckIns > 0 && (
-        <button
+        <button className="press"
           onClick={() => router.push('/staff/bookings')}
           style={{
             marginTop:      16,

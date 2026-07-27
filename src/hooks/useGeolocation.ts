@@ -1,7 +1,7 @@
 // hooks/useGeolocation.ts
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 
 export type GeoState =
   | { status: 'idle' }
@@ -11,6 +11,7 @@ export type GeoState =
 
 const CACHE_KEY = 'ls_geo'
 const CACHE_TTL = 10 * 60 * 1000   // 10 minutes
+
 
 function readCache(): { lat: number; lng: number } | null {
   try {
@@ -62,14 +63,6 @@ export function useGeolocation() {
       },
       { enableHighAccuracy: false, timeout: 8000, maximumAge: CACHE_TTL },
     )
-  }, [])
-
-  // Auto-request on mount if cached
-  useEffect(() => {
-    const cached = readCache()
-    if (cached) {
-      setGeo({ status: 'granted', lat: cached.lat, lng: cached.lng, accuracy: 0 })
-    }
   }, [])
 
   return { geo, request }

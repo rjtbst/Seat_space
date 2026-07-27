@@ -262,7 +262,7 @@ export default function OwnerProfileClient() {
               </div>
             )}
 
-            <button
+            <button className="press"
               type="submit"
               disabled={!valid || isPending}
               style={{
