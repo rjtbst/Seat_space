@@ -794,7 +794,7 @@ export default function SeatManagerClient({
                         ].filter(Boolean).join(' · ')
                         return (
                           <option key={s.id} value={s.id}>
-                            {s.planName} ({s.sessionsLimit === null ? 'unlimited' : `${s.sessionsUsed}/${s.sessionsLimit} used`}){restriction ? ` — ${restriction} only` : ''}
+                            {s.planName}{restriction ? ` — ${restriction} only` : ''}
                           </option>
                         )
                       })}
