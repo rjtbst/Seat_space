@@ -8,6 +8,18 @@
  * rather than duplicated a second time, matching how every other
  * booking-mechanics duplication in this codebase has been consolidated
  * into lib/booking/ or services/booking/.
+ *
+ * NOTE: this is entitlement for AD-HOC hourly bookings that happen to be
+ * covered by a subscription (e.g. a different library than the one the
+ * student's plan seat is reserved in, or a time outside their reserved
+ * window on another eligible plan) — see the "Hourly Bookings" section of
+ * the subscription-model spec. It is unrelated to the seat a subscription
+ * reserves for its own duration (subscriptions.seat_id) — that seat is
+ * used via QR check-in (see lib/actions/students/student-subscription-attendance.ts),
+ * not through this booking path.
+ *
+ * There is no quota / session-limit concept anymore: a subscription is
+ * simply "active and not expired" — no consumption counting.
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -16,8 +28,6 @@ import type { Database } from '@/lib/supabase/types'
 export type EligibleSubscription = {
   id:            string
   planName:      string
-  sessionsUsed:  number
-  sessionsLimit: number | null   // null = unlimited
   endDate:       string
   timeWindowStart: string | null // "HH:MM:SS", or null = valid any time of day
   timeWindowEnd:   string | null
@@ -77,10 +87,9 @@ export function describeDaysOfWeek(days: number[] | null | undefined): string | 
 
 /**
  * Subscriptions must be checked live against end_date (no automatic expiry
- * sweep exists for the student `subscriptions` table), and against
- * session_limit consumption by counting non-cancelled bookings already
- * linked to each subscription — there's no separate counter column to go
- * stale, consumption is always derived from the bookings table directly.
+ * sweep exists for the student `subscriptions` table) — that's the only
+ * thing that determines eligibility now. No session/quota consumption is
+ * tracked or counted.
  *
  * Deliberately avoids a doubly-nested PostgREST embedded filter like
  * .eq('plans.plan_libraries.library_id', …) — there's no existing
@@ -123,41 +132,20 @@ export async function getEligibleSubscriptions(
 
   const { data: plans } = await supabase
     .from('plans')
-    .select('id, name, session_limit, time_window_start, time_window_end, days_of_week')
+    .select('id, name, time_window_start, time_window_end, days_of_week')
     .in('id', eligible.map(s => s.plan_id))
 
   const planById = new Map((plans as any[] ?? []).map(p => [p.id, p]))
 
-  // Session-limit consumption — one count query per subscription. Eligible
-  // subscriptions for a single library are almost always 0 or 1 in
-  // practice, so this stays cheap without needing a batched query.
-  const results: EligibleSubscription[] = []
-  for (const s of eligible) {
+  return eligible.map((s): EligibleSubscription => {
     const plan = planById.get(s.plan_id)
-    const limit = plan?.session_limit != null ? parseInt(plan.session_limit, 10) : null
-
-    let used = 0
-    if (limit !== null) {
-      const { count } = await supabase
-        .from('bookings')
-        .select('id', { count: 'exact', head: true })
-        .eq('subscription_id', s.id)
-        .in('status', ['confirmed', 'checked_in', 'completed'] as never[])
-      used = count ?? 0
-      if (used >= limit) continue   // fully consumed — not eligible to book with
-    }
-
-    results.push({
-      id:            s.id,
-      planName:      plan?.name ?? 'Membership plan',
-      sessionsUsed:  used,
-      sessionsLimit: limit,
-      endDate:       s.end_date,
+    return {
+      id:              s.id,
+      planName:        plan?.name ?? 'Membership plan',
+      endDate:         s.end_date,
       timeWindowStart: plan?.time_window_start ?? null,
       timeWindowEnd:   plan?.time_window_end ?? null,
       daysOfWeek:      (plan as any)?.days_of_week ?? null,
-    })
-  }
-
-  return results
+    }
+  })
 }

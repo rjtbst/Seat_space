@@ -17,7 +17,6 @@ export type PlanWithStats = {
   name:             string
   price:            number
   duration_days:    number
-  session_limit:    string | null
   scope:            string
   time_window_start: string | null  // "HH:MM:SS" or null = no time restriction
   time_window_end:   string | null
@@ -35,7 +34,7 @@ export async function getOwnerPlans(ownerId?: string): Promise<PlanWithStats[]> 
 
     const { data: plans, error: planErr } = await supabase
       .from('plans')
-      .select(`id, name, price, duration_days, session_limit, scope, time_window_start, time_window_end, days_of_week, plan_libraries(library_id, libraries(id, name))`)
+      .select(`id, name, price, duration_days, scope, time_window_start, time_window_end, days_of_week, plan_libraries(library_id, libraries(id, name))`)
       .eq('owner_id', uid)
       .order('created_at', { ascending: false })
 
@@ -59,7 +58,6 @@ export async function getOwnerPlans(ownerId?: string): Promise<PlanWithStats[]> 
         name:             p.name ?? '',
         price:            Number(p.price ?? 0),
         duration_days:    p.duration_days ?? 30,
-        session_limit:    p.session_limit ?? null,
         scope:            (p.scope as string) ?? 'library',
         time_window_start: (p as any).time_window_start ?? null,
         time_window_end:   (p as any).time_window_end ?? null,
@@ -82,7 +80,6 @@ const planFieldsSchema = z.object({
   name:               z.string().min(2).max(80).trim(),
   price:              z.number().positive(),
   duration_days:      z.number().int().positive(),
-  session_limit:      z.string().optional(),
   scope:              z.enum(['library', 'cross']),
   library_ids:        z.array(z.string().uuid()).min(1),
   // Optional time-of-day restriction, e.g. a "9 to 12" morning-only
@@ -115,15 +112,39 @@ function validatePlanFields(input: CreatePlanInput): { error: string } | { error
 /** Shared insert/update payload builder — one place that decides how the
  *  validated form fields map onto plans columns. */
 function buildPlanPayload(input: CreatePlanInput) {
-  const { name, price, duration_days, session_limit, scope, time_window_start, time_window_end, days_of_week } = input
+  const { name, price, duration_days, scope, time_window_start, time_window_end, days_of_week } = input
   return {
     name, price, duration_days,
-    session_limit: session_limit ?? null,
     scope: scope as never,
     time_window_start: time_window_start ? `${time_window_start}:00` : null,
     time_window_end:   time_window_end   ? `${time_window_end}:00`   : null,
     days_of_week:      days_of_week && days_of_week.length > 0 ? days_of_week : null,
   }
+}
+
+/**
+ * For scope='cross' ("all my libraries") plans, the set of linked
+ * libraries is NOT the client's to decide — it's always "every active
+ * library this owner currently has," kept in sync going forward by the
+ * sync_library_into_cross_scope_plans trigger on the libraries table.
+ * This is the write-time half of that same guarantee: even if the client
+ * sent a stale or partial library_ids array (an old page, a replayed
+ * request, a bug in a future screen), a cross-scope plan can never be
+ * saved half-covering the owner's libraries. scope='library' plans are
+ * untouched — that list is a deliberate owner choice, taken as-is.
+ */
+async function resolveLibraryIds(
+  supabase: Awaited<ReturnType<typeof getSupabaseUser>>['supabase'],
+  ownerId: string,
+  scope: 'library' | 'cross',
+  submittedIds: string[],
+): Promise<string[]> {
+  if (scope !== 'cross') return submittedIds
+
+  const { data } = await supabase
+    .from('libraries').select('id').eq('owner_id', ownerId).eq('is_active', true as never)
+  const ids = (data as any[] ?? []).map(l => l.id)
+  return ids.length > 0 ? ids : submittedIds
 }
 
 export async function createPlan(input: CreatePlanInput): Promise<ActionResult<{ planId: string }>> {
@@ -143,8 +164,10 @@ export async function createPlan(input: CreatePlanInput): Promise<ActionResult<{
 
   if (planErr || !plan) { logError('createPlan', 'Insert failed', planErr); return { success: false, error: planErr?.message ?? 'Failed to create plan' } }
 
+  const libraryIds = await resolveLibraryIds(supabase, user.id, parsed.data.scope, parsed.data.library_ids)
+
   const { error: linkErr } = await supabase
-    .from('plan_libraries').insert(parsed.data.library_ids.map((lid) => ({ plan_id: plan.id, library_id: lid })))
+    .from('plan_libraries').insert(libraryIds.map((lid) => ({ plan_id: plan.id, library_id: lid })))
   if (linkErr) { logError('createPlan', 'Link insert failed', linkErr); return { success: false, error: linkErr.message } }
 
   log('createPlan', `plan=${plan.id} name=${parsed.data.name}`)
@@ -160,14 +183,13 @@ export async function createPlan(input: CreatePlanInput): Promise<ActionResult<{
  * place.
  *
  * Important, and surfaced in the UI rather than hidden here: the
- * `subscriptions` table has no snapshot of price/session_limit/time
- * window at signup time — it always joins live to `plans`. That means
- * editing price only affects future signups (past payments already
- * happened and are immutable), but editing session_limit, the time
- * window, or days_of_week takes effect immediately for EXISTING active
- * subscribers too, since there's nothing else for their entitlement
- * check to read. PlanBuilderClient warns about this before saving when
- * the plan being edited has active subscribers.
+ * `subscriptions` table has no snapshot of price/time window at signup
+ * time — it always joins live to `plans`. That means editing price only
+ * affects future signups (past payments already happened and are
+ * immutable), but editing the time window or days_of_week takes effect
+ * immediately for EXISTING active subscribers too, since there's nothing
+ * else for their entitlement check to read. PlanBuilderClient warns about
+ * this before saving when the plan being edited has active subscribers.
  */
 export async function updatePlan(input: UpdatePlanInput): Promise<ActionResult> {
   const { planId, ...fields } = input
@@ -197,8 +219,10 @@ export async function updatePlan(input: UpdatePlanInput): Promise<ActionResult> 
   const { error: deleteLinkErr } = await supabase.from('plan_libraries').delete().eq('plan_id', planId)
   if (deleteLinkErr) { logError('updatePlan', 'Link delete failed', deleteLinkErr); return { success: false, error: deleteLinkErr.message } }
 
+  const libraryIds = await resolveLibraryIds(supabase, user.id, parsed.data.scope, parsed.data.library_ids)
+
   const { error: linkErr } = await supabase
-    .from('plan_libraries').insert(parsed.data.library_ids.map((lid) => ({ plan_id: planId, library_id: lid })))
+    .from('plan_libraries').insert(libraryIds.map((lid) => ({ plan_id: planId, library_id: lid })))
   if (linkErr) { logError('updatePlan', 'Link insert failed', linkErr); return { success: false, error: linkErr.message } }
 
   log('updatePlan', `plan=${planId} name=${parsed.data.name}`)

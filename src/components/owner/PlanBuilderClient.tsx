@@ -21,7 +21,6 @@ const DURATION_OPTIONS = [
   { label: '30 days', value: 30 },
   { label: '90 days', value: 90 },
 ]
-const QUOTA_OPTIONS = ['Unlimited', '1 session/day', '2 sessions/day', '20 sessions total']
 const DAY_OPTIONS = [
   { value: 0, label: 'Sun' }, { value: 1, label: 'Mon' }, { value: 2, label: 'Tue' },
   { value: 3, label: 'Wed' }, { value: 4, label: 'Thu' }, { value: 5, label: 'Fri' }, { value: 6, label: 'Sat' },
@@ -29,7 +28,6 @@ const DAY_OPTIONS = [
 
 const EMPTY_FORM = {
   name: '', price: '', duration_days: 30,
-  session_limit: 'Unlimited',
   scope: 'library' as 'library' | 'cross',
   library_ids: [] as string[],
   time_window_enabled: false,
@@ -60,7 +58,7 @@ function PlanCard({
             ₹{plan.price.toLocaleString('en-IN')}
           </div>
           <div style={{ fontSize: 11, color: TEXT_MUTED, marginTop: 2 }}>
-            {plan.duration_days} days · {plan.session_limit ?? 'Unlimited'}
+            {plan.duration_days} days
           </div>
           {(plan.time_window_start && plan.time_window_end) || dayDesc ? (
             <div style={{
@@ -180,12 +178,39 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
     }))
   }, [])
 
+  const selectSingleLibrary = useCallback((id: string) => {
+    setForm(f => ({ ...f, library_ids: [id] }))
+  }, [])
+
+  // Three distinct, explicit choices an owner makes for a plan — matches
+  // how the purchase flow / owner dashboard actually talk about it,
+  // rather than a bare "library vs cross" toggle. Under the hood there
+  // are still only two `scope` values in the DB ('library' | 'cross') —
+  // "One library" and "Multiple libraries" both store scope='library'
+  // and differ only in whether the picker below allows one selection or
+  // several. Defaults to "One library," never to "All my libraries" —
+  // an owner has to deliberately opt into cross-library reach.
+  const [libraryMode, setLibraryMode] = useState<'all' | 'one' | 'some'>('one')
+
+  const applyLibraryMode = useCallback((mode: 'all' | 'one' | 'some') => {
+    setLibraryMode(mode)
+    setForm(f => ({
+      ...f,
+      scope: mode === 'all' ? 'cross' : 'library',
+      library_ids:
+        mode === 'all' ? libraries.map(l => l.id)
+        : mode === 'one' ? (f.library_ids.length === 1 ? f.library_ids : [])
+        : f.library_ids,
+    }))
+  }, [libraries])
+
   const setScope = useCallback((scope: 'library' | 'cross') => {
     setForm(f => ({
       ...f, scope,
       library_ids: scope === 'cross' ? libraries.map(l => l.id) : f.library_ids,
     }))
   }, [libraries])
+  void setScope // superseded by applyLibraryMode's 3-way selector below; kept only to avoid a churny diff if something still imports the old 2-way scope() elsewhere in this file
 
   const toggleDayOfWeek = useCallback((day: number) => {
     setForm(f => ({
@@ -198,11 +223,11 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
 
   const handleEdit = useCallback((plan: PlanWithStats) => {
     setEditingPlanId(plan.id)
+    setLibraryMode(plan.scope === 'cross' ? 'all' : plan.libraries.length === 1 ? 'one' : 'some')
     setForm({
       name: plan.name,
       price: String(plan.price),
       duration_days: plan.duration_days,
-      session_limit: plan.session_limit ?? 'Unlimited',
       scope: plan.scope === 'cross' ? 'cross' : 'library',
       library_ids: plan.libraries.map(l => l.id),
       time_window_enabled: !!(plan.time_window_start && plan.time_window_end),
@@ -219,6 +244,7 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
     setShowForm(false)
     setEditingPlanId(null)
     setForm(EMPTY_FORM)
+    setLibraryMode('one')
     setError('')
   }, [])
 
@@ -240,7 +266,6 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
       name:          form.name.trim(),
       price:         Number(form.price),
       duration_days: form.duration_days,
-      session_limit: form.session_limit === 'Unlimited' ? undefined : form.session_limit,
       scope:         form.scope,
       library_ids:   form.library_ids,
       time_window_start: form.time_window_enabled ? form.time_window_start : undefined,
@@ -257,6 +282,7 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
       setShowForm(false)
       setEditingPlanId(null)
       setForm(EMPTY_FORM)
+      setLibraryMode('one')
       router.refresh()
     })
   }, [form, editingPlanId, showToast, router])
@@ -357,8 +383,8 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
               padding: '10px 14px', marginBottom: 16, fontSize: 12, color: '#92400E', lineHeight: 1.5,
             }}>
               ⚠️ This plan has <strong>{plans.find(p => p.id === editingPlanId)?.subscriber_count} active subscriber(s)</strong>.
-              Changing the session quota, restricted hours/days, scope, or linked libraries applies to
-              them immediately too — there's no "grandfather" period. Changing the price only affects
+              Changing the restricted hours/days, scope, or linked libraries applies to them
+              immediately too — there's no "grandfather" period. Changing the price only affects
               future signups; it won't re-charge anyone already subscribed.
             </div>
           )}
@@ -377,22 +403,14 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
             </div>
           </div>
 
-          {/* Duration + Quota */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+          {/* Duration */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 12, marginBottom: 16 }}>
             <div>
               <label style={{ fontSize: 11, fontWeight: 600, color: TEXT_SECONDARY, display: 'block', marginBottom: 5 }}>Duration</label>
               <select value={form.duration_days}
                 onChange={e => setForm(f => ({ ...f, duration_days: Number(e.target.value) }))}
                 style={{ ...INP_STYLE, cursor: 'pointer', appearance: 'none' }}>
                 {DURATION_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
-            </div>
-            <div>
-              <label style={{ fontSize: 11, fontWeight: 600, color: TEXT_SECONDARY, display: 'block', marginBottom: 5 }}>Session quota</label>
-              <select value={form.session_limit}
-                onChange={e => setForm(f => ({ ...f, session_limit: e.target.value }))}
-                style={{ ...INP_STYLE, cursor: 'pointer', appearance: 'none' }}>
-                {QUOTA_OPTIONS.map(o => <option key={o}>{o}</option>)}
               </select>
             </div>
           </div>
@@ -505,43 +523,55 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
 
           {/* Scope toggle */}
           <div style={{ marginBottom: 16 }}>
-            <label style={{ fontSize: 11, fontWeight: 600, color: TEXT_SECONDARY, display: 'block', marginBottom: 8 }}>Plan Scope *</label>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: TEXT_SECONDARY, display: 'block', marginBottom: 8 }}>Which libraries? *</label>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
               {([
-                { value: 'library', icon: '🏛️', title: 'Library-specific', sub: 'Student uses at selected library only' },
-                { value: 'cross',   icon: '🔗', title: 'Cross-library',    sub: 'Student uses at all your libraries'  },
+                { value: 'one',  icon: '🏛️', title: 'One library',  sub: 'Pick a single library' },
+                { value: 'some', icon: '📚', title: 'Selected libraries', sub: 'Pick two or more' },
+                { value: 'all',  icon: '🔗', title: 'All my libraries', sub: 'Every library, including future ones' },
               ] as const).map(opt => {
-                const active = form.scope === opt.value
+                const active = libraryMode === opt.value
                 return (
-                  <button className="press" key={opt.value} type="button" onClick={() => setScope(opt.value)} style={{
-                    padding: '12px 14px', borderRadius: 10, textAlign: 'left', cursor: 'pointer',
+                  <button className="press" key={opt.value} type="button" onClick={() => applyLibraryMode(opt.value)} style={{
+                    padding: '12px 12px', borderRadius: 10, textAlign: 'left', cursor: 'pointer',
                     border: `${active ? 2 : 1.5}px solid ${active ? BLUE : BORDER}`,
                     background: active ? BLUE_LIGHT : '#F9F8F5',
                     fontFamily: FONT_BODY, transition: 'all .12s',
                   }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: active ? BLUE_DARK : '#3A4A5C', marginBottom: 3 }}>
+                    <div style={{ fontSize: 12.5, fontWeight: 700, color: active ? BLUE_DARK : '#3A4A5C', marginBottom: 3 }}>
                       {opt.icon} {opt.title}
                     </div>
-                    <div style={{ fontSize: 11, color: TEXT_MUTED }}>{opt.sub}</div>
+                    <div style={{ fontSize: 10.5, color: TEXT_MUTED }}>{opt.sub}</div>
                   </button>
                 )
               })}
             </div>
           </div>
 
-          {/* Library checkboxes */}
+          {/* Library picker — behavior depends on libraryMode:
+              'one' = single-select (picking one deselects any other),
+              'some' = ordinary multi-select checkboxes,
+              'all' = every library, pre-checked and locked (kept in sync
+              automatically going forward, including libraries the owner
+              adds later — see sync_library_into_cross_scope_plans). */}
           <div style={{ marginBottom: 20 }}>
-            <label style={{ fontSize: 11, fontWeight: 600, color: TEXT_SECONDARY, display: 'block', marginBottom: 8 }}>Applicable Libraries *</label>
+            <label style={{ fontSize: 11, fontWeight: 600, color: TEXT_SECONDARY, display: 'block', marginBottom: 8 }}>
+              {libraryMode === 'one' ? 'Choose the library *' : libraryMode === 'some' ? 'Choose libraries *' : 'Applicable libraries'}
+            </label>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {libraries.map(lib => {
                 const checked = form.library_ids.includes(lib.id)
                 return (
                   <button className="press" key={lib.id} type="button"
-                    onClick={() => form.scope !== 'cross' && toggleLibrary(lib.id)}
+                    onClick={() => {
+                      if (libraryMode === 'all') return
+                      if (libraryMode === 'one') selectSingleLibrary(lib.id)
+                      else toggleLibrary(lib.id)
+                    }}
                     style={{
                       display: 'flex', alignItems: 'center', gap: 12,
                       padding: '10px 14px', borderRadius: 9, textAlign: 'left',
-                      cursor: form.scope === 'cross' ? 'default' : 'pointer',
+                      cursor: libraryMode === 'all' ? 'default' : 'pointer',
                       border: `1.5px solid ${checked ? BLUE : BORDER}`,
                       background: checked ? BLUE_LIGHT : '#F9F8F5',
                       fontFamily: FONT_BODY, transition: 'all .12s',
@@ -552,7 +582,8 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
                       {lib.name}
                     </span>
                     <div style={{
-                      width: 18, height: 18, borderRadius: 4, flexShrink: 0,
+                      width: 18, height: 18, flexShrink: 0,
+                      borderRadius: libraryMode === 'one' ? 9 : 4,
                       border: `2px solid ${checked ? BLUE : BORDER}`,
                       background: checked ? BLUE : 'transparent',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -564,9 +595,9 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
                 )
               })}
             </div>
-            {form.scope === 'cross' && (
+            {libraryMode === 'all' && (
               <div style={{ fontSize: 11, color: TEXT_MUTED, marginTop: 6 }}>
-                All libraries selected automatically for cross-library plans.
+                Selected automatically — this plan will also cover any new library you add later, no need to come back and update it.
               </div>
             )}
           </div>

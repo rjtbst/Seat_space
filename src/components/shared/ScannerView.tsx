@@ -6,11 +6,19 @@
  *   - src/app/(staff)/staff/scanner/page.tsx       (via lookupBookingForScan / staffCheckIn)
  *   - src/app/(owner)/dashboard/scanner/page.tsx   (via lookupBookingForOwnerScan / checkInBooking)
  *
- * Identical UI and scanning logic either way — only the two server actions
- * passed in differ, since "who is allowed to check in this booking" is
- * scoped differently for staff (via the `staff` table) vs owner (via
- * `libraries.owner_id`). Extracted here so a future fix to the camera/scan
- * loop/UI only needs to happen once.
+ * Scans TWO kinds of QR code, told apart by URL shape (both still end
+ * with the UUID as the final "/"-separated path segment):
+ *   - a BOOKING QR      "…/booking/<uuid>"       — single hourly booking
+ *   - a SUBSCRIPTION QR "…/subscription/<uuid>"  — a student's digital
+ *     library pass, valid for their whole membership duration. Scanning it
+ *     records a check-in, or a check-out if they already have an open
+ *     visit today (see lib/booking/subscriptionScan.ts).
+ *
+ * Identical UI and scanning mechanics either way — only the four server
+ * actions passed in differ, since "who is allowed to check in this
+ * booking/subscription" is scoped differently for staff (via the `staff`
+ * table) vs owner (via `libraries.owner_id`). Extracted here so a future
+ * fix to the camera/scan loop/UI only needs to happen once.
  */
 import { useEffect, useRef, useState, useTransition } from 'react'
 import jsQR from 'jsqr'
@@ -31,11 +39,29 @@ type BookingPreview = {
   status:      string
 }
 
+type SubscriptionPreview = {
+  id:              string
+  studentName:     string
+  planName:        string
+  libraryId:       string
+  libraryName:     string
+  seatLabel:       string
+  status:          string
+  startDate:       string
+  endDate:         string
+  timeWindowStart: string | null
+  timeWindowEnd:   string | null
+  daysOfWeek:      number[] | null
+}
+
 type ScanState = 'idle' | 'scanning' | 'found' | 'success' | 'error'
+type ScanKind  = 'booking' | 'subscription'
 
 export interface ScannerViewProps {
-  lookupBooking: (bookingId: string) => Promise<ActionResult<BookingPreview>>
-  checkIn:       (bookingId: string) => Promise<ActionResult>
+  lookupBooking:        (bookingId: string) => Promise<ActionResult<BookingPreview>>
+  checkIn:              (bookingId: string) => Promise<ActionResult>
+  lookupSubscription?:  (subscriptionId: string) => Promise<ActionResult<SubscriptionPreview>>
+  checkInSubscription?: (subscriptionId: string, libraryId: string) => Promise<ActionResult<{ action: 'checked_in' | 'checked_out' }>>
   title?:        string
   subtitle?:     string
 }
@@ -43,8 +69,10 @@ export interface ScannerViewProps {
 export default function ScannerView({
   lookupBooking,
   checkIn,
+  lookupSubscription,
+  checkInSubscription,
   title    = 'QR Scanner',
-  subtitle = "Scan student's booking QR code to check them in",
+  subtitle = "Scan a student's booking or membership QR code",
 }: ScannerViewProps) {
   const videoRef                      = useRef<HTMLVideoElement>(null)
   const streamRef                     = useRef<MediaStream | null>(null)
@@ -53,7 +81,10 @@ export default function ScannerView({
   const scanningRef                   = useRef(false)
 
   const [scanState, setScanState]     = useState<ScanState>('idle')
+  const [scanKind,  setScanKind]      = useState<ScanKind>('booking')
   const [booking,   setBooking]       = useState<BookingPreview | null>(null)
+  const [subscription, setSubscription] = useState<SubscriptionPreview | null>(null)
+  const [scanAction, setScanAction]   = useState<'checked_in' | 'checked_out' | null>(null)
   const [errorMsg,  setErrorMsg]      = useState('')
   const [manualId,  setManualId]      = useState('')
   const [hasCam,    setHasCam]        = useState(true)
@@ -64,6 +95,7 @@ export default function ScannerView({
     setScanState('scanning')
     setErrorMsg('')
     setBooking(null)
+    setSubscription(null)
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -118,7 +150,7 @@ export default function ScannerView({
         })
         if (code && code.data) {
           stopCamera()
-          resolveBookingId(code.data)
+          resolveScan(code.data)
           return
         }
       } catch { /* frame not ready / decode hiccup — just retry */ }
@@ -137,11 +169,38 @@ export default function ScannerView({
   // Clean up on unmount (e.g. navigating away mid-scan)
   useEffect(() => () => stopCamera(), [])
 
-  const resolveBookingId = async (rawId: string) => {
-    // Normalize — QR might encode a full URL like https://app.com/booking/UUID
-    const id = rawId.trim().split('/').pop() ?? rawId.trim()
+  /**
+   * A raw scan is either a bare UUID (manual entry) or a full URL like
+   * https://app.com/booking/UUID or https://app.com/subscription/UUID.
+   * The kind is decided by whichever path segment precedes the UUID —
+   * defaults to "booking" for a bare UUID (existing behavior, unchanged).
+   */
+  const resolveScan = async (rawId: string) => {
+    const trimmed = rawId.trim()
+    const parts   = trimmed.split('/').filter(Boolean)
+    const id      = parts[parts.length - 1] ?? trimmed
+    const kind: ScanKind = parts[parts.length - 2] === 'subscription' ? 'subscription' : 'booking'
+
+    setScanKind(kind)
     setScanState('found')
+
     startTransition(async () => {
+      if (kind === 'subscription') {
+        if (!lookupSubscription) {
+          setScanState('error')
+          setErrorMsg('Membership scanning is not available here')
+          return
+        }
+        const res = await lookupSubscription(id)
+        if (res.success) {
+          setSubscription(res.data)
+        } else {
+          setScanState('error')
+          setErrorMsg((res as any).error ?? 'Membership pass not found')
+        }
+        return
+      }
+
       const res = await lookupBooking(id)
       if (res.success) {
         setBooking(res.data)
@@ -153,6 +212,21 @@ export default function ScannerView({
   }
 
   const handleCheckIn = () => {
+    if (scanKind === 'subscription') {
+      if (!subscription || !checkInSubscription) return
+      startTransition(async () => {
+        const res = await checkInSubscription(subscription.id, subscription.libraryId)
+        if (res.success) {
+          setScanAction(res.data.action)
+          setScanState('success')
+        } else {
+          setScanState('error')
+          setErrorMsg((res as any).error ?? 'Scan failed')
+        }
+      })
+      return
+    }
+
     if (!booking) return
     startTransition(async () => {
       const res = await checkIn(booking.id)
@@ -168,6 +242,8 @@ export default function ScannerView({
   const handleReset = () => {
     setScanState('idle')
     setBooking(null)
+    setSubscription(null)
+    setScanAction(null)
     setErrorMsg('')
     setManualId('')
     stopCamera()
@@ -175,7 +251,7 @@ export default function ScannerView({
 
   const handleManualLookup = () => {
     if (!manualId.trim()) return
-    resolveBookingId(manualId.trim())
+    resolveScan(manualId.trim())
   }
 
   return (
@@ -236,13 +312,13 @@ export default function ScannerView({
           {/* Manual ID fallback */}
           <div style={{ borderTop: '1px solid #E2DDD4', paddingTop: 16 }}>
             <div style={{ fontSize: 12, fontWeight: 600, color: '#6B7689', marginBottom: 8 }}>
-              Or enter Booking ID manually
+              Or enter Booking / Membership ID manually
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
               <input
                 value={manualId}
                 onChange={e => setManualId(e.target.value)}
-                placeholder="Paste booking UUID…"
+                placeholder="Paste booking or membership UUID…"
                 style={{
                   flex: 1, padding: '10px 12px',
                   border: '1.5px solid #E2DDD4', borderRadius: 9,
@@ -339,19 +415,19 @@ export default function ScannerView({
       )}
 
       {/* ── FOUND (looking up in DB) ── */}
-      {scanState === 'found' && !booking && (
+      {scanState === 'found' && !booking && !subscription && (
         <div style={{ textAlign: 'center', padding: '40px 0' }}>
           <div style={{
             width: 40, height: 40, border: `3px solid ${ACCENT_LIGHT}`,
             borderTopColor: ACCENT, borderRadius: '50%',
             margin: '0 auto 16px', animation: 'spin .65s linear infinite',
           }} />
-          <div style={{ fontSize: 14, color: '#6B7689' }}>Looking up booking…</div>
+          <div style={{ fontSize: 14, color: '#6B7689' }}>Looking up {scanKind === 'subscription' ? 'membership' : 'booking'}…</div>
         </div>
       )}
 
       {/* ── FOUND + booking loaded → confirm check-in ── */}
-      {(scanState === 'found') && booking && (
+      {scanState === 'found' && booking && (
         <div>
           <div style={{
             background:   GREEN_LIGHT,
@@ -445,6 +521,101 @@ export default function ScannerView({
         </div>
       )}
 
+      {/* ── FOUND + subscription loaded → confirm check-in/out ── */}
+      {scanState === 'found' && subscription && (
+        <div>
+          <div style={{
+            background:   GREEN_LIGHT,
+            border:       `1.5px solid rgba(13,124,84,.3)`,
+            borderRadius: 16,
+            padding:      '18px',
+            marginBottom: 14,
+          }}>
+            <div style={{ fontSize: 12, fontWeight: 600, color: '#6B7689', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '.05em' }}>
+              Membership Pass
+            </div>
+            <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
+              <div style={{
+                width: 48, height: 48, borderRadius: 12,
+                background: ACCENT_LIGHT, display: 'flex',
+                alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0,
+              }}>
+                🪪
+              </div>
+              <div>
+                <div style={{ fontSize: 17, fontWeight: 800, color: '#0A0D12', fontFamily: 'Syne, sans-serif' }}>
+                  {subscription.studentName}
+                </div>
+                <div style={{ fontSize: 13, color: '#6B7689' }}>
+                  {subscription.planName} — Seat <strong style={{ color: '#0A0D12' }}>{subscription.seatLabel}</strong>
+                </div>
+              </div>
+            </div>
+            <div style={{
+              background: '#fff', borderRadius: 10, padding: '10px 14px',
+              fontSize: 12, color: '#3A4A5C', lineHeight: 1.8,
+            }}>
+              🏛️ {subscription.libraryName}<br />
+              📅 Valid {fmtIST(subscription.startDate)} – {fmtIST(subscription.endDate)}<br />
+              🏷️ Status: <strong style={{ textTransform: 'capitalize' }}>{subscription.status}</strong>
+            </div>
+          </div>
+
+          {subscription.status === 'active' ? (
+            <button
+              onClick={handleCheckIn}
+              disabled={isPending}
+              style={{
+                width:        '100%',
+                padding:      '14px 0',
+                borderRadius: 12,
+                border:       'none',
+                background:   GREEN,
+                color:        '#fff',
+                fontSize:     15,
+                fontWeight:   700,
+                fontFamily:   'Syne, sans-serif',
+                cursor:       'pointer',
+                marginBottom: 10,
+                opacity:      isPending ? 0.7 : 1,
+                boxShadow:    '0 4px 16px rgba(13,124,84,.3)',
+              }}
+            >
+              {isPending ? 'Processing…' : '✓ Confirm Scan'}
+            </button>
+          ) : (
+            <div style={{
+              padding:      '12px 14px',
+              background:   '#FEF3E2',
+              borderRadius: 12,
+              fontSize:     13,
+              color:        '#92400E',
+              marginBottom: 10,
+              fontWeight:   600,
+            }}>
+              ⚠️ Cannot scan — membership is <strong>{subscription.status}</strong>
+            </div>
+          )}
+
+          <button
+            onClick={handleReset}
+            style={{
+              width:        '100%',
+              padding:      '11px 0',
+              borderRadius: 10,
+              border:       '1.5px solid #E2DDD4',
+              background:   '#FDFCF9',
+              color:        '#6B7689',
+              fontSize:     13,
+              fontWeight:   600,
+              cursor:       'pointer',
+            }}
+          >
+            Scan Another
+          </button>
+        </div>
+      )}
+
       {/* ── SUCCESS ── */}
       {scanState === 'success' && (
         <div style={{ textAlign: 'center', padding: '20px 0' }}>
@@ -469,13 +640,17 @@ export default function ScannerView({
             color:        GREEN,
             marginBottom: 6,
           }}>
-            Checked In!
+            {scanKind === 'subscription'
+              ? (scanAction === 'checked_out' ? 'Checked Out!' : 'Checked In!')
+              : 'Checked In!'}
           </div>
           <div style={{ fontSize: 14, color: '#6B7689', marginBottom: 6 }}>
-            {booking?.studentName} — Seat {booking?.seatLabel}
+            {scanKind === 'subscription'
+              ? `${subscription?.studentName} — Seat ${subscription?.seatLabel}`
+              : `${booking?.studentName} — Seat ${booking?.seatLabel}`}
           </div>
           <div style={{ fontSize: 12, color: '#9AAAB8', marginBottom: 24 }}>
-            Entry recorded in system
+            {scanKind === 'subscription' ? 'Attendance recorded' : 'Entry recorded in system'}
           </div>
           <button
             onClick={handleReset}
@@ -507,7 +682,7 @@ export default function ScannerView({
             marginBottom: 14,
           }}>
             <div style={{ fontSize: 32, marginBottom: 8 }}>❌</div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#9B1C1C', marginBottom: 4 }}>Check-in Failed</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#9B1C1C', marginBottom: 4 }}>Scan Failed</div>
             <div style={{ fontSize: 13, color: '#9B1C1C' }}>{errorMsg}</div>
           </div>
           <button

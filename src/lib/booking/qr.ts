@@ -76,3 +76,46 @@ export async function bookingQRDataUrl(bookingId: string): Promise<string> {
     },
   })
 }
+
+/**
+ * Subscription QR codes — a student's digital library pass. One code per
+ * subscription, valid for its ENTIRE duration (unlike a booking QR, which
+ * is single-use / single-day). The scanner (staff/owner scanner pages)
+ * tells a subscription QR apart from a booking QR by URL shape:
+ * "/subscription/<uuid>" vs "/booking/<uuid>" — both still end with the
+ * UUID as the final "/"-separated path segment, so the existing
+ * `rawId.split('/').pop()` parsing keeps working; the scanner additionally
+ * checks for the "/subscription/" segment to route the lookup correctly.
+ */
+export function subscriptionScanUrl(subscriptionId: string): string {
+  const base = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, '') || ''
+  return `${base}/subscription/${subscriptionId}`
+}
+
+/** Inline SVG markup for a subscription's QR code (its digital pass). */
+export async function subscriptionQRSvg(subscriptionId: string): Promise<string> {
+  const url = subscriptionScanUrl(subscriptionId)
+  return QRCode.toString(url, {
+    type: 'svg',
+    errorCorrectionLevel: 'M',
+    margin: 1,
+    color: {
+      dark:  '#0D1117',
+      light: '#FFFFFF',
+    },
+  })
+}
+
+/** PNG data: URL for a subscription's QR code, for <img src="..."> contexts. */
+export async function subscriptionQRDataUrl(subscriptionId: string): Promise<string> {
+  const url = subscriptionScanUrl(subscriptionId)
+  return QRCode.toDataURL(url, {
+    errorCorrectionLevel: 'M',
+    margin: 1,
+    width: 320,
+    color: {
+      dark:  '#0D1117',
+      light: '#FFFFFF',
+    },
+  })
+}

@@ -10,6 +10,12 @@ import {cache} from 'react'
 import { listSeatStatus, listSeatLayout } from '@/repositories/seats.repository'
 import { setBookingStatus } from '@/repositories/bookings.repository'
 import { createManualBooking } from '@/services/booking/createManualBooking'
+import {
+  fetchSubscriptionScanPreview,
+  recordSubscriptionScan,
+  type SubscriptionScanPreview,
+} from '@/lib/booking/subscriptionScan'
+export type { SubscriptionScanPreview }
 /* ═══════════════════════════════════════════════════════════════════════════
    TYPES
 ═══════════════════════════════════════════════════════════════════════════ */
@@ -486,6 +492,51 @@ export async function lookupBookingForScan(bookingId: string): Promise<ActionRes
     success: true,
     data: { id: b.id, seatLabel, studentName: name, startTime: b.start_time, endTime: b.end_time, status: b.status },
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SUBSCRIPTION QR SCANNING (digital pass check-in/out)
+   ─────────────────────────────────────────────────────────────────────────
+   Separate from the booking scanner above — a subscription has no daily
+   booking row to look up. Same "staff.library_id must match" scoping as
+   lookupBookingForScan.
+═══════════════════════════════════════════════════════════════════════════ */
+
+export async function lookupSubscriptionForScan(
+  subscriptionId: string,
+): Promise<ActionResult<SubscriptionScanPreview>> {
+  const supabase = await createServerSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Not authenticated' }
+
+  const { data: staffRow } = await supabase.from('staff').select('library_id').eq('user_id', user.id).limit(1).maybeSingle()
+  if (!staffRow) return { success: false, error: 'Staff record not found' }
+  if (!staffRow.library_id) return { success: false, error: 'Your staff account is not assigned to a library yet' }
+
+  const result = await fetchSubscriptionScanPreview(supabase, subscriptionId)
+  if (!result) return { success: false, error: 'Subscription not found' }
+  if (result.preview.libraryId !== staffRow.library_id) return { success: false, error: 'This pass belongs to a different library' }
+
+  return { success: true, data: result.preview }
+}
+
+export async function staffCheckInSubscription(
+  subscriptionId: string,
+): Promise<ActionResult<{ action: 'checked_in' | 'checked_out' }>> {
+  const supabase = await createServerSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Not authenticated' }
+
+  const { data: staffRow } = await supabase.from('staff').select('library_id').eq('user_id', user.id).limit(1).maybeSingle()
+  if (!staffRow) return { success: false, error: 'Staff record not found' }
+  if (!staffRow.library_id) return { success: false, error: 'Your staff account is not assigned to a library yet' }
+
+  const result = await recordSubscriptionScan(supabase, subscriptionId, staffRow.library_id, user.id)
+  if (result.success) {
+    revalidatePath('/staff')
+    revalidatePath('/staff/scanner')
+  }
+  return result
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

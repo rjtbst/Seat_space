@@ -70,7 +70,7 @@ import { describeDaysOfWeek } from '@/lib/booking/subscriptionEntitlement'
 
 type Plan = {
   id: string; name: string; price: number
-  duration_days: number; session_limit: string | null
+  duration_days: number
   time_window_start?: string | null
   time_window_end?:   string | null
   days_of_week?:      number[] | null
@@ -247,27 +247,9 @@ export default function LibraryDetail({
     const [h, m]   = time.split(':').map(Number)
     const nowMins  = h * 60 + m
 
-    // If we're looking at today and today's whole slot window has already
-    // ended (e.g. it's 8pm and this slot runs 9am–5pm), defaulting to the
-    // slot's nominal start (9am) is a start time that's already hours in
-    // the past — the person never chose that, it was just the fallback,
-    // and it immediately trips "cannot be in the past" with no visible
-    // cause. Roll forward to tomorrow instead, where the slot's normal
-    // start time is actually valid.
-    if (selectedDate === nowDate && nowMins >= slotEndMins) {
-      const tomorrow = new Date(new Date(nowDate + 'T00:00:00+05:30').getTime() + 86_400_000)
-        .toLocaleString('sv-SE', { timeZone: 'Asia/Kolkata' }).slice(0, 10)
-      setSelectedDate(tomorrow)
-      return // the date change re-fires this effect with the new date
-    }
-
     let defStart = slotStartMins
     if (selectedDate === nowDate && nowMins > slotStartMins && nowMins < slotEndMins) {
-      // +10 min lead time baked into the rounding, not just rounded up to
-      // the next 15-min mark with zero buffer — a start time of "right
-      // now" can already read as "in the past" by the time the request
-      // reaches the server a moment later.
-      defStart = Math.ceil((nowMins + 10) / 15) * 15
+      defStart = Math.ceil(nowMins / 15) * 15
     }
     let defEnd = Math.min(defStart + 120, slotEndMins)
 
@@ -650,33 +632,6 @@ export default function LibraryDetail({
         </div>
       </div>
 
-      {/* ── Stats row ─────────────────────────────────────────────────── */}
-      {/* Moved here from below the entire booking panel — Free Seats is
-          "the main thing" (as flagged) and previously required scrolling
-          past the whole slot/time/seat-selection flow to see at all. */}
-      <div className="grid grid-cols-3 gap-3 mb-4 items-stretch">
-        {[
-          { icon: Users,    label: 'Free Seats', value: isOpen ? `${freeSeats}` : '—' },
-          { icon: Calendar, label: 'Today',      value: status.todayHoursLabel },
-          { icon: Star,     label: 'Rating',     value: `${library.rating.toFixed(1)}/5` },
-        ].map(({ icon: Icon, label, value }) => (
-          <div key={label} className="bg-white border border-[#E4EAF2] rounded-xl p-3 text-center flex flex-col items-center justify-center">
-            <Icon className="w-4 h-4 text-[#9AACBE] mb-1" />
-            {/* WebkitLineClamp caps a long value like the "Today" hours
-                string to 2 lines with an ellipsis, instead of letting it
-                wrap to 5+ lines and force the Free Seats/Rating cards in
-                the same grid row to stretch to match. */}
-            <div
-              className="text-[13px] font-bold text-[#0D1117] leading-tight"
-              style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
-            >
-              {value}
-            </div>
-            <div className="text-[10px] text-[#9AACBE] mt-0.5">{label}</div>
-          </div>
-        ))}
-      </div>
-
       {/* ── Description ───────────────────────────────────────────────── */}
       {library.description && (
         <p className="text-[13px] text-[#6E7F94] leading-relaxed mb-4">{library.description}</p>
@@ -771,32 +726,18 @@ export default function LibraryDetail({
 
           {/* ── Time + date pickers ───────────────────────────────────── */}
           <div className="px-4 pb-4 border-t border-[#F0F4F8] pt-3">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-[11px] font-semibold text-[#9AACBE] uppercase tracking-widest">
-                Choose Time
-              </p>
-              {/* Selected-slot reminder — the slot list above scrolls out
-                  of view once you're down here setting the time, so this
-                  keeps the choice visible instead of it feeling "lost".
-                  selectedSlot is the raw SlotConfig (no .label field);
-                  the display label lives on slotOptions, computed by
-                  slotToDisplayOption. */}
-              {selectedSlot && (
-                <span className="text-[11px] font-semibold text-[#1E5CFF] bg-[rgba(30,92,255,0.06)] px-2 py-0.5 rounded-full">
-                  {slotOptions.find((s) => s.id === selectedSlotId)?.label}
-                </span>
-              )}
-            </div>
-            <div className="flex flex-col gap-3 sm:grid sm:grid-cols-3 mb-3">
-              {/* Date — TimePicker renders 3 native <select> elements
-                  (hour/min/AM-PM) side by side, which need ~180px of
-                  width once native OS chrome (dropdown arrows etc.) is
-                  accounted for — more than even a half-width mobile
-                  column can reliably give. Stacking Date/Start/End as
-                  full-width rows on mobile guarantees they fit regardless
-                  of device width; sm: restores the compact 3-across
-                  layout once there's actually room for it. */}
-              <div>
+            <p className="text-[11px] font-semibold text-[#9AACBE] uppercase tracking-widest mb-3">
+              Choose Time
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-3">
+              {/* Date — spans both mobile columns so Start/End each get a
+                  full half-width row below instead of squeezing into a
+                  third of the screen. TimePicker renders 3 native
+                  <select> elements (hour/min/AM-PM) side by side, which
+                  needs ~140px minimum; a 3-way equal split on a ~360px
+                  phone only gives ~100px, causing the controls to
+                  overflow/overlap as seen in the screenshot. */}
+              <div className="col-span-2 md:col-span-1">
                 <label className="text-[11px] font-semibold text-[#6E7F94] uppercase tracking-wider block mb-1.5">
                   Date
                 </label>
@@ -1053,7 +994,7 @@ export default function LibraryDetail({
                 <div className="text-[20px] font-extrabold my-0.5" style={{ color: PLAN_COLORS[i % PLAN_COLORS.length] }}>
                   ₹{p.price}
                 </div>
-                <div className="text-[10px] text-[#6E7F94]">{p.duration_days}d · {p.session_limit ?? 'Unlimited'}</div>
+                <div className="text-[10px] text-[#6E7F94]">{p.duration_days} days</div>
                 {(p.time_window_start && p.time_window_end) || describeDaysOfWeek(p.days_of_week) ? (
                   <div className="text-[9.5px] text-[#92400E] font-semibold mt-0.5">
                     🕐 {[
@@ -1069,6 +1010,35 @@ export default function LibraryDetail({
         </div>
       )}
 
+      {/* ── Stats row ─────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-3 gap-3 mb-5 items-stretch">
+        {[
+          { icon: Users,    label: 'Free Seats', value: isOpen ? `${freeSeats}` : '—' },
+          { icon: Calendar, label: 'Today',      value: status.todayHoursLabel },
+          { icon: Star,     label: 'Rating',     value: `${library.rating.toFixed(1)}/5` },
+        ].map(({ icon: Icon, label, value }) => (
+          <div key={label} className="bg-white border border-[#E4EAF2] rounded-xl p-3 text-center flex flex-col items-center justify-center">
+            <Icon className="w-4 h-4 text-[#9AACBE] mb-1" />
+            {/* WebkitLineClamp (not Tailwind's line-clamp utility, to
+                avoid depending on whether that core utility is enabled in
+                this project's Tailwind version) caps a long value like
+                the "Today" hours string to 2 lines with an ellipsis,
+                instead of letting it wrap to 5+ lines and force the
+                Free Seats/Rating cards in the same grid row to stretch
+                to match — that mismatch was the actual bug: a short "8"
+                sitting inside a card that was only tall because its
+                neighbor's text was long. */}
+            <div
+              className="text-[13px] font-bold text-[#0D1117] leading-tight"
+              style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+            >
+              {value}
+            </div>
+            <div className="text-[10px] text-[#9AACBE] mt-0.5">{label}</div>
+          </div>
+        ))}
+      </div>
+
       {/* ── Address ───────────────────────────────────────────────────── */}
       <div className="bg-white border border-[#E4EAF2] rounded-xl p-4">
         <div className="flex items-center gap-1.5 text-[12px] font-bold text-[#0D1117] mb-1.5">
@@ -1078,7 +1048,7 @@ export default function LibraryDetail({
       </div>
 
       {/* ── Sticky CTA (collapsed state — opens panel) ────────────────── */}
-      {!bookingOpen && hasAnySlots && (
+      {/* {!bookingOpen && hasAnySlots && (
         <div className="fixed bottom-0 left-0 right-0 lg:left-[252px] bg-white/95 backdrop-blur-sm border-t border-[#E4EAF2] px-5 py-4 z-50">
           <div className="max-w-3xl mx-auto flex items-center gap-4">
             <div className="flex-1 min-w-0">
@@ -1105,7 +1075,7 @@ export default function LibraryDetail({
             </button>
           </div>
         </div>
-      )}
+      )} */}
 
       {subscribePlan && (
         <SubscribeModal

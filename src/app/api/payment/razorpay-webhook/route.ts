@@ -248,7 +248,7 @@ export async function POST(req: NextRequest) {
 
         const { data: payRecord, error: fetchErr } = await supabase
           .from('payments')
-          .select('id, status, booking_id')
+          .select('id, status, booking_id, subscription_id')
           .eq('razorpay_order_id', orderId)
           .maybeSingle()
 
@@ -287,6 +287,19 @@ export async function POST(req: NextRequest) {
             .update({ status: 'cancelled' } as never)
             .eq('id', (payRecord as any).booking_id)
             .eq('status', 'held')
+        }
+
+        // A subscription reserves its seat as soon as it's created
+        // ('pending'), the same way a booking's 'held' status does — a
+        // declined/failed payment must release that seat immediately
+        // rather than leaving it locked until the stale-pending sweep
+        // eventually catches it (see sweep_expire_stale_pending_subscriptions).
+        if ((payRecord as any).subscription_id) {
+          await supabase
+            .from('subscriptions')
+            .update({ status: 'cancelled' } as never)
+            .eq('id', (payRecord as any).subscription_id)
+            .eq('status', 'pending')
         }
 
         break

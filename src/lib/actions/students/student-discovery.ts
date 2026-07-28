@@ -67,7 +67,6 @@ export type LibraryPlan = {
   name:          string
   price:         number
   duration_days: number
-  session_limit: string | null
   scope:         string
   time_window_start: string | null
   time_window_end:   string | null
@@ -384,7 +383,7 @@ export async function exploreLibraries(filters: ExploreFilters = {}): Promise<{
 
   const { data: planLibsData } = await supabase
     .from('plan_libraries')
-    .select('library_id, plans(id, name, price, duration_days, session_limit, scope, time_window_start, time_window_end, days_of_week)')
+    .select('library_id, plans(id, name, price, duration_days, scope, time_window_start, time_window_end, days_of_week)')
     .in('library_id', libIds)
 
   const plansByLib: Record<string, LibraryPlan[]> = {}
@@ -398,7 +397,6 @@ export async function exploreLibraries(filters: ExploreFilters = {}): Promise<{
       name:          p.name          ?? '',
       price:         Number(p.price  ?? 0),
       duration_days: p.duration_days ?? 30,
-      session_limit: p.session_limit ?? null,
       scope:         p.scope         ?? 'library',
       time_window_start: p.time_window_start ?? null,
       time_window_end:   p.time_window_end   ?? null,
@@ -491,7 +489,7 @@ export async function getLibraryDetail(
 
   const { data: planLibs } = await supabase
     .from('plan_libraries')
-    .select('library_id, plans(id, name, price, duration_days, session_limit, scope, time_window_start, time_window_end, days_of_week)')
+    .select('library_id, plans(id, name, price, duration_days, scope, time_window_start, time_window_end, days_of_week)')
     .eq('library_id', libraryId)
 
   const plans: LibraryPlan[] = (planLibs ?? [])
@@ -502,7 +500,6 @@ export async function getLibraryDetail(
       name:          p.name          ?? '',
       price:         Number(p.price  ?? 0),
       duration_days: p.duration_days ?? 30,
-      session_limit: p.session_limit ?? null,
       scope:         p.scope         ?? 'library',
       time_window_start: p.time_window_start ?? null,
       time_window_end:   p.time_window_end   ?? null,

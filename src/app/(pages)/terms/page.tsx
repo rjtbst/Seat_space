@@ -81,10 +81,11 @@ const sections: LegalSection[] = [
     body: (
       <>
         <p>
-          Library owners may offer subscription plans (e.g. monthly or session-based
-          passes) that let you book seats at that library without paying per session,
-          up to any session limit stated on the plan. Plan price, duration, and session
-          limit are set by the library owner and shown before you pay.
+          Library owners may offer subscription plans (e.g. monthly passes) that
+          reserve a specific seat for you at that library, within the plan's stated
+          hours and days, for the full plan duration — no per-session payment or daily
+          booking needed. Plan price, duration, and applicable hours/days are set by
+          the library owner and shown before you pay.
         </p>
         <p>
           Owners may occasionally offer discount codes for their own plans. A code only

@@ -3,7 +3,7 @@
 
 import { useRouter } from 'next/navigation'
 import type { StudentSubscription } from '@/lib/actions/students/student-subscriptions'
-import { CreditCard, MapPin, CheckCircle2, XCircle, Clock3, AlertCircle, Plus } from 'lucide-react'
+import { CreditCard, MapPin, Armchair, AlertCircle, Plus, QrCode } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { fmtIST } from '@/lib/ist'
 import { describeDaysOfWeek } from '@/lib/booking/subscriptionEntitlement'
@@ -18,11 +18,6 @@ const STATUS_CFG: Record<string, { label: string; cls: string }> = {
 function SubCard({ sub }: { sub: StudentSubscription }) {
   const cfg     = STATUS_CFG[sub.status] ?? STATUS_CFG.expired
   const isActive = sub.status === 'active'
-  const sessions = sub.session_limit
-    ? isNaN(Number(sub.session_limit))
-      ? sub.session_limit
-      : `${sub.session_limit} sessions`
-    : 'Unlimited sessions'
 
   const progressPct = isActive && sub.duration_days > 0
     ? Math.round((sub.days_left / sub.duration_days) * 100)
@@ -50,7 +45,11 @@ function SubCard({ sub }: { sub: StudentSubscription }) {
             </div>
             <div>
               <h3 className="text-[14px] font-bold text-[#0D1117]">{sub.plan_name}</h3>
-              <p className="text-[11px] text-[#9AACBE]">{sessions}</p>
+              {sub.seat && (
+                <p className="text-[11px] text-[#9AACBE] flex items-center gap-1">
+                  <Armchair className="w-3 h-3" /> Seat {sub.seat.label}
+                </p>
+              )}
               {(sub.time_window_start && sub.time_window_end) || describeDaysOfWeek(sub.days_of_week) ? (
                 <p className="text-[10.5px] text-[#92400E] font-semibold mt-0.5">
                   🕐 {[
@@ -66,16 +65,12 @@ function SubCard({ sub }: { sub: StudentSubscription }) {
           </span>
         </div>
 
-        {sub.libraries.length > 0 && (
+        {sub.library && (
           <div className="flex items-start gap-1.5 mb-3">
             <MapPin className="w-3 h-3 text-[#9AACBE] mt-0.5 flex-shrink-0" />
-            <div className="flex flex-wrap gap-1">
-              {sub.libraries.map((l) => (
-                <span key={l.id} className="text-[10px] bg-[#F4F7FB] px-2 py-0.5 rounded-full text-[#6E7F94]">
-                  {l.name}
-                </span>
-              ))}
-            </div>
+            <span className="text-[10px] bg-[#F4F7FB] px-2 py-0.5 rounded-full text-[#6E7F94]">
+              {sub.library.name}
+            </span>
           </div>
         )}
 
@@ -107,6 +102,16 @@ function SubCard({ sub }: { sub: StudentSubscription }) {
             <p className="text-[11px] text-[#92400E] leading-relaxed">
               Payment is pending verification. Plan activates automatically once payment is confirmed.
             </p>
+          </div>
+        )}
+
+        {isActive && sub.qrSvg && (
+          <div className="mt-3 flex flex-col items-center gap-2 bg-[#F4F7FB] rounded-xl p-4">
+            <p className="text-[10px] font-bold text-[#6E7F94] uppercase tracking-wide flex items-center gap-1">
+              <QrCode className="w-3 h-3" /> Your Digital Pass
+            </p>
+            <div className="w-32 h-32 bg-white p-2 rounded-lg" dangerouslySetInnerHTML={{ __html: sub.qrSvg }} />
+            <p className="text-[10px] text-[#9AACBE] text-center">Show this at the library — staff will scan you in and out.</p>
           </div>
         )}
       </div>

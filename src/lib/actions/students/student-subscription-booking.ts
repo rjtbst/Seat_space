@@ -97,7 +97,6 @@ export async function bookSeatViaSubscription(
       subscription_expired:       'This subscription has expired',
       plan_not_found:              'Plan not found',
       plan_not_valid_for_library:  'Your plan does not cover this library',
-      session_limit_reached:      'You have used all sessions included in this plan',
       seat_conflict:              'This seat was just booked by someone else. Please choose another seat.',
     }
     if (rpcResult?.error === 'outside_plan_time_window') {

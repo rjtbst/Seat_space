@@ -28,6 +28,8 @@ import {
   inputToDB,
 } from '@/lib/ist'
 import { fetchActiveSlotConfigs, fetchSlotConfigs, fetchActiveSlotConfigsCached } from '@/lib/booking/slotConfigService'
+import { listSeatLayout } from '@/repositories/seats.repository'
+import { subscriptionQRSvg } from '@/lib/booking/qr'
 import { getActiveCitiesCached } from '@/lib/booking/citiesCache'
 import { calculateBookingAmount }   from '@/lib/booking/pricing'
 import { computeEscrowSplit, computeFeeOnTopSplit, SUBSCRIPTION_COMMISSION_BPS } from '@/lib/booking/escrow'
@@ -64,7 +66,6 @@ export type StudentSubscription = {
   plan_name:     string
   plan_price:    number
   duration_days: number
-  session_limit: string | null
   time_window_start: string | null
   time_window_end:   string | null
   days_of_week:      number[] | null
@@ -72,7 +73,12 @@ export type StudentSubscription = {
   end_date:      string
   status:        string
   days_left:     number
-  libraries:     { id: string; name: string; city: string }[]
+  // The one library + seat this subscription is reserved for (chosen at
+  // purchase time) — a subscription no longer covers "any" of the plan's
+  // applicable libraries, just this one.
+  library:       { id: string; name: string; city: string } | null
+  seat:          { id: string; label: string } | null
+  qrSvg:         string | null   // the student's digital pass, null while pending
 }
 
 
@@ -83,8 +89,97 @@ export type StudentSubscription = {
 const subscribePlanSchema = z.object({
   planId:     z.string().uuid(),
   libraryId:  z.string().uuid(),
+  seatId:     z.string().uuid(),
+  // Optional — defaults to "today" (IST) inside the RPC when omitted.
+  startDate:  z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   couponCode: z.string().trim().max(40).optional(),
 })
+
+/**
+ * Seats in `libraryId` that are still free for this plan's window — i.e.
+ * NOT already reserved by another pending/active subscription whose date
+ * range + time window + days-of-week overlap this plan's. Powers the seat
+ * picker step of the purchase flow (after the student has chosen a plan +
+ * library, before they pay). The database trigger
+ * (prevent_overlapping_seat_subscription) and the RPC
+ * (create_pending_subscription_with_payment) are the real, unbypassable
+ * checks — this is purely so the student doesn't pick a seat only to have
+ * it rejected at checkout.
+ */
+export async function getAvailableSeatsForPlan(
+  planId: string,
+  libraryId: string,
+): Promise<{ id: string; label: string }[]> {
+  const { supabase } = await getSupabaseUser()
+
+  const [{ data: plan }, seats] = await Promise.all([
+    supabase.from('plans').select('duration_days, time_window_start, time_window_end, days_of_week').eq('id', planId).maybeSingle(),
+    listSeatLayout(supabase, libraryId, { activeOnly: true }),
+  ])
+  if (!plan || seats.length === 0) return []
+
+  // Every OTHER plan's window that currently has a pending/active
+  // subscription reserving a seat in this library — used to filter out
+  // seats already claimed for an overlapping window. Pending subscriptions
+  // older than the stale-pending cutoff (see
+  // sweep_expire_stale_pending_subscriptions) are excluded here too, since
+  // an abandoned checkout will be released before purchase actually goes
+  // through — no point showing the seat as taken in the meantime.
+  const staleCutoffIso = new Date(Date.now() - 20 * 60_000).toISOString()
+  const { data: reserved } = await supabase
+    .from('subscriptions')
+    .select('seat_id, status, created_at, start_date, end_date, plans(time_window_start, time_window_end, days_of_week)')
+    .eq('library_id', libraryId)
+    .in('status', ['pending', 'active'] as never[])
+
+  const overlaps = (r: any): boolean => {
+    if (r.status === 'pending' && r.created_at && r.created_at < staleCutoffIso) return false
+    const p = r.plans as any
+    const timeOverlap = !p?.time_window_start || !(plan as any).time_window_start
+      ? true
+      : p.time_window_start < (plan as any).time_window_end && (plan as any).time_window_start < p.time_window_end
+    const daysOverlap = !p?.days_of_week || !(plan as any).days_of_week
+      ? true
+      : (p.days_of_week as number[]).some((d: number) => ((plan as any).days_of_week as number[]).includes(d))
+    return timeOverlap && daysOverlap
+  }
+
+  const reservedSeatIds = new Set(
+    (reserved as any[] ?? []).filter(overlaps).map(r => r.seat_id).filter(Boolean),
+  )
+
+  // Seats that already have an ad-hoc hourly booking sitting on them during
+  // hours this plan would reserve, anywhere in the plan's duration — the
+  // seat picker should never offer a seat the purchase RPC will reject
+  // with seat_has_active_bookings.
+  const planStart = new Date().toISOString()
+  const planEnd    = new Date(Date.now() + ((plan as any).duration_days ?? 30) * 86_400_000).toISOString()
+  const { data: booked } = await supabase
+    .from('bookings')
+    .select('seat_id, start_time, end_time')
+    .eq('library_id', libraryId)
+    .in('status', ['confirmed', 'held', 'checked_in'] as never[])
+    .lte('start_time', planEnd)
+    .gte('end_time', planStart)
+
+  const bookingOverlaps = (b: any): boolean => {
+    const startTod = (b.start_time as string).slice(11, 16)
+    const endTod   = (b.end_time as string).slice(11, 16)
+    const timeOverlap = !(plan as any).time_window_start
+      ? true
+      : (plan as any).time_window_start.slice(0, 5) < endTod && startTod < (plan as any).time_window_end.slice(0, 5)
+    if (!timeOverlap) return false
+    if (!(plan as any).days_of_week) return true
+    const dow = new Date(b.start_time as string).getDay()
+    return ((plan as any).days_of_week as number[]).includes(dow)
+  }
+
+  for (const b of (booked as any[] ?? [])) {
+    if (bookingOverlaps(b)) reservedSeatIds.add(b.seat_id)
+  }
+
+  return seats.filter(s => !reservedSeatIds.has(s.id)).map(s => ({ id: s.id, label: `${s.row_label}${s.column_number}` }))
+}
 
 export async function initiatePlanSubscription(
   input: z.infer<typeof subscribePlanSchema>,
@@ -104,7 +199,7 @@ export async function initiatePlanSubscription(
   const { supabase, user } = await getSupabaseUser()
   if (!user) return { success: false, error: 'Please sign in to subscribe' }
 
-  const { planId, libraryId, couponCode } = parsed.data
+  const { planId, libraryId, seatId, startDate, couponCode } = parsed.data
 
   // Verify plan ↔ library link
   const { data: planLib } = await supabase
@@ -121,6 +216,14 @@ export async function initiatePlanSubscription(
     .eq('id', planId)
     .maybeSingle()
   if (!plan) return { success: false, error: 'Plan not found' }
+
+  // Cheap pre-flight seat check for a clean error message — the RPC's own
+  // row lock + overlap check (and the DB trigger backing it) is the real,
+  // unbypassable guard against two subscriptions claiming the same seat.
+  const { data: seat } = await supabase
+    .from('seats').select('id, library_id, is_active').eq('id', seatId).maybeSingle()
+  if (!seat || (seat as any).library_id !== libraryId) return { success: false, error: 'Seat not found' }
+  if (!(seat as any).is_active) return { success: false, error: 'This seat is currently inactive' }
 
   // Block duplicate active subscriptions — also re-checked inside the RPC
   // (the authoritative check); this is just a fast pre-flight for a clean
@@ -198,8 +301,10 @@ export async function initiatePlanSubscription(
       p_user_id:           user.id,
       p_plan_id:           planId,
       p_library_id:        libraryId,
+      p_seat_id:           seatId,
       p_razorpay_order_id: orderId,
       p_expected_total:    amountINR,
+      p_start_date:        startDate ?? null,
       p_coupon_code:       couponCode ?? null,
       p_commission_bps:    SUBSCRIPTION_COMMISSION_BPS,
     },
@@ -211,6 +316,11 @@ export async function initiatePlanSubscription(
     const errorMessages: Record<string, string> = {
       plan_not_available_for_library: 'Plan not available for this library',
       plan_not_found:                 'Plan not found',
+      seat_not_found:                 'Seat not found',
+      seat_inactive:                  'This seat is currently inactive',
+      seat_unavailable:               'This seat is already reserved for an overlapping subscription. Please choose another seat.',
+      seat_has_active_bookings:       'This seat already has hourly bookings during these hours. Please choose another seat.',
+      start_date_in_past:             'Start date cannot be in the past',
       invalid_plan_price:             'Invalid plan price',
       already_subscribed:             'You already have an active subscription to this plan',
       invalid_coupon:                 'Invalid coupon code',
@@ -320,9 +430,10 @@ export async function getMySubscriptions(): Promise<StudentSubscription[]> {
   const { data, error } = await supabase
     .from('subscriptions')
     .select(`
-      id, plan_id, start_date, end_date, status, created_at,
-      plans(id, name, price, duration_days, session_limit, scope, time_window_start, time_window_end, days_of_week,
-        plan_libraries(library_id, libraries(id, name, city)))
+      id, plan_id, start_date, end_date, status, created_at, library_id, seat_id,
+      plans(id, name, price, duration_days, scope, time_window_start, time_window_end, days_of_week),
+      libraries(id, name, city),
+      seats(row_label, column_number)
     `)
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
@@ -331,9 +442,10 @@ export async function getMySubscriptions(): Promise<StudentSubscription[]> {
 
   const nowMs = Date.now()
 
-  return (data as any[]).map((s): StudentSubscription => {
+  return Promise.all((data as any[]).map(async (s): Promise<StudentSubscription> => {
     const plan     = s.plans as any
-    const planLibs = (plan?.plan_libraries ?? []) as any[]
+    const library  = s.libraries as any
+    const seat     = s.seats as any
     const endMs    = s.end_date ? new Date((s.end_date as string) + '+05:30').getTime() : null
     const daysLeft = endMs ? Math.max(0, Math.ceil((endMs - nowMs) / 86_400_000)) : 0
 
@@ -343,7 +455,6 @@ export async function getMySubscriptions(): Promise<StudentSubscription[]> {
       plan_name:     plan?.name          ?? 'Unknown Plan',
       plan_price:    Number(plan?.price  ?? 0),
       duration_days: plan?.duration_days ?? 30,
-      session_limit: plan?.session_limit ?? null,
       time_window_start: plan?.time_window_start ?? null,
       time_window_end:   plan?.time_window_end   ?? null,
       days_of_week:      (plan as any)?.days_of_week ?? null,
@@ -351,12 +462,12 @@ export async function getMySubscriptions(): Promise<StudentSubscription[]> {
       end_date:      s.end_date   ?? '',
       status:        s.status     ?? '',
       days_left:     daysLeft,
-      libraries:     planLibs.map((pl) => ({
-        id:   pl.libraries?.id   ?? pl.library_id,
-        name: pl.libraries?.name ?? '',
-        city: pl.libraries?.city ?? '',
-      })),
+      library:       library ? { id: library.id, name: library.name, city: library.city } : null,
+      seat:          seat ? { id: s.seat_id, label: `${seat.row_label}${seat.column_number}` } : null,
+      // The QR is the student's digital pass — only meaningful once the
+      // subscription is active (payment confirmed).
+      qrSvg:         s.status === 'active' ? await subscriptionQRSvg(s.id) : null,
     }
-  })
+  }))
 }
 

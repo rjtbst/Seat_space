@@ -42,6 +42,20 @@ export async function GET(req: NextRequest) {
   const supabase = createServiceSupabaseClient()
   const results: Array<{ paymentId: string; action: string; detail?: string }> = []
 
+  // Second, visible trigger for releasing abandoned pending-subscription
+  // seat locks (see sweep_expire_stale_pending_subscriptions in migration
+  // 2026072800_close_seat_and_payment_loopholes.sql) — this cron already
+  // runs every 15 minutes via Vercel, so piggybacking here means this
+  // protection doesn't silently depend on pg_cron also being configured
+  // correctly on top of it.
+  try {
+    const { data: sweepCount, error: sweepErr } = await (supabase as any).rpc('sweep_expire_stale_pending_subscriptions')
+    if (sweepErr) console.error('[cron:reconcile-payments] sweep_expire_stale_pending_subscriptions failed:', sweepErr.message)
+    else if (sweepCount) results.push({ paymentId: 'n/a', action: 'swept_stale_pending_subscriptions', detail: String(sweepCount) })
+  } catch (err) {
+    console.error('[cron:reconcile-payments] sweep_expire_stale_pending_subscriptions threw:', err)
+  }
+
   try {
     const { data: stuck, error } = await (supabase as any).rpc('find_stuck_pending_payments', {
       p_older_than: '30 minutes',
@@ -60,7 +74,26 @@ export async function GET(req: NextRequest) {
       const captured = orderPayments.data.find((p: { captured: boolean; status: string }) => p.captured && p.status === 'captured')
       const failed   = orderPayments.data.length > 0 && orderPayments.data.every((p: { status: string }) => p.status === 'failed')
 
-      if (captured) {
+      if (captured && row.subscription_id) {
+        // Money was genuinely captured on Razorpay's side, but neither the
+        // webhook nor the client success-callback ever confirmed it on
+        // ours — the subscription is stuck 'pending' (its seat still
+        // locked) even though the student paid. Drive it through the same
+        // atomic, idempotent RPC the webhook itself uses for this exact
+        // scenario.
+        const { data: result, error: rpcErr } = await (supabase as any).rpc('confirm_subscription_payment_captured', {
+          p_subscription_id: row.subscription_id,
+          p_razorpay_order_id: row.razorpay_order_id,
+          p_razorpay_payment_id: captured.id,
+          p_actor_type: 'reconciliation_cron',
+          p_actor_id: null,
+        })
+        results.push({
+          paymentId: row.payment_id,
+          action: rpcErr ? 'error' : ((result as any)?.success ? 'reconciled_subscription_confirmed' : 'reconciled_subscription_but_flagged'),
+          detail: rpcErr?.message ?? (result as any)?.error,
+        })
+      } else if (captured) {
         // Razorpay shows this order as genuinely paid but our side never
         // recorded it — drive it through the exact same atomic function
         // the webhook and client-confirm path use, so it ends up in

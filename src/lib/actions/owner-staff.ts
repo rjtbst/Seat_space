@@ -507,7 +507,6 @@ export async function staffBookSeatViaSubscription(
       subscription_expired:        'This subscription has expired',
       plan_not_found:               'Plan not found',
       plan_not_valid_for_library:   'This plan does not cover this library',
-      session_limit_reached:       'This student has used all sessions included in their plan',
       seat_conflict:               'This seat was just booked by someone else. Please choose another seat.',
     }
     if (rpcResult?.error === 'outside_plan_time_window') {

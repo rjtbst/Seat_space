@@ -364,8 +364,8 @@ export default function BookSeatClient({
 
   /* ── Subscription-covered booking ──────────────────────────────────────
      Fetched once per library — if the student has an active, non-expired
-     subscription whose plan covers this library (and session_limit isn't
-     already fully used), they can book without paying per-seat. Defaults
+     subscription whose plan covers this library, they can book without
+     paying per-seat (no usage cap anymore). Defaults
      to using the subscription when one is available, since that's almost
      always what a subscriber wants; they can switch back to "pay instead"
      if they'd rather save the session for later. */
@@ -436,25 +436,11 @@ export default function BookSeatClient({
       return h * 60 + m
     })()
 
-    // If today's whole slot window has already ended (e.g. it's 8pm and
-    // this slot runs 9am–5pm), defaulting to the slot's nominal start
-    // (9am) silently hands back a start time that's already hours in the
-    // past, which immediately trips "cannot be in the past" for a reason
-    // the person never caused. Roll forward to tomorrow instead.
-    if (selectedDate === nowDate && nowMins >= slotEndMins) {
-      const tomorrow = new Date(new Date(nowDate + 'T00:00:00+05:30').getTime() + 86_400_000)
-        .toLocaleString('sv-SE', { timeZone: 'Asia/Kolkata' }).slice(0, 10)
-      setSelectedDate(tomorrow)
-      return // the date change re-fires this effect with the new date
-    }
-
-    // Default start: now (+10 min lead time, not just rounded up to the
-    // next 15-min mark with zero buffer — "right now" can already read as
-    // "in the past" by the time the request reaches the server a moment
-    // later) if we're inside the slot today, otherwise slot start
+    // Default start: now (rounded up to next 15 min) if we're inside the slot today,
+    // otherwise slot start
     let defaultStartMins = slotStartMins
     if (selectedDate === nowDate && nowMins > slotStartMins && nowMins < slotEndMins) {
-      defaultStartMins = Math.ceil((nowMins + 10) / 15) * 15
+      defaultStartMins = Math.ceil(nowMins / 15) * 15
     }
 
     // Default end: start + 2h, capped at slot end
@@ -1160,9 +1146,15 @@ export default function BookSeatClient({
                     Book free with your membership
                   </div>
                   <div className="text-[11.5px] text-[#3D7A5C] mt-0.5">
-                    {subsForCurrentTime[0].sessionsLimit === null
-                      ? `${subsForCurrentTime[0].planName} — unlimited sessions`
-                      : `${subsForCurrentTime[0].planName} — ${subsForCurrentTime[0].sessionsUsed}/${subsForCurrentTime[0].sessionsLimit} sessions used`}
+                    {(() => {
+                      const s = subsForCurrentTime[0]
+                      const schedule = s.timeWindowStart && s.timeWindowEnd
+                        ? `${s.timeWindowStart.slice(0, 5)}–${s.timeWindowEnd.slice(0, 5)}`
+                        : null
+                      const days = describeDaysOfWeek(s.daysOfWeek)
+                      const suffix = [schedule, days].filter(Boolean).join(', ')
+                      return suffix ? `${s.planName} — ${suffix}` : `${s.planName} — no charge`
+                    })()}
                   </div>
                 </div>
               </label>
@@ -1175,7 +1167,7 @@ export default function BookSeatClient({
                 >
                   {subsForCurrentTime.map(s => (
                     <option key={s.id} value={s.id}>
-                      {s.planName} ({s.sessionsLimit === null ? 'unlimited' : `${s.sessionsUsed}/${s.sessionsLimit} used`})
+                      {s.planName}
                     </option>
                   ))}
                 </select>
