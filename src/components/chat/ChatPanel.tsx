@@ -13,7 +13,7 @@ const SUGGESTIONS = [
   'How do I list my library?',
 ]
 
-export function ChatPanel({ onClose }: { onClose: () => void }) {
+export function ChatPanel({ onClose, tabBar }: { onClose: () => void; tabBar: boolean }) {
   const { status, messages, errorMessage, activeToolName, send, retryLast } = useChat()
   const [input, setInput] = useState('')
   const endRef = useRef<HTMLDivElement>(null)
@@ -46,12 +46,26 @@ export function ChatPanel({ onClose }: { onClose: () => void }) {
 
   return (
     <div
-      // bottom-[calc(...)] keeps this sitting just above the repositioned
-      // launcher button (now safe-area-aware) so the panel doesn't open
-      // underneath/behind the mobile tab bar; lg: reverts to the
-      // original desktop position.
-      className="fixed bottom-[calc(164px+env(safe-area-inset-bottom,0px))] lg:bottom-24 right-6 z-50 w-[360px] sm:w-[400px] flex flex-col rounded-2xl overflow-hidden shadow-xl border border-divider bg-surface max-w-[calc(100vw-2rem)]"
-      style={{ maxHeight: 'calc(100vh - 240px)', height: '560px' }}
+      // Sits just above the launcher button — button offset (74px w/ tab
+      // bar, 16px without, see mobileTabBarOffset.ts) + button height
+      // (56px) + a small gap, so this always docks correctly above the
+      // button regardless of which page it's on. lg: reverts to the
+      // original desktop position, which never had this problem since
+      // there's no tab bar or safe-area concern on desktop.
+      className={
+        (tabBar
+          ? 'fixed bottom-[calc(146px+env(safe-area-inset-bottom,0px))]'
+          : 'fixed bottom-[calc(88px+env(safe-area-inset-bottom,0px))]') +
+        ' lg:bottom-24 right-6 z-50 w-[360px] sm:w-[400px] flex flex-col rounded-2xl overflow-hidden shadow-xl border border-divider bg-surface max-w-[calc(100vw-2rem)]'
+      }
+      // 100dvh (dynamic viewport height), not 100vh — 100vh doesn't
+      // shrink when a mobile browser's on-screen keyboard opens, which
+      // could previously push this panel's bottom (including the input)
+      // out of the visible area, or clip it, the moment someone tapped
+      // into the text field. dvh recalculates live as the keyboard
+      // opens/closes. Falls back fine on older browsers that don't
+      // support dvh — they just keep the old vh behavior.
+      style={{ maxHeight: 'calc(100dvh - 240px)', height: '560px' }}
     >
       {/* Header */}
       <div className="bg-ink px-4 py-3.5 flex items-center justify-between shrink-0">
