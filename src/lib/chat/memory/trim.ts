@@ -12,7 +12,8 @@
 // Groq's free models), history is usually the biggest lever you have:
 // system prompt + tool schemas are close to fixed per request, but history
 // grows unboundedly if you let it. Raise this only if you've moved to a
-// tier/provider with real TPM headroom.
+// tier/model with real TPM headroom (check your OpenRouter Qwen model's
+// context/rate limits before bumping this).
 
 import type { ChatMessage } from './types'
 

@@ -1,7 +1,7 @@
 // src/lib/chat/providers/types.ts
 //
-// The one contract every provider implementation (Grok now; OpenAI, Claude,
-// Gemini, Ollama later) must satisfy. Nothing outside providers/ should
+// The one contract every provider implementation (Qwen/OpenRouter now;
+// OpenAI, Claude, Ollama later) must satisfy. Nothing outside providers/ should
 // import a provider-specific SDK or know provider-specific request/response
 // shapes — that's the entire point of this file existing.
 
