@@ -23,6 +23,7 @@ import {
   createServerSupabaseClient,
   getSupabaseUser,
 } from '@/lib/supabase/server'
+import { getAllAmenitiesCached } from '@/lib/booking/amenitiesCache'
 import { createServiceSupabaseClient } from '@/lib/supabase/service'
 import { z } from 'zod'
 import {
@@ -699,8 +700,8 @@ export async function getSeatAvailability(
 
 
 export async function getAllAmenities(): Promise<string[]> {
-  const supabase = await createServerSupabaseClient()
-  const { data } = await supabase.from('amenities').select('name').order('name')
-  return (data ?? []).map((a: any) => a.name as string).filter(Boolean)
+  // Cached — see lib/booking/amenitiesCache.ts. This is a small, effectively
+  // static reference list; no need to hit the DB on every explore page load.
+  return getAllAmenitiesCached()
 }
 

@@ -20,6 +20,7 @@ import {
 import { fetchActiveSlotConfigs } from '@/lib/booking/slotConfigService'
 import { computeLibraryDisplayStatus, type LibraryDisplayStatus } from '@/lib/library-status'
 import { getLibraryBookingRevenue } from '@/lib/booking/revenue'
+import { getYesterdayRevenueCached, getMonthlyRevenueCached } from '@/lib/booking/dashboardStatsCache'
 import { setBookingStatus } from '@/repositories/bookings.repository'
 import { listSeatStatus, listSeatStatusForLibraries } from '@/repositories/seats.repository'
 
@@ -236,6 +237,14 @@ export async function getDashboardStats(libraryId: string): Promise<DashboardSta
     const { supabase, user } = await getSupabaseUser()
     if (!user) return null
 
+    // Explicit ownership check — required here (not just left to RLS) because
+    // yesterday's revenue below goes through a service-role-backed cache
+    // (dashboardStatsCache.ts) that bypasses RLS. Same convention already
+    // used elsewhere in owner actions (e.g. owner/coupons.ts).
+    const { data: ownedLib } = await supabase
+      .from('libraries').select('id').eq('id', libraryId).eq('owner_id', user.id).maybeSingle()
+    if (!ownedLib) return null
+
     const now       = nowIST()
     const today     = todayRangeIST()
     const yesterday = yesterdayRangeIST()
@@ -254,9 +263,12 @@ export async function getDashboardStats(libraryId: string): Promise<DashboardSta
       // Centralized booking-revenue calculation (lib/booking/revenue.ts) —
       // same query shape used by getOwnerLibraries' month_revenue, so
       // "today's revenue" and "this month's revenue" are never computed two
-      // different ways.
+      // different ways. Today's figure stays LIVE (uncached) — an owner
+      // checking today's numbers mid-day expects them current. Yesterday's
+      // figure is cached (60s TTL, see dashboardStatsCache.ts) since it
+      // cannot change except via a refund.
       getLibraryBookingRevenue(supabase, libraryId, today.start, today.end),
-      getLibraryBookingRevenue(supabase, libraryId, yesterday.start, yesterday.end),
+      getYesterdayRevenueCached(libraryId, yesterday.start, yesterday.end),
     ])
 
     const planIds = planIdsRes.data?.map((r) => r.plan_id) ?? []
@@ -304,15 +316,19 @@ export async function getMonthlyRevenue(libraryId: string): Promise<MonthRevPoin
   const { supabase, user } = await getSupabaseUser()
   if (!user) return []
 
+  // Explicit ownership check — required because the trend below goes
+  // through a service-role-backed cache that bypasses RLS. See
+  // getDashboardStats above / dashboardStatsCache.ts for the full reasoning.
+  const { data: ownedLib } = await supabase
+    .from('libraries').select('id').eq('id', libraryId).eq('owner_id', user.id).maybeSingle()
+  if (!ownedLib) return []
+
   const since = pastMonthsStartIST(6)
 
-  const { data, error } = await supabase.rpc('monthly_revenue', {
-    p_library_id: libraryId,
-    p_since:      since,
-  })
-
-  if (error) { logError('getMonthlyRevenue', 'RPC failed', error); return [] }
-  return (data ?? []) as MonthRevPoint[]
+  // Cached (60s TTL) — this trend cannot change except via a refund, and
+  // was being recomputed via RPC on every dashboard load. See
+  // dashboardStatsCache.ts.
+  return getMonthlyRevenueCached(libraryId, since)
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
