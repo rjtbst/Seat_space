@@ -34,6 +34,6 @@ const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/openai/
 
 export class GeminiProvider extends OpenAICompatibleProvider {
   constructor(apiKey: string, model?: string) {
-    super(GEMINI_API_URL, apiKey, model || process.env.GEMINI_MODEL || 'gemini-2.5-flash')
+    super(GEMINI_API_URL, apiKey, model || process.env.GEMINI_MODEL || 'gemini-3-flash-preview')
   }
 }
