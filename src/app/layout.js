@@ -2,7 +2,6 @@
 
 import { Syne, Instrument_Serif, DM_Sans } from 'next/font/google'
 import ChatWidget from '@/components/chat/ChatWidget'
-import QueryProvider from '@/components/shared/QueryProvider'
 import './globals.css'
 
 const syne = Syne({ subsets: ['latin'], weight: ['400','500','600','700','800'], variable: '--font-syne', display: 'swap' })
@@ -70,12 +69,8 @@ export default function RootLayout({ children }) {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       </head>
       <body className="font-dm bg-surface text-ink antialiased overflow-x-hidden">
-        {/* <div id="cursor-dot" aria-hidden="true" />
-        <div id="cursor-ring" aria-hidden="true" /> */}
-        <QueryProvider>
-          {children}
-          <ChatWidget />
-        </QueryProvider>
+        {children}
+        <ChatWidget />
       </body>
     </html>
   )

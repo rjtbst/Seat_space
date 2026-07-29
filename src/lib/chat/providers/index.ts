@@ -9,6 +9,7 @@
 import type { ChatProvider } from './types'
 import { GroqProvider } from './groq.provider'
 import { GrokProvider } from './grok.provider'
+import { GeminiProvider } from './gemini.provider'
 
 export type { ChatProvider, ProviderMessage, ProviderStreamEvent, ProviderToolCall, ProviderToolSpec } from './types'
 
@@ -18,8 +19,11 @@ export function getChatProvider(): ChatProvider {
   if (cached) return cached
 
   // Groq is the default: free-tier-friendly (rate-limited, not
-  // usage-metered), same OpenAI-compatible wire format as Grok. Switch via
-  // CHAT_PROVIDER if you want xAI's Grok instead.
+  // usage-metered), same OpenAI-compatible wire format as Grok/Gemini.
+  // Switch via CHAT_PROVIDER — e.g. CHAT_PROVIDER=gemini for noticeably
+  // better tool-calling/instruction-following accuracy, still free (see
+  // gemini.provider.ts for the free-tier data-use note before going live
+  // with real customers).
   const kind = (process.env.CHAT_PROVIDER || 'groq').toLowerCase()
 
   switch (kind) {
@@ -35,11 +39,16 @@ export function getChatProvider(): ChatProvider {
       cached = new GrokProvider(apiKey)
       return cached
     }
+    case 'gemini': {
+      const apiKey = process.env.GEMINI_API_KEY
+      if (!apiKey) throw new Error('GEMINI_API_KEY is not set — required for CHAT_PROVIDER=gemini')
+      cached = new GeminiProvider(apiKey)
+      return cached
+    }
     // Future providers plug in here, each behind the same ChatProvider
     // contract — e.g.:
     // case 'openai':  cached = new OpenAIProvider(process.env.OPENAI_API_KEY!); break
     // case 'claude':  cached = new ClaudeProvider(process.env.ANTHROPIC_API_KEY!); break
-    // case 'gemini':  cached = new GeminiProvider(process.env.GOOGLE_API_KEY!); break
     // case 'ollama':  cached = new OllamaProvider(process.env.OLLAMA_BASE_URL!); break
     default:
       throw new Error(`Unknown CHAT_PROVIDER "${kind}"`)
