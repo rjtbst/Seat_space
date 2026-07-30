@@ -66,6 +66,7 @@ export default function RootLayout({ children }) {
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <meta name="facebook-domain-verification" content="ki8f1mqw361b1dpdgh404oz9c9rk4y" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       </head>
       <body className="font-dm bg-surface text-ink antialiased overflow-x-hidden">
