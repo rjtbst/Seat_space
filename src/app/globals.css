@@ -722,8 +722,8 @@ img, video { display: block; max-width: 100%; }
   --dash-text-secondary: #6B7689;
   --dash-text-muted:     #9AAAB8;
   --dash-border:         #E2DDD4;
-  --dash-bg-card:        #FDFCF9;
-  --dash-bg-page:        #F4F7FB;
+  --dash-bg-card:        var(--clay-surface, #F6F8FC);
+  --dash-bg-page:        var(--clay-bg, #EDF1F7);
   --dash-bg-hover:       #F0EDE8;
 
   --dash-font-display: 'Syne', sans-serif;
@@ -735,20 +735,23 @@ img, video { display: block; max-width: 100%; }
 }
 
 /* ── Card — components/owner/ui/Card.tsx ─────────────────────────────────
- * Default padding (18px 20px) and the hoverable shadow transition are kept
- * as inline overrides in the component, since those vary per usage; only
- * the part that was IDENTICAL on every single Card render moves here. */
+ * Claymorphic: dual soft shadow instead of a border, so the same .dash-card
+ * class used across every owner page gets the clay look with this one
+ * edit — no per-page changes needed. Default padding (18px 20px) and the
+ * hoverable shadow transition stay inline in the component since they vary
+ * per usage. */
 .dash-card {
   background:    var(--dash-bg-card);
-  border:        1px solid var(--dash-border);
-  border-radius: 14px;
-  box-shadow:    var(--dash-shadow-sm);
+  border:        none;
+  border-radius: 18px;
+  box-shadow:    5px 5px 12px var(--clay-dark-sm, rgba(163,177,198,.3)), -4px -4px 10px var(--clay-light-sm, rgba(255,255,255,.65));
 }
 .dash-card--hoverable {
-  transition: box-shadow .15s;
+  transition: box-shadow .15s, transform .15s;
 }
 .dash-card--hoverable:hover {
-  box-shadow: var(--dash-shadow-md);
+  box-shadow: 7px 7px 16px var(--clay-dark, rgba(163,177,198,.38)), -5px -5px 12px var(--clay-light, rgba(255,255,255,.75));
+  transform:  translateY(-1px);
 }
 
 /* ── StatusBadge / ColorBadge — components/owner/ui/Badge.tsx ──────────── */
@@ -759,17 +762,18 @@ img, video { display: block; max-width: 100%; }
   font-size:     11px;
   font-weight:   600;
   white-space:   nowrap;
+  box-shadow:    2px 2px 5px var(--clay-dark-sm, rgba(163,177,198,.25)), -1px -1px 4px rgba(255,255,255,.5);
 }
 
 /* ── StatCard — components/owner/ui/StatCard.tsx ─────────────────────────
  * Layout (flex, gaps) stays inline since it's structural, not styling —
- * only the repeated visual treatment (background/border/shadow/typography)
+ * only the repeated visual treatment (background/shadow/typography)
  * moves to classes. */
 .dash-stat-card {
   background:    var(--dash-bg-card);
-  border:        1px solid var(--dash-border);
-  border-radius: 14px;
-  box-shadow:    var(--dash-shadow-sm);
+  border:        none;
+  border-radius: 18px;
+  box-shadow:    5px 5px 12px var(--clay-dark-sm, rgba(163,177,198,.3)), -4px -4px 10px var(--clay-light-sm, rgba(255,255,255,.65));
 }
 .dash-stat-card__label {
   font-size:      11px;
@@ -813,10 +817,11 @@ img, video { display: block; max-width: 100%; }
 }
 
 /* ── Toggle — components/owner/ui/Toggle.tsx ─────────────────────────────
+ * Claymorphic: the track reads as a sunken groove (inset shadow) and the
+ * dot as a small raised pebble sitting inside it, instead of a flat pill.
  * The dot's position genuinely depends on the `on` boolean at runtime, so
  * it's driven by a CSS variable (--toggle-dot-left) set inline by the
- * component rather than a static class — everything else about the toggle
- * is static and lives here. */
+ * component rather than a static class — everything else is static. */
 .dash-toggle {
   width:          36px;
   height:         20px;
@@ -827,6 +832,7 @@ img, video { display: block; max-width: 100%; }
   flex-shrink:    0;
   transition:     background .2s;
   cursor:         pointer;
+  box-shadow:     inset 2px 2px 5px rgba(163,177,198,.35), inset -1px -1px 3px rgba(255,255,255,.5);
 }
 .dash-toggle:disabled {
   cursor:  not-allowed;
@@ -841,7 +847,7 @@ img, video { display: block; max-width: 100%; }
   top:            3px;
   left:           var(--toggle-dot-left, 3px);
   transition:     left .2s;
-  box-shadow:     0 1px 3px rgba(0,0,0,.15);
+  box-shadow:     1px 1px 3px rgba(0,0,0,.2), -1px -1px 2px rgba(255,255,255,.6);
 }
 
 /* ── Dashboard form input — matches INP_STYLE in lib/constants/theme.ts ─── */
@@ -941,3 +947,113 @@ img, video { display: block; max-width: 100%; }
    keeping them scrollable — matches native segmented-control feel. */
 .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
 .scrollbar-none::-webkit-scrollbar { display: none; }
+
+/* ═════════════════════════════════════════════════════════════════════════
+   CLAYMORPHIC SYSTEM — student surfaces
+   Soft, puffy, low-contrast "clay" look: big radii, no hard borders, depth
+   from dual-tone soft shadows instead of strokes. Colored elements (the
+   primary blue button, status chips) get a gradient sheen + tinted shadow
+   so they read as pressable clay rather than flat neumorphism.
+
+   Scope: rolling this out to student-facing UI first (shell, cards, etc).
+   Everything here is additive (new classnames) — nothing existing is
+   overridden, so owner/staff dashboards are untouched until opted in.
+───────────────────────────────────────────────────────────────────────── */
+:root {
+  --clay-bg:       #EDF1F7;  /* canvas the shell/page sits on */
+  --clay-surface:  #F6F8FC;  /* raised card / nav / button surface */
+  --clay-dark:     rgba(163, 177, 198, .38);   /* "shadow" side of the clay */
+  --clay-light:    rgba(255, 255, 255, .75);   /* "highlight" side of the clay */
+  --clay-dark-sm:  rgba(163, 177, 198, .30);
+  --clay-light-sm: rgba(255, 255, 255, .65);
+}
+
+/* Large raised block — page backgrounds panels, big cards. */
+.clay-raised {
+  background:    var(--clay-surface);
+  border:        none;
+  border-radius: 20px;
+  box-shadow:    6px 6px 14px var(--clay-dark), -5px -5px 12px var(--clay-light);
+}
+/* Smaller raised block — nav items, chips, list rows. */
+.clay-raised-sm {
+  background:    var(--clay-surface);
+  border:        none;
+  border-radius: 14px;
+  box-shadow:    3px 3px 8px var(--clay-dark-sm), -3px -3px 7px var(--clay-light-sm);
+}
+/* Pressed-in look — active/selected state (nav item you're on, a toggled tab). */
+.clay-pressed {
+  background:    var(--clay-surface);
+  border:        none;
+  box-shadow:    inset 3px 3px 7px var(--clay-dark-sm), inset -2px -2px 5px var(--clay-light-sm);
+}
+/* Hover/press motion for anything raised — lift slightly on hover, settle
+   back down (and deepen the inset) on active, so it feels squeezable. */
+.clay-interactive {
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+@media (hover: hover) {
+  .clay-interactive:hover { transform: translateY(-1px); }
+}
+.clay-interactive:active {
+  transform: translateY(1px);
+  box-shadow: inset 2px 2px 5px var(--clay-dark-sm), inset -2px -2px 5px var(--clay-light-sm);
+}
+
+/* Primary puffy button — brand blue gradient (same hues as --blue/--blue2/
+   --blue-dk) + a soft colored shadow so it reads as a distinct pressable
+   "blob" rather than a flat rectangle, without introducing a new hue. */
+.clay-btn-primary {
+  background:    linear-gradient(155deg, var(--blue2) 0%, var(--blue) 60%, var(--blue-dk) 100%);
+  color:         #fff;
+  border:        none;
+  border-radius: 14px;
+  box-shadow:    4px 4px 10px rgba(18,70,255,.22), -3px -3px 8px rgba(255,255,255,.4),
+                 inset 0 1px 1px rgba(255,255,255,.25);
+  transition:    transform .15s ease, box-shadow .15s ease;
+}
+@media (hover: hover) {
+  .clay-btn-primary:hover { transform: translateY(-1px); }
+}
+.clay-btn-primary:active {
+  transform:  translateY(1px);
+  box-shadow: 2px 2px 6px rgba(18,70,255,.25), inset 0 2px 4px rgba(0,0,0,.15);
+}
+.clay-btn-primary:disabled {
+  opacity: .55;
+  box-shadow: 2px 2px 6px rgba(18,70,255,.12);
+  transform: none;
+}
+
+/* Icon badge — the rounded-square "clay pebble" holding an icon (logo mark,
+   amenity glyphs, avatar fallback container). */
+.clay-icon-badge {
+  background:    var(--clay-surface);
+  border-radius: 12px;
+  box-shadow:    3px 3px 8px var(--clay-dark-sm), -3px -3px 7px var(--clay-light-sm);
+}
+
+/* Pill chip — status/rating/amenity badges. Tint via inline style or a
+   modifier class; the shadow stays soft/neutral so any tint sits on top. */
+.clay-chip {
+  display:       inline-flex;
+  align-items:   center;
+  border:        none;
+  border-radius: 999px;
+  box-shadow:    2px 2px 6px var(--clay-dark-sm), -2px -2px 5px var(--clay-light-sm);
+}
+
+/* Sunken input/search field — a clay field reads as a shallow groove rather
+   than a boxed rectangle. */
+.clay-input {
+  background:    var(--clay-surface);
+  border:        none;
+  border-radius: 14px;
+  box-shadow:    inset 3px 3px 7px var(--clay-dark-sm), inset -2px -2px 6px var(--clay-light-sm);
+}
+.clay-input:focus {
+  outline: none;
+  box-shadow: inset 3px 3px 7px var(--clay-dark-sm), inset -2px -2px 6px var(--clay-light-sm),
+              0 0 0 3px rgba(18,70,255,.18);
+}

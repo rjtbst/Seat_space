@@ -42,10 +42,13 @@ const handleClick = useCallback(() => {
       onClick={handleClick}
       style={{
         display: 'flex', alignItems: 'center', gap: 10,
-        padding: '9px 12px', borderRadius: 9, marginBottom: 2,
+        padding: '9px 12px', borderRadius: 12, marginBottom: 2,
         fontSize: 13, fontWeight: active ? 700 : 500,
         color: active ? ACCENT : '#3A4A5C',
         background: active ? ACCENT_LIGHT : 'transparent',
+        boxShadow: active
+          ? 'inset 3px 3px 7px rgba(163,177,198,.28), inset -2px -2px 5px rgba(255,255,255,.6)'
+          : 'none',
         textDecoration: 'none', transition: 'all .12s',
       }}
     >
@@ -74,21 +77,21 @@ function SidebarContent({
 }) {
   return (
     <aside style={{
-      width: 240, height: '100%', background: '#FDFCF9',
-      borderRight: isMobile ? 'none' : '1px solid #E2DDD4',
+      width: 240, height: '100%', background: 'var(--clay-surface)',
+      borderRight: 'none',
       display: 'flex', flexDirection: 'column',
-      boxShadow: isMobile ? 'none' : '2px 0 12px rgba(10,13,18,.05)',
+      boxShadow: isMobile ? 'none' : '6px 0 18px rgba(163,177,198,.28)',
     }}>
       {/* Logo */}
       <div style={{
-        padding: '20px 20px 16px', borderBottom: '1px solid #E2DDD4',
+        padding: '20px 20px 16px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{
-            width: 36, height: 36, borderRadius: 10, background: ACCENT,
+            width: 36, height: 36, borderRadius: 12, background: ACCENT,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 18, boxShadow: '0 2px 8px rgba(13,124,84,.3)',
+            fontSize: 18, boxShadow: '3px 3px 8px rgba(13,124,84,.3), -2px -2px 6px rgba(255,255,255,.5)',
           }}>📚</div>
           <div>
             <div style={{ fontSize: 14, fontWeight: 800, fontFamily: FONT_DISPLAY, color: '#0A0D12', letterSpacing: '-0.02em' }}>
@@ -124,13 +127,13 @@ function SidebarContent({
           )
         })}
 
-        <div style={{ height: 1, background: '#E2DDD4', margin: '10px 4px' }} />
+        <div style={{ height: 1, background: 'rgba(163,177,198,.3)', margin: '10px 4px' }} />
         <Link
           href="/onboarding/add-library"
           onClick={() => (window as any).__startNavProgress?.()}
           style={{
             display: 'flex', alignItems: 'center', gap: 10,
-            padding: '9px 12px', borderRadius: 9,
+            padding: '9px 12px', borderRadius: 12,
             fontSize: 13, fontWeight: 600, color: ACCENT,
             border: `1.5px dashed ${ACCENT}`,
             textDecoration: 'none', background: 'transparent',
@@ -141,12 +144,13 @@ function SidebarContent({
       </nav>
 
       {/* Footer */}
-      <div style={{ padding: '12px 16px', borderTop: '1px solid #E2DDD4' }}>
+      <div style={{ padding: '12px 16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
           <div style={{
             width: 32, height: 32, borderRadius: '50%', background: ACCENT,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 14, color: '#fff', fontWeight: 700, flexShrink: 0,
+            boxShadow: '2px 2px 6px rgba(163,177,198,.4)',
           }}>
             {ownerName.charAt(0).toUpperCase()}
           </div>
@@ -159,9 +163,10 @@ function SidebarContent({
         </div>
         <form action={signOut}>
           <button type="submit" style={{
-            width: '100%', padding: '8px 0', borderRadius: 8,
+            width: '100%', padding: '8px 0', borderRadius: 10,
             fontSize: 12, fontWeight: 600, color: '#6B7689',
-            border: '1.5px solid #E2DDD4', background: 'transparent',
+            border: 'none', background: 'var(--clay-surface, #fff)',
+            boxShadow: '2px 2px 6px rgba(163,177,198,.3), -2px -2px 5px rgba(255,255,255,.6)',
             cursor: 'pointer', fontFamily: FONT_BODY,
           }}>
             Sign out
@@ -187,9 +192,9 @@ export default function OwnerSidebar() {
         {/* Mobile top bar */}
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, height: 56,
-          background: '#FDFCF9', borderBottom: '1px solid #E2DDD4',
+          background: 'var(--clay-surface)', borderBottom: 'none',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '0 16px', zIndex: 100, boxShadow: '0 2px 8px rgba(10,13,18,.06)',
+          padding: '0 16px', zIndex: 100, boxShadow: '0 4px 14px rgba(163,177,198,.28)',
         }}>
           <button onClick={() => setDrawerOpen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 5, padding: 6 }} aria-label="Open menu">
             {[0,1,2].map(i => <div key={i} style={{ width: 22, height: 2, background: '#3A4A5C', borderRadius: 2 }} />)}

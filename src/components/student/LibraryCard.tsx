@@ -1,12 +1,12 @@
 // components/student/LibraryCard.tsx
 'use client'
 
-import Link from 'next/link'
 import Image from 'next/image'
 import type { LibraryCard } from '@/lib/actions/students/student-discovery'
 import { effectiveSlotRate } from '@/lib/booking/types'
 import { MapPin, Star, Clock, Navigation2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ClayCard, ClayChip } from '@/components/ui/Clay'
 
 const AMENITY_ICON: Record<string, string> = {
   WiFi: '📶', AC: '❄️', Parking: '🅿️', Cafeteria: '☕',
@@ -33,7 +33,7 @@ const AMENITY_ICON: Record<string, string> = {
 function priceDisplay(library: LibraryCard): { label: string; rate: number } | null {
   const activeSlots = library.slots.filter((s) => s.is_active)
   if (activeSlots.length === 0) return null
-console.log('libbarrary details ', library)
+
   if (library.status.isOpen && library.status.currentSlot) {
     return { label: 'Now', rate: effectiveSlotRate(library.status.currentSlot) }
   }
@@ -52,15 +52,9 @@ export default function LibraryCardTile({ library }: { library: LibraryCard }) {
   const price = priceDisplay(library)
 
   return (
-    <Link
-      href={`/library/${library.id}`}
-      className={cn(
-        'group block bg-white rounded-2xl border overflow-hidden transition-all duration-200',
-        'border-[#E8E5DF] hover:border-[#1246FF] hover:shadow-[0_4px_20px_rgba(18,70,255,0.09)]',
-      )}
-    >
+    <ClayCard href={`/library/${library.id}`} className="group block">
       {/* Image */}
-      <div className="relative h-44 bg-[#F0EDE8]">
+      <div className="relative h-44 bg-[#F0EDE8] rounded-t-[20px] overflow-hidden">
         {library.cover_url ? (
           <Image
             src={library.cover_url}
@@ -75,31 +69,22 @@ export default function LibraryCardTile({ library }: { library: LibraryCard }) {
 
         {/* Open/Closed badge — driven by slot_configs via resolveLibraryStatus */}
         <div className="absolute top-2.5 left-2.5">
-          <span className={cn(
-            'text-[10px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm',
-            open ? 'bg-[#D1FAE5]/90 text-[#0D7C54]' : 'bg-black/30 text-white',
-          )}>
-            {open ? '● Open' : '○ Closed'}
-          </span>
+          <ClayChip tone={open ? 'success' : 'dark'}>{open ? '● Open' : '○ Closed'}</ClayChip>
         </div>
 
         {/* Full badge */}
         {library.available_seats === 0 && library.total_seats > 0 && (
           <div className="absolute top-2.5 right-2.5">
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FEE2E2]/90 text-[#C5282C] backdrop-blur-sm">
-              Full
-            </span>
+            <ClayChip tone="danger">Full</ClayChip>
           </div>
         )}
 
         {/* Rating */}
         {library.rating > 0 && (
-          <div className="absolute bottom-2.5 right-2.5 flex items-center gap-1 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full">
+          <ClayChip tone="neutral" className="absolute bottom-2.5 right-2.5 gap-1 bg-white/95 text-[#1A1714]">
             <Star className="w-3 h-3 text-[#F59E0B] fill-[#F59E0B]" />
-            <span className="text-[11px] font-bold text-[#1A1714]">
-              {library.rating.toFixed(1)}
-            </span>
-          </div>
+            {library.rating.toFixed(1)}
+          </ClayChip>
         )}
       </div>
 
@@ -127,12 +112,12 @@ export default function LibraryCardTile({ library }: { library: LibraryCard }) {
         </div>
 
         {/* Today's hours — derived from slot_configs (lib/booking/libraryStatus.ts) */}
-        <div className="flex items-center gap-1.5 mt-2 text-[11px] text-[#6B6560]">
+        {/* <div className="flex items-center gap-1.5 mt-2 text-[11px] text-[#6B6560]">
           <Clock className="w-3 h-3 flex-shrink-0" />
           {library.status.todayHoursLabel}
-        </div>
+        </div> */}
 
-        {/* Seat availability bar */}
+        {/* Seat availability bar — sunken clay groove with a raised fill */}
         {library.total_seats > 0 && (
           <div className="mt-2.5">
             <div className="flex justify-between mb-1">
@@ -148,7 +133,10 @@ export default function LibraryCardTile({ library }: { library: LibraryCard }) {
                 {library.available_seats === 0 ? 'Full' : `${library.available_seats} left`}
               </span>
             </div>
-            <div className="h-1 bg-[#F0EDE8] rounded-full overflow-hidden">
+            <div
+              className="h-1.5 rounded-full overflow-hidden"
+              style={{ boxShadow: 'inset 1px 1px 3px rgba(163,177,198,.3), inset -1px -1px 2px rgba(255,255,255,.5)' }}
+            >
               <div
                 className={cn(
                   'h-full rounded-full transition-all',
@@ -164,11 +152,11 @@ export default function LibraryCardTile({ library }: { library: LibraryCard }) {
 
         {/* Amenities */}
         {library.amenities.length > 0 && (
-          <div className="flex items-center gap-1 mt-2.5 flex-wrap">
+          <div className="flex items-center gap-1.5 mt-2.5 flex-wrap">
             {library.amenities.slice(0, 3).map((a) => (
-              <span key={a} className="text-[9px] px-1.5 py-0.5 bg-[#F7F6F3] rounded text-[#6B6560]">
+              <ClayChip key={a} tone="neutral" className="text-[9px] px-2 py-1">
                 {AMENITY_ICON[a] ?? ''} {a}
-              </span>
+              </ClayChip>
             ))}
             {library.amenities.length > 3 && (
               <span className="text-[9px] text-[#9B9591]">+{library.amenities.length - 3}</span>
@@ -177,7 +165,10 @@ export default function LibraryCardTile({ library }: { library: LibraryCard }) {
         )}
 
         {/* Price — slot-based, see priceDisplay() above */}
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#F0EDE8]">
+        <div
+          className="flex items-center justify-between mt-3 pt-3"
+          style={{ boxShadow: 'inset 0 1px 0 rgba(163,177,198,.25)' }}
+        >
           <div>
             {price ? (
               <>
@@ -190,12 +181,12 @@ export default function LibraryCardTile({ library }: { library: LibraryCard }) {
             )}
           </div>
           {library.plans.length > 0 && (
-            <span className="text-[10px] px-2 py-0.5 bg-[#EEF2FF] text-[#1246FF] font-semibold rounded-full">
+            <ClayChip tone="info">
               {library.plans.length} plan{library.plans.length > 1 ? 's' : ''}
-            </span>
+            </ClayChip>
           )}
         </div>
       </div>
-    </Link>
+    </ClayCard>
   )
 }

@@ -31,8 +31,8 @@ export default function OwnerMobileTabBar() {
       className="safe-bottom"
       style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 120,
-        display: 'flex', background: 'rgba(253,252,249,.95)',
-        backdropFilter: 'blur(10px)', borderTop: '1px solid #E2DDD4',
+        display: 'flex', background: 'var(--clay-surface)',
+        borderTop: 'none', boxShadow: '0 -4px 16px rgba(163,177,198,.28)',
         height: 58, // fixed so layout.tsx's padding-bottom can clear it precisely
       }}
     >
@@ -55,7 +55,15 @@ export default function OwnerMobileTabBar() {
             }}
             aria-current={active ? 'page' : undefined}
           >
-            <span style={{ fontSize: 19, lineHeight: 1 }}>{item.icon}</span>
+            <span
+              className={active ? 'clay-pressed' : undefined}
+              style={{
+                fontSize: 19, lineHeight: 1, width: 36, height: 28,
+                borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
+            >
+              {item.icon}
+            </span>
             <span>{item.label}</span>
           </Link>
         )

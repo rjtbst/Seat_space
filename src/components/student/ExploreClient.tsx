@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useGeolocation } from '@/hooks/useGeolocation'
+import { ClayButton, ClayChip, ClayIconBadge, ClayInput, ClaySelect, ClayToggleChip } from '@/components/ui/Clay'
 
 const MapView = lazy(() => import('./MapView'))
 
@@ -301,20 +302,20 @@ export default function ExploreClient({
   return (
     <div className="flex flex-col" style={{ height: 'calc(100vh - 58px)' }}>
       {/* ── Header ──────────────────────────────────────────── */}
-      <div className="flex-shrink-0 bg-white border-b border-[#E4EAF2] px-4 md:px-6 py-3 space-y-2.5">
+      <div className="flex-shrink-0 px-4 md:px-6 py-3 space-y-2.5" style={{ background: 'var(--clay-surface)', boxShadow: '0 4px 14px rgba(163,177,198,.25)' }}>
         <div className="flex items-center justify-between gap-3">
           <div>
             <h1 className="text-[17px] font-bold text-[#0D1117]">Find a Library</h1>
             <p className="text-[11px] text-[#9AACBE]">{subtitle}</p>
           </div>
-          <div className="flex items-center bg-[#F4F7FB] rounded-lg p-0.5 border border-[#E4EAF2]">
+          <div className="clay-pressed flex items-center rounded-[11px] p-0.5">
             {(['list', 'map'] as const).map((m) => (
               <button
                 key={m}
                 onClick={() => setViewMode(m)}
                 className={cn(
-                  'flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[12px] font-semibold transition-all capitalize',
-                  viewMode === m ? 'bg-white text-[#0D1117] shadow-sm' : 'text-[#9AACBE] hover:text-[#6E7F94]',
+                  'flex items-center gap-1.5 px-2.5 py-1.5 rounded-[9px] text-[12px] font-semibold transition-all capitalize',
+                  viewMode === m ? 'clay-raised-sm text-[#0D1117]' : 'text-[#9AACBE] hover:text-[#6E7F94]',
                 )}
               >
                 {m === 'list' ? <List className="w-3.5 h-3.5" /> : <Map className="w-3.5 h-3.5" />}
@@ -335,10 +336,10 @@ export default function ExploreClient({
         {/* Search */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9AACBE] pointer-events-none" />
-          <input
+          <ClayInput
             type="text" value={q} onChange={(e) => handleSearch(e.target.value)}
             placeholder="Search by name, city, area…"
-            className="w-full h-10 pl-9 pr-9 bg-[#F4F7FB] border border-[#E4EAF2] rounded-xl text-[13px] text-[#0D1117] placeholder:text-[#9AACBE] focus:outline-none focus:border-[#1246FF] focus:bg-white transition-all"
+            className="h-10 pl-9 pr-9"
           />
           {q && <button onClick={() => handleSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2"><X className="w-3.5 h-3.5 text-[#9AACBE]" /></button>}
         </div>
@@ -346,62 +347,45 @@ export default function ExploreClient({
         {/* Filter pills */}
         <div className="flex items-center gap-2 overflow-x-auto pb-0.5 scrollbar-none">
           {/* Near Me pill — active by default, shows spinner while geo resolves */}
-          <button
+          <ClayToggleChip
             onClick={handleEnableLocation}
-            className={cn(
-              'flex-shrink-0 flex items-center gap-1.5 h-7 px-2.5 rounded-full border text-[11px] font-medium transition-all',
-              locEnabled && geo.status === 'granted'
-                ? 'bg-[#1246FF] border-[#1246FF] text-white'
-                : geo.status === 'loading'
-                  ? 'bg-[#F4F7FB] border-[#E4EAF2] text-[#9AACBE]'
-                  : locEnabled
-                    ? 'bg-[#E8EFFE] border-[#1246FF] text-[#1246FF]'  // enabled but not yet granted
-                    : 'bg-white border-[#E4EAF2] text-[#6E7F94] hover:border-[#1246FF]',
-            )}
+            active={locEnabled}
+            className={locEnabled && geo.status === 'granted' ? 'text-[#0D7C54]' : undefined}
           >
             {geo.status === 'loading'
               ? <Loader2 className="w-3 h-3 animate-spin" />
               : <Navigation className="w-3 h-3" />
             }
             {locEnabled && geo.status === 'granted' ? 'Near Me ✓' : 'Near Me'}
-          </button>
+          </ClayToggleChip>
 
-          <button
+          <ClayToggleChip
             onClick={() => { setOpenNow(v => !v); buildAndNavigate({ open_now: !openNow }) }}
-            className={cn(
-              'flex-shrink-0 flex items-center gap-1.5 h-7 px-2.5 rounded-full border text-[11px] font-medium transition-all',
-              openNow ? 'bg-[#D1FAE5] border-[#0D7C54] text-[#0D7C54]' : 'bg-white border-[#E4EAF2] text-[#6E7F94] hover:border-[#0D7C54]',
-            )}
+            active={openNow}
+            className={openNow ? 'text-[#0D7C54]' : undefined}
           >
             <Clock className="w-3 h-3" />Open Now
-          </button>
+          </ClayToggleChip>
 
           {selAmenities.map((a) => (
-            <button key={a} onClick={() => toggleAmenity(a)}
-              className="flex-shrink-0 flex items-center gap-1 h-7 px-2.5 rounded-full bg-[#1246FF] text-white border border-[#1246FF] text-[11px] font-medium">
-              {a}<X className="w-2.5 h-2.5" />
-            </button>
+            <ClayChip key={a} tone="info" className="cursor-pointer" onClick={() => toggleAmenity(a)}>
+              {a}<X className="w-2.5 h-2.5 ml-1" />
+            </ClayChip>
           ))}
 
-          <button
-            onClick={() => setShowFilters(v => !v)}
-            className={cn(
-              'flex-shrink-0 flex items-center gap-1.5 h-7 px-2.5 rounded-full border text-[11px] font-medium transition-all',
-              showFilters ? 'bg-[#E8EFFE] border-[#1246FF] text-[#1246FF]' : 'bg-white border-[#E4EAF2] text-[#6E7F94] hover:border-[#1246FF]',
-            )}
-          >
+          <ClayToggleChip onClick={() => setShowFilters(v => !v)} active={showFilters}>
             <SlidersHorizontal className="w-3 h-3" />More
             {hasFilters && (
               <span className="w-4 h-4 rounded-full bg-[#1246FF] text-white text-[9px] font-bold flex items-center justify-center">
                 {[!!q, !!city, openNow, selAmenities.length > 0].filter(Boolean).length}
               </span>
             )}
-          </button>
+          </ClayToggleChip>
 
           {hasFilters && (
-            <button onClick={clearAll} className="flex-shrink-0 h-7 px-2.5 rounded-full border border-[#E4EAF2] text-[11px] text-[#C5282C] hover:bg-[#FEE2E2] transition-all">
+            <ClayButton variant="ghost" size="sm" onClick={clearAll} className="text-[#C5282C] hover:text-[#C5282C]">
               Clear all
-            </button>
+            </ClayButton>
           )}
         </div>
 
@@ -448,9 +432,9 @@ export default function ExploreClient({
               </div>
             ) : initialLibraries.length === 0 ? (
               <div className="flex flex-col items-center py-20 text-center">
-                <div className="w-14 h-14 rounded-2xl bg-[#F4F7FB] flex items-center justify-center mb-4">
+                <ClayIconBadge size="lg" className="mb-4">
                   <Search className="w-6 h-6 text-[#C4CDD8]" />
-                </div>
+                </ClayIconBadge>
                 <h3 className="text-[14px] font-semibold text-[#0D1117] mb-1">No libraries found</h3>
                 <p className="text-[12px] text-[#9AACBE] max-w-xs">
                   {locationMode === 'profile_city'
@@ -462,12 +446,9 @@ export default function ExploreClient({
                         : 'No libraries available right now.'}
                 </p>
                 {(hasFilters || locationMode !== 'all') && (
-                  <button
-                    onClick={clearAll}
-                    className="mt-4 px-5 py-2.5 bg-[#1246FF] text-white rounded-xl text-[13px] font-semibold hover:bg-[#0E38CC] transition-colors"
-                  >
+                  <ClayButton onClick={clearAll} className="mt-4">
                     {locationMode !== 'all' ? 'Show All Libraries' : 'Clear Filters'}
-                  </button>
+                  </ClayButton>
                 )}
               </div>
             ) : (
@@ -482,9 +463,11 @@ export default function ExploreClient({
                     <button
                       disabled={page <= 1}
                       onClick={() => buildAndNavigate({ page: page - 1 })}
-                      className="w-9 h-9 rounded-xl border border-[#E4EAF2] bg-white flex items-center justify-center disabled:opacity-40 hover:border-[#1246FF] transition"
+                      className="disabled:opacity-40"
                     >
-                      <ChevronLeft className="w-4 h-4 text-[#6E7F94]" />
+                      <ClayIconBadge interactive size="md">
+                        <ChevronLeft className="w-4 h-4 text-[#6E7F94]" />
+                      </ClayIconBadge>
                     </button>
                     <span className="text-[13px] text-[#6E7F94] min-w-[100px] text-center">
                       Page {page} / {totalPages}
@@ -492,9 +475,11 @@ export default function ExploreClient({
                     <button
                       disabled={page >= totalPages}
                       onClick={() => buildAndNavigate({ page: page + 1 })}
-                      className="w-9 h-9 rounded-xl border border-[#E4EAF2] bg-white flex items-center justify-center disabled:opacity-40 hover:border-[#1246FF] transition"
+                      className="disabled:opacity-40"
                     >
-                      <ChevronRight className="w-4 h-4 text-[#6E7F94]" />
+                      <ClayIconBadge interactive size="md">
+                        <ChevronRight className="w-4 h-4 text-[#6E7F94]" />
+                      </ClayIconBadge>
                     </button>
                   </div>
                 )}
@@ -505,7 +490,7 @@ export default function ExploreClient({
       ) : (
         <div className="flex-1 min-h-0">
           <Suspense fallback={
-            <div className="flex items-center justify-center h-full bg-[#F4F7FB]">
+            <div className="flex items-center justify-center h-full" style={{ background: 'var(--clay-bg)' }}>
               <Loader2 className="w-6 h-6 animate-spin text-[#1246FF]" />
             </div>
           }>
@@ -557,25 +542,24 @@ function FilterSheet({
         role="dialog"
         aria-modal="true"
         aria-label="Filters"
-        className="relative bg-white rounded-t-2xl safe-bottom max-h-[80vh] flex flex-col animate-in slide-in-from-bottom duration-200"
+        className="relative rounded-t-[22px] safe-bottom max-h-[80vh] flex flex-col animate-in slide-in-from-bottom duration-200"
+        style={{ background: 'var(--clay-surface)' }}
       >
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#F4F7FB] flex-shrink-0">
+        <div className="flex items-center justify-between px-4 py-3 flex-shrink-0" style={{ boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.25)' }}>
           <span className="w-8" />
           <div className="w-9 h-1 rounded-full bg-[#E4EAF2] absolute left-1/2 -translate-x-1/2 top-2" />
           <h2 className="text-[15px] font-bold text-[#0D1117]">Filters</h2>
-          <button onClick={onClose} className="tap-target press w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#F4F7FB]" aria-label="Close filters">
-            <X className="w-4 h-4 text-[#6E7F94]" />
+          <button onClick={onClose} aria-label="Close filters">
+            <ClayIconBadge interactive size="sm">
+              <X className="w-4 h-4 text-[#6E7F94]" />
+            </ClayIconBadge>
           </button>
         </div>
 
         <div className="overflow-y-auto px-4 py-4 space-y-4">
           <div>
             <p className="text-[10px] font-bold text-[#9AACBE] uppercase tracking-wider mb-1.5">City</p>
-            <select
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              className="w-full px-3 py-2.5 bg-[#F4F7FB] border border-[#E4EAF2] rounded-lg text-[13px] text-[#0D1117] focus:outline-none focus:border-[#1246FF] appearance-none cursor-pointer"
-            >
+            <ClaySelect value={city} onChange={(e) => setCity(e.target.value)}>
               <option value="">All Cities</option>
               {profileCity && (
                 <option value={profileCity}>{profileCity} (My City)</option>
@@ -584,35 +568,31 @@ function FilterSheet({
                 .filter(c => c !== profileCity)
                 .map(c => <option key={c} value={c}>{c}</option>)
               }
-            </select>
+            </ClaySelect>
           </div>
           {allAmenities.length > 0 && (
             <div>
               <p className="text-[10px] font-bold text-[#9AACBE] uppercase tracking-wider mb-1.5">Amenities</p>
               <div className="flex flex-wrap gap-1.5">
                 {allAmenities.map((a) => (
-                  <button key={a} onClick={() => toggleAmenity(a)}
-                    className={cn(
-                      'press px-3 py-1.5 rounded-full border text-[12px] font-medium transition-all tap-target',
-                      selAmenities.includes(a)
-                        ? 'bg-[#1246FF] border-[#1246FF] text-white'
-                        : 'bg-white border-[#E4EAF2] text-[#6E7F94] hover:border-[#1246FF]',
-                    )}>
+                  <ClayToggleChip
+                    key={a}
+                    onClick={() => toggleAmenity(a)}
+                    active={selAmenities.includes(a)}
+                    className="h-auto px-3 py-1.5 text-[12px]"
+                  >
                     {a}
-                  </button>
+                  </ClayToggleChip>
                 ))}
               </div>
             </div>
           )}
         </div>
 
-        <div className="flex-shrink-0 p-4 border-t border-[#F4F7FB]">
-          <button
-            onClick={onClose}
-            className="press w-full py-3 rounded-xl bg-[#1246FF] text-white text-[14px] font-bold"
-          >
+        <div className="flex-shrink-0 p-4" style={{ boxShadow: 'inset 0 1px 0 rgba(163,177,198,.25)' }}>
+          <ClayButton onClick={onClose} size="lg" className="w-full">
             Show {resultCount} {resultCount === 1 ? 'library' : 'libraries'}
-          </button>
+          </ClayButton>
         </div>
       </div>
     </div>

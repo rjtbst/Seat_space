@@ -27,7 +27,7 @@ export default async function OwnerDashboardLayout({ children }: { children: Rea
       firstLibraryId={firstLibraryId}
       libraries={libraries}
     >
-      <div style={{ display: 'flex', minHeight: '100dvh', background: '#F4F7FB', fontFamily: 'DM Sans, sans-serif' }}>
+      <div style={{ display: 'flex', minHeight: '100dvh', background: 'var(--clay-bg)', fontFamily: 'DM Sans, sans-serif' }}>
         {/* NavProgressBar needs Suspense because it reads useSearchParams */}
         <Suspense fallback={null}>
           <NavProgressBar />

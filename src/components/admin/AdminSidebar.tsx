@@ -35,13 +35,15 @@ function SidebarContent({
       width: 240, height: '100%', flexShrink: 0, background: '#0A0D12',
       display: 'flex', flexDirection: 'column', padding: '24px 16px',
       boxSizing: 'border-box', overflowY: 'auto',
+      boxShadow: isMobile ? 'none' : '6px 0 20px rgba(0,0,0,.35)',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32, padding: '0 8px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{
-            width: 36, height: 36, borderRadius: 10, background: ACCENT,
+            width: 36, height: 36, borderRadius: 12, background: ACCENT,
             display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18,
             flexShrink: 0,
+            boxShadow: '3px 3px 8px rgba(0,0,0,.4), -2px -2px 6px rgba(255,255,255,.06)',
           }}>🛡️</div>
           <div>
             <p style={{ color: '#fff', fontWeight: 800, fontSize: 15, margin: 0, fontFamily: 'Syne, sans-serif' }}>
@@ -71,10 +73,11 @@ function SidebarContent({
               onClick={onNavigate}
               style={{
                 display: 'flex', alignItems: 'center', gap: 10,
-                padding: '10px 12px', borderRadius: 10, textDecoration: 'none',
+                padding: '10px 12px', borderRadius: 12, textDecoration: 'none',
                 fontSize: 13.5, fontWeight: active ? 700 : 500,
                 color: active ? '#fff' : '#A6AEBA',
                 background: active ? ACCENT : 'transparent',
+                boxShadow: active ? 'inset 2px 2px 5px rgba(0,0,0,.35), inset -1px -1px 3px rgba(255,255,255,.08)' : 'none',
                 transition: 'all .15s',
               }}
             >
@@ -85,7 +88,7 @@ function SidebarContent({
         })}
       </nav>
 
-      <div style={{ borderTop: '1px solid #1E232C', paddingTop: 16, marginTop: 16 }}>
+      <div style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,.06)', paddingTop: 16, marginTop: 16 }}>
         <p style={{ color: '#8B95A5', fontSize: 11, marginBottom: 8, padding: '0 8px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           Signed in as<br />
           <span style={{ color: '#fff', fontWeight: 600 }}>{adminName}</span>
@@ -95,7 +98,8 @@ function SidebarContent({
             type="submit"
             style={{
               width: '100%', padding: '9px 12px', borderRadius: 10, fontSize: 13, fontWeight: 600,
-              background: 'transparent', border: '1.5px solid #2A2F3A', color: '#A6AEBA',
+              background: 'rgba(255,255,255,.04)', border: 'none', color: '#A6AEBA',
+              boxShadow: '2px 2px 6px rgba(0,0,0,.4), -2px -2px 5px rgba(255,255,255,.05)',
               cursor: 'pointer', fontFamily: 'DM Sans, sans-serif',
             }}
           >
@@ -121,9 +125,10 @@ export default function AdminSidebar({ adminName }: { adminName: string }) {
         {/* Mobile top bar */}
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, height: 56,
-          background: '#0A0D12', borderBottom: '1px solid #1E232C',
+          background: '#0A0D12', borderBottom: 'none',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '0 16px', zIndex: 100, boxSizing: 'border-box',
+          boxShadow: '0 4px 14px rgba(0,0,0,.35)',
         }}>
           <button
             onClick={() => setDrawerOpen(true)}

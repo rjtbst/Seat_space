@@ -52,27 +52,26 @@ export default function StaffSidebar({
     <aside style={{
       width:           220,
       height:          '100%',
-      background:      '#FDFCF9',
-      borderRight:     '1px solid #E2DDD4',
+      background:      'var(--clay-surface)',
+      borderRight:     'none',
       display:         'flex',
       flexDirection:   'column',
-      boxShadow:       '2px 0 12px rgba(10,13,18,.05)',
+      boxShadow:       '6px 0 18px rgba(163,177,198,.28)',
     }}>
 
       {/* Logo row */}
       <div style={{
         padding:        '18px 16px 14px',
-        borderBottom:   '1px solid #E2DDD4',
         display:        'flex',
         alignItems:     'center',
         justifyContent: 'space-between',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{
-            width: 34, height: 34, borderRadius: 10,
+            width: 34, height: 34, borderRadius: 11,
             background: ACCENT,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 17, boxShadow: '0 2px 8px rgba(5,151,167,.3)',
+            fontSize: 17, boxShadow: '3px 3px 8px rgba(5,151,167,.3), -2px -2px 6px rgba(255,255,255,.5)',
           }}>
             📚
           </div>
@@ -144,12 +143,15 @@ export default function StaffSidebar({
                 alignItems:     'center',
                 gap:            10,
                 padding:        '9px 12px',
-                borderRadius:   9,
+                borderRadius:   12,
                 marginBottom:   2,
                 fontSize:       13,
                 fontWeight:     active ? 700 : 500,
                 color:          active ? ACCENT : '#3A4A5C',
                 background:     active ? ACCENT_LIGHT : 'transparent',
+                boxShadow:      active
+                  ? 'inset 3px 3px 7px rgba(163,177,198,.28), inset -2px -2px 5px rgba(255,255,255,.6)'
+                  : 'none',
                 textDecoration: 'none',
                 transition:     'all .12s',
               }}
@@ -170,12 +172,13 @@ export default function StaffSidebar({
       </nav>
 
       {/* User footer */}
-      <div style={{ padding: '12px 14px', borderTop: '1px solid #E2DDD4' }}>
+      <div style={{ padding: '12px 14px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
           <div style={{
             width: 30, height: 30, borderRadius: '50%', background: ACCENT,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 13, color: '#fff', fontWeight: 700, flexShrink: 0,
+            boxShadow: '2px 2px 6px rgba(163,177,198,.4)',
           }}>
             {initials}
           </div>
@@ -195,9 +198,10 @@ export default function StaffSidebar({
           <button
             type="submit"
             style={{
-              width: '100%', padding: '7px 0', borderRadius: 8,
+              width: '100%', padding: '7px 0', borderRadius: 10,
               fontSize: 12, fontWeight: 600, color: '#6B7689',
-              border: '1.5px solid #E2DDD4', background: 'transparent',
+              border: 'none', background: 'var(--clay-surface, #fff)',
+              boxShadow: '2px 2px 6px rgba(163,177,198,.3), -2px -2px 5px rgba(255,255,255,.6)',
               cursor: 'pointer', fontFamily: 'DM Sans, sans-serif',
             }}
           >
@@ -217,11 +221,11 @@ export default function StaffSidebar({
           position:   'fixed',
           bottom:     0, left: 0, right: 0,
           height:     64,
-          background: '#FDFCF9',
-          borderTop:  '1px solid #E2DDD4',
+          background: 'var(--clay-surface)',
+          borderTop:  'none',
           display:    'flex',
           zIndex:     50,
-          boxShadow:  '0 -2px 12px rgba(10,13,18,.06)',
+          boxShadow:  '0 -4px 16px rgba(163,177,198,.28)',
         }}>
           {NAV_ITEMS.map(item => {
             const active = pathname === item.href ||
@@ -247,19 +251,19 @@ export default function StaffSidebar({
                   position:       'relative',
                 }}
               >
-                <span style={{ fontSize: 20, lineHeight: 1, filter: active ? 'none' : 'grayscale(40%)' }}>
+                <span
+                  className={active ? 'clay-pressed' : undefined}
+                  style={{
+                    fontSize: 20, lineHeight: 1, filter: active ? 'none' : 'grayscale(40%)',
+                    width: 36, height: 28, borderRadius: 11,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}
+                >
                   {item.emoji}
                 </span>
                 <span style={{ fontSize: 10, fontWeight: active ? 700 : 500, letterSpacing: '.02em' }}>
                   {item.label}
                 </span>
-                {active && (
-                  <div style={{
-                    position: 'absolute', top: 0,
-                    width: 32, height: 2,
-                    background: ACCENT, borderRadius: '0 0 2px 2px',
-                  }} />
-                )}
               </Link>
             )
           })}

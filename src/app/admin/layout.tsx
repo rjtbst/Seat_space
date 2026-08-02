@@ -6,7 +6,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const { profile } = await requireActiveRole('admin')
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F4F7FB', fontFamily: 'DM Sans, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--clay-bg)', fontFamily: 'DM Sans, sans-serif' }}>
       <AdminSidebar adminName={profile.full_name ?? 'Admin'} />
 
       <main

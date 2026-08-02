@@ -35,9 +35,12 @@ export default function MobileTabBar() {
       aria-label="Primary"
       className={cn(
         'lg:hidden fixed bottom-0 left-0 right-0 z-[120] min-h-[58px]',
-        'bg-white/95 backdrop-blur-md border-t border-[#E4EAF2]',
         'flex items-stretch safe-bottom',
       )}
+      style={{
+        background: 'var(--clay-surface)',
+        boxShadow: '0 -4px 16px rgba(163,177,198,.3)',
+      }}
     >
       {TAB_ITEMS.map((item) => {
         const active = pathname === item.href || pathname.startsWith(item.href + '/')
@@ -52,18 +55,23 @@ export default function MobileTabBar() {
             // instant-feedback squash as every other primary control —
             // see globals.css for what these two classes do.
             className={cn(
-              'tap-target press flex-1 flex flex-col items-center justify-center gap-0.5',
+              'tap-target press flex-1 flex flex-col items-center justify-center gap-1',
               'py-2 text-[10px] font-medium select-none',
               active ? 'text-[#1246FF]' : 'text-[#9AACBE]',
             )}
             aria-current={active ? 'page' : undefined}
           >
-            <item.icon
-              className="w-[21px] h-[21px]"
-              strokeWidth={active ? 2.4 : 2}
-              fill={active ? 'currentColor' : 'none'}
-              fillOpacity={active ? 0.12 : 0}
-            />
+            <div className={cn(
+              'w-9 h-7 rounded-[11px] flex items-center justify-center transition-shadow',
+              active && 'clay-pressed',
+            )}>
+              <item.icon
+                className="w-[19px] h-[19px]"
+                strokeWidth={active ? 2.4 : 2}
+                fill={active ? 'currentColor' : 'none'}
+                fillOpacity={active ? 0.12 : 0}
+              />
+            </div>
             <span>{item.label}</span>
           </Link>
         )

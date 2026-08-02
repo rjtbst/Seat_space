@@ -36,7 +36,7 @@
 
 ## 1. Overview
 
-**Seatspace** ("library_spot" in `package.json`) is a multi-tenant SaaS platform that lets independent paid study libraries (reading rooms / "seat libraries," a common model in Indian towns preparing students for competitive exams) list their space online, publish seat maps and time-slot pricing, and accept online bookings and payments. Students discover libraries near them, book a specific seat for a specific time slot, pay online, and check in with a QR code. Library owners run one or more branches from a dashboard; on-site staff handle walk-ins, check-ins, and the book-lending desk.
+**Seatspace**  is a multi-tenant SaaS platform that lets independent paid study libraries (reading rooms / "seat libraries," a common model in Indian towns preparing students for competitive exams) list their space online, publish seat maps and time-slot pricing, and accept online bookings and payments. Students discover libraries near them, book a specific seat for a specific time slot, pay online, and check in with a QR code. Library owners run one or more branches from a dashboard; on-site staff handle walk-ins, check-ins, and the book-lending desk.
 
 **Who uses it:**
 

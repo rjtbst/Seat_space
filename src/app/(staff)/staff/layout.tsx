@@ -33,7 +33,7 @@ export default async function StaffLayout({ children }: { children: React.ReactN
   return (
     <div style={{
       minHeight:   '100dvh',
-      background:  '#F4F7FB',
+      background:  'var(--clay-bg)',
       fontFamily:  'DM Sans, sans-serif',
       paddingBottom: 72,
     }}>

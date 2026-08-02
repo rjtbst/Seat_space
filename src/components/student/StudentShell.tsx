@@ -28,6 +28,7 @@ import {
   Menu, X, ChevronRight,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ClayIconBadge } from '@/components/ui/Clay'
 import { getInitials, avatarGradient } from '@/lib/utils'
 import NotificationBell from './NotificationBell'
 import { StudentNavProgressBar } from './NavProgressBar'
@@ -61,7 +62,7 @@ export default function StudentShell({
 
   const currentLabel =
     NAV_ITEMS.find((n) => pathname === n.href || pathname.startsWith(n.href + '/'))?.label
-    ?? 'LibrarySpot'
+    ?? 'Seatspace'
 
   async function handleLogout() {
     const supabase = createBrowserSupabaseClient()
@@ -70,7 +71,7 @@ export default function StudentShell({
   }
 
   return (
-    <div className="flex h-dvh overflow-hidden bg-[#F4F7FB]">
+    <div className="flex h-dvh overflow-hidden" style={{ background: 'var(--clay-bg)' }}>
       {/* StudentNavProgressBar needs Suspense because it reads useSearchParams */}
       <Suspense fallback={null}>
         <StudentNavProgressBar />
@@ -88,20 +89,26 @@ export default function StudentShell({
       <nav
         className={cn(
           'fixed lg:static top-0 left-0 bottom-0 z-[200]',
-          'w-[252px] bg-white border-r border-[#E4EAF2]',
-          'flex flex-col flex-shrink-0',
+          'w-[252px] flex flex-col flex-shrink-0',
           'transition-transform duration-250 ease-[cubic-bezier(.4,0,.2,1)]',
-          sidebarOpen ? 'translate-x-0 shadow-[4px_0_40px_rgba(13,17,23,.15)]' : '-translate-x-full lg:translate-x-0',
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
         )}
+        style={{
+          background: 'var(--clay-surface)',
+          boxShadow: '6px 0 20px rgba(163,177,198,.35)',
+        }}
       >
         {/* Logo */}
-        <div className="px-4 py-[18px] pb-[14px] border-b border-[#E4EAF2] flex items-center gap-[11px]">
-          <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-[#1246FF] to-[#4A7CFF] flex items-center justify-center flex-shrink-0 shadow-[0_2px_8px_rgba(18,70,255,.3)]">
+        <div className="px-4 py-[18px] pb-[14px] flex items-center gap-[11px]">
+          <div
+            className="w-9 h-9 rounded-[12px] bg-gradient-to-br from-[#4D78FF] to-[#0D3AE0] flex items-center justify-center flex-shrink-0"
+            style={{ boxShadow: '3px 3px 8px rgba(18,70,255,.35), -2px -2px 6px rgba(255,255,255,.5), inset 0 1px 1px rgba(255,255,255,.35)' }}
+          >
             <BookOpen className="w-[18px] h-[18px] text-white" />
           </div>
           <div>
             <div className="font-serif text-[17px] text-[#0D1117]">
-              Library<span className="text-[#1246FF] font-bold">Spot</span>
+              Seat<span className="text-[#1246FF] font-bold">Space</span>
             </div>
             <div className="text-[9px] tracking-[.08em] uppercase text-[#9AACBE] mt-px">
               Student Dashboard
@@ -116,8 +123,8 @@ export default function StudentShell({
         </div>
 
         {/* Nav links */}
-        <div className="flex-1 overflow-y-auto py-1.5 scrollbar-none">
-          <div className="text-[9px] font-bold tracking-[.1em] uppercase text-[#9AACBE] px-4 py-3 pb-1">
+        <div className="flex-1 overflow-y-auto py-1.5 px-2.5 scrollbar-none space-y-[3px]">
+          <div className="text-[9px] font-bold tracking-[.1em] uppercase text-[#9AACBE] px-[9px] py-3 pb-1">
             🎓 Student
           </div>
           {NAV_ITEMS.map((item) => {
@@ -131,15 +138,15 @@ export default function StudentShell({
                   if (pathname !== item.href) (window as any).__startStudentNavProgress?.()
                 }}
                 className={cn(
-                  'flex items-center gap-[9px] px-4 py-[7px] text-[13px] font-medium',
-                  'cursor-pointer transition-all duration-120 border-l-[2.5px]',
+                  'clay-interactive flex items-center gap-[9px] px-[9px] py-[7px] rounded-[13px] text-[13px] font-medium',
+                  'cursor-pointer',
                   active
-                    ? 'text-[#1246FF] bg-[#E8EFFE] border-l-[#1246FF] font-semibold'
-                    : 'text-[#6E7F94] border-transparent hover:text-[#1C2333] hover:bg-[#F4F7FB]',
+                    ? 'clay-pressed text-[#1246FF] font-semibold'
+                    : 'text-[#6E7F94] hover:text-[#1C2333]',
                 )}
               >
                 <div className={cn(
-                  'w-[30px] h-7 rounded-[7px] flex items-center justify-center flex-shrink-0',
+                  'w-[30px] h-7 rounded-[9px] flex items-center justify-center flex-shrink-0',
                   active && 'bg-[#1246FF]/12',
                 )}>
                   <item.icon className="w-[14px] h-[14px]" />
@@ -151,11 +158,11 @@ export default function StudentShell({
         </div>
 
         {/* User footer */}
-        <div className="p-3.5 border-t border-[#E4EAF2]">
-          <div className="flex items-center gap-[9px] px-[10px] py-[9px] rounded-[10px] bg-[#F4F7FB] hover:bg-[#E4EAF2] transition-colors group cursor-pointer">
+        <div className="p-3">
+          <div className="clay-raised-sm clay-interactive flex items-center gap-[9px] px-[10px] py-[9px] group cursor-pointer">
             <div
               className="w-8 h-8 rounded-full flex items-center justify-center text-white text-[11px] font-bold flex-shrink-0"
-              style={{ background: gradient }}
+              style={{ background: gradient, boxShadow: '2px 2px 6px rgba(163,177,198,.5)' }}
             >
               {initials}
             </div>
@@ -179,13 +186,18 @@ export default function StudentShell({
       {/* ── Main area ──────────────────────────────────────── */}
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         {/* Top header */}
-        <header className="h-[58px] bg-white border-b border-[#E4EAF2] flex items-center px-5 gap-3 flex-shrink-0 z-[100]">
+        <header
+          className="h-[58px] flex items-center px-5 gap-3 flex-shrink-0 z-[100]"
+          style={{ background: 'var(--clay-surface)', boxShadow: '0 4px 16px rgba(163,177,198,.3)' }}
+        >
           <button
-            className="tap-target press lg:hidden text-[#6E7F94] p-1.5 rounded-lg hover:bg-[#F4F7FB] transition-colors"
             onClick={() => setSidebarOpen(true)}
             aria-label="Open menu"
+            className="lg:hidden"
           >
-            <Menu className="w-5 h-5" />
+            <ClayIconBadge interactive size="md" className="text-[#6E7F94]">
+              <Menu className="w-5 h-5" />
+            </ClayIconBadge>
           </button>
           <span className="font-serif text-[17px] text-[#0D1117] tracking-[-0.2px] flex-1 truncate">
             {currentLabel}
