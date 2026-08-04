@@ -345,7 +345,7 @@ function PayoutSetupPanel({ initial }: { initial: PayoutSetupView | null }) {
 
 export default function BillingClient({ libraries, payoutSetup }: { libraries: OwnerLibrary[]; payoutSetup: PayoutSetupView | null }) {
   return (
-    <div style={{ fontFamily: 'DM Sans, sans-serif', padding: '8px 4px', maxWidth: 880 }}>
+    <div style={{padding: '28px 32px', maxWidth: 1000, fontFamily: 'DM Sans, sans-serif' }}>
       <h1 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 24, margin: '0 0 6px' }}>Billing & Payouts</h1>
       <p style={{ fontSize: 13.5, color: '#6B7689', margin: '0 0 24px' }}>
         Manage your platform subscriptions and where your booking earnings get paid out.

@@ -18,7 +18,7 @@ export default function SubscribersClient({
   const others  = subscribers.filter(s => s.status !== 'active')
 
   return (
-    <div>
+    <div style={{ padding: '28px 32px', maxWidth: 1000 }}>
       <PageHeader
         title="Subscribed Students"
         subtitle="Everyone with a membership plan at this library — their seat, schedule, and check-in history."

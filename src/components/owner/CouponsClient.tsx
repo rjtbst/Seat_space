@@ -97,7 +97,7 @@ export default function CouponsClient({
   }
 
   return (
-    <div>
+    <div style={{ padding: '28px 32px', maxWidth: 1000}}>
       <Toast toast={toast} />
       <PageHeader
         title="Coupons"
