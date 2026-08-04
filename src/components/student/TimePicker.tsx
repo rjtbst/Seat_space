@@ -66,7 +66,7 @@ export function TimePicker({
 
   const selCls = [
      'clay-input px-2 py-2',
-    'text-[13px] font-semibold text-[#0D1117] outline-none',
+    'text-[10px] font-semibold text-[#0D1117] outline-none',
     'transition-shadow',
     disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
   ].join(' ')
@@ -102,7 +102,7 @@ export function TimePicker({
         aria-label="Hour"
       >
         {Array.from({ length: 12 }, (_, i) => i + 1).map(h => (
-          <option key={h} value={h} disabled={isHourDisabled(h)}>{h}</option>
+          <option  key={h} value={h} disabled={isHourDisabled(h)}>{h}</option>
         ))}
       </select>
 
