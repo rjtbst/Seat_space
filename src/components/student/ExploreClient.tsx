@@ -405,49 +405,57 @@ export default function ExploreClient({
         </div>
 
         {/* Filter pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-0.5 scrollbar-none">
-          {/* Near Me pill — active by default, shows spinner while geo resolves */}
-          <ClayToggleChip
-            onClick={handleEnableLocation}
-            active={locEnabled}
-            className={locEnabled && geo.status === 'granted' ? 'text-[#0D7C54]' : undefined}
-          >
-            {geo.status === 'loading'
-              ? <Loader2 className="w-3 h-3 animate-spin" />
-              : <Navigation className="w-3 h-3" />
-            }
-            {locEnabled && geo.status === 'granted' ? 'Near Me ✓' : 'Near Me'}
-          </ClayToggleChip>
+      <div className="flex flex-col gap-1.5">
+  {/* Row 1 — controls, wraps to next line if it doesn't fit */}
+  <div className="flex items-center gap-2 flex-wrap">
+    <ClayToggleChip
+      onClick={handleEnableLocation}
+      active={locEnabled}
+      className={locEnabled && geo.status === 'granted' ? 'text-[#0D7C54]' : undefined}
+    >
+      {geo.status === 'loading'
+        ? <Loader2 className="w-3 h-3 animate-spin" />
+        : <Navigation className="w-3 h-3" />
+      }
+      {locEnabled && geo.status === 'granted' ? 'Near Me ✓' : 'Near Me'}
+    </ClayToggleChip>
 
-          <ClayToggleChip
-            onClick={() => { setOpenNow(v => !v); buildAndNavigate({ open_now: !openNow }) }}
-            active={openNow}
-            className={openNow ? 'text-[#0D7C54]' : undefined}
-          >
-            <Clock className="w-3 h-3" />Open Now
-          </ClayToggleChip>
+    <ClayToggleChip
+      onClick={() => { setOpenNow(v => !v); buildAndNavigate({ open_now: !openNow }) }}
+      active={openNow}
+      className={openNow ? 'text-[#0D7C54]' : undefined}
+    >
+      <Clock className="w-3 h-3" />Open Now
+    </ClayToggleChip>
 
-          {selAmenities.map((a) => (
-            <ClayChip key={a} tone="info" className="cursor-pointer" onClick={() => toggleAmenity(a)}>
-              {a}<X className="w-2.5 h-2.5 ml-1" />
-            </ClayChip>
-          ))}
+    <ClayToggleChip onClick={() => setShowFilters(v => !v)} active={showFilters}>
+      <SlidersHorizontal className="w-3 h-3" />More
+      {hasFilters && (
+        <span className="w-4 h-4 rounded-full bg-[#1246FF] text-white text-[9px] font-bold flex items-center justify-center">
+          {[!!q, !!city, openNow, selAmenities.length > 0].filter(Boolean).length}
+        </span>
+      )}
+    </ClayToggleChip>
 
-          <ClayToggleChip onClick={() => setShowFilters(v => !v)} active={showFilters}>
-            <SlidersHorizontal className="w-3 h-3" />More
-            {hasFilters && (
-              <span className="w-4 h-4 rounded-full bg-[#1246FF] text-white text-[9px] font-bold flex items-center justify-center">
-                {[!!q, !!city, openNow, selAmenities.length > 0].filter(Boolean).length}
-              </span>
-            )}
-          </ClayToggleChip>
+    {hasFilters && (
+      <ClayButton variant="ghost" size="sm" onClick={clearAll} className="text-[#C5282C] hover:text-[#C5282C]">
+        Clear all
+      </ClayButton>
+    )}
+  </div>
 
-          {hasFilters && (
-            <ClayButton variant="ghost" size="sm" onClick={clearAll} className="text-[#C5282C] hover:text-[#C5282C]">
-              Clear all
-            </ClayButton>
-          )}
-        </div>
+  {/* Row 2 — active amenity chips, wraps to as many lines as needed.
+      No horizontal scroll/clipping — every chip is always fully visible. */}
+  {selAmenities.length > 0 && (
+    <div className="flex items-center gap-2 flex-wrap">
+      {selAmenities.map((a) => (
+        <ClayChip key={a} tone="info" className="cursor-pointer flex-shrink-0" onClick={() => toggleAmenity(a)}>
+          {a}<X className="w-2.5 h-2.5 ml-1" />
+        </ClayChip>
+      ))}
+    </div>
+  )}
+</div>
 
         {/* Filter bottom-sheet — was previously an inline block here that
             pushed the library list down to a sliver of the screen when
