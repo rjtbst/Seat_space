@@ -78,8 +78,8 @@ function TimePicker({
   }
 
   const sel = [
-    'bg-white border border-[#DDE4EE] rounded-lg px-2.5 py-2 text-[13px] font-semibold',
-    'text-[#0D1117] outline-none focus:border-[#1E5CFF] transition-colors',
+    'clay-input px-2.5 py-2 text-[13px] font-semibold',
+    'text-[#0D1117] outline-none transition-shadow',
     disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
   ].join(' ')
 
@@ -291,10 +291,10 @@ export default function ExtendBookingModal({ bookingId, onClose }: Props) {
   /* ── Render ─────────────────────────────────────────────── */
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[500] flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <div className="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden">
+      <div className="clay-raised w-full sm:max-w-md overflow-hidden" style={{ background: 'var(--clay-surface)' }}>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#F0F4F8]">
+        <div className="flex items-center justify-between px-5 py-4" style={{ boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.2)' }}>
           <div>
             <div className="text-[14px] font-bold text-[#0D1117]">Extend Booking</div>
             {booking && (
@@ -320,7 +320,7 @@ export default function ExtendBookingModal({ bookingId, onClose }: Props) {
 
           {/* Load error */}
           {loadErr && (
-            <div className="flex items-center gap-2 text-[12px] text-[#C5282C] bg-[#FFF0F0] border border-[#FCA5A5] rounded-xl p-3">
+            <div className="clay-raised-sm flex items-center gap-2 text-[12px] text-[#C5282C] p-3" style={{ background: '#FFF0F0' }}>
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               {loadErr}
             </div>
@@ -336,7 +336,7 @@ export default function ExtendBookingModal({ bookingId, onClose }: Props) {
               </div>
               <button
                 onClick={onClose}
-                className="mt-2 px-6 py-2.5 rounded-xl bg-[#1E5CFF] text-white text-[13px] font-bold"
+                className="clay-btn-primary mt-2 px-6 py-2.5 text-[13px] font-bold"
               >
                 Done
               </button>
@@ -347,7 +347,7 @@ export default function ExtendBookingModal({ bookingId, onClose }: Props) {
           {booking && !success && (
             <>
               {/* Current vs new time */}
-              <div className="bg-[#F4F7FB] rounded-xl p-3.5 space-y-2">
+              <div className="clay-pressed p-3.5 space-y-2">
                 <div className="flex items-center justify-between text-[12px]">
                   <span className="text-[#9AACBE]">Current end time</span>
                   <span className="font-semibold text-[#0D1117]">
@@ -386,7 +386,7 @@ export default function ExtendBookingModal({ bookingId, onClose }: Props) {
 
               {/* Error */}
               {error && (
-                <div className="flex items-start gap-2 bg-[#FFF0F0] border border-[#FCA5A5] rounded-xl px-3 py-2.5 text-[12px] text-[#C5282C]">
+                <div className="clay-raised-sm flex items-start gap-2 px-3 py-2.5 text-[12px] text-[#C5282C]" style={{ background: '#FFF0F0' }}>
                   <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
                   {error}
                 </div>
@@ -394,7 +394,7 @@ export default function ExtendBookingModal({ bookingId, onClose }: Props) {
 
               {/* Price preview */}
               {!error && (
-                <div className="bg-[rgba(30,92,255,0.05)] border border-[rgba(30,92,255,0.18)] rounded-xl px-4 py-3 space-y-2">
+                <div className="clay-raised-sm px-4 py-3 space-y-2" style={{ background: 'rgba(30,92,255,0.05)' }}>
                   {previewLoading
                     ? (
                       <div className="flex items-center justify-between">
@@ -413,7 +413,7 @@ export default function ExtendBookingModal({ bookingId, onClose }: Props) {
                             <span>Platform fee</span>
                             <span>₹{preview.platformFee}</span>
                           </div>
-                          <div className="flex justify-between items-center border-t border-[rgba(30,92,255,0.15)] pt-2 mt-1">
+                          <div className="flex justify-between items-center pt-2 mt-1" style={{ boxShadow: 'inset 0 1px 0 rgba(30,92,255,.18)' }}>
                             <span className="text-[12px] font-bold text-[#0D1117]">Total payable</span>
                             <span className="text-[20px] font-bold text-[#1E5CFF]">₹{preview.totalPayable}</span>
                           </div>
@@ -438,7 +438,7 @@ export default function ExtendBookingModal({ bookingId, onClose }: Props) {
             <button
               onClick={handlePay}
               disabled={paying || previewLoading || !preview || !!error}
-              className="w-full py-3.5 rounded-xl bg-[#1E5CFF] text-white text-[14px] font-bold flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(30,92,255,.3)] hover:bg-[#1447D4] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
+              className="clay-btn-primary w-full py-3.5 text-[14px] font-bold flex items-center justify-center gap-2 disabled:cursor-not-allowed"
             >
               {paying || previewLoading
                 ? <><Loader2 className="w-4 h-4 animate-spin" /> {paying ? 'Processing…' : 'Calculating…'}</>

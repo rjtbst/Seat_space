@@ -71,9 +71,11 @@ function Steps() {
             <div style={{
               width: 26, height: 26, borderRadius: '50%', display: 'flex',
               alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700,
-              background: s.done || s.active ? ACCENT : '#E2DDD4',
+              background: s.done || s.active ? ACCENT : 'var(--clay-surface)',
               color:      s.done || s.active ? '#fff'  : '#9AAAB8',
-              boxShadow:  s.active ? `0 0 0 3px ${ACCENT_LIGHT}` : 'none',
+              boxShadow:  s.done || s.active
+                ? '2px 2px 6px rgba(13,124,84,.35), -1px -1px 4px rgba(255,255,255,.4)'
+                : 'inset 2px 2px 5px rgba(163,177,198,.35), inset -1px -1px 3px rgba(255,255,255,.6)',
             }}>
               {s.done ? '✓' : i + 1}
             </div>
@@ -100,10 +102,11 @@ function Steps() {
 /* ─── Shared input style ────────────────────────────────────── */
 const inpBase: React.CSSProperties = {
   width: '100%', padding: '11px 13px',
-  border: '1.5px solid #E2DDD4', borderRadius: 10,
+  border: 'none', borderRadius: 12,
   fontSize: 14, color: '#0A0D12', outline: 'none',
-  fontFamily: 'DM Sans, sans-serif', background: '#FDFCF9',
-  boxSizing: 'border-box', transition: 'border-color .15s, box-shadow .15s',
+  fontFamily: 'DM Sans, sans-serif', background: 'var(--clay-surface)',
+  boxSizing: 'border-box', boxShadow: 'inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6)',
+  transition: 'box-shadow .15s',
   appearance: 'none' as const,
 }
 
@@ -192,12 +195,10 @@ export default function AddLibraryForm({
     setForm(prev => ({ ...prev, ...partial })), [])
 
   const onFocus = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    e.target.style.borderColor = ACCENT
-    e.target.style.boxShadow   = `0 0 0 3px ${ACCENT_LIGHT}`
+    e.target.style.boxShadow = `inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6), 0 0 0 3px ${ACCENT_LIGHT}`
   }
   const onBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    e.target.style.borderColor = '#E2DDD4'
-    e.target.style.boxShadow   = 'none'
+    e.target.style.boxShadow = 'inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6)'
   }
 
   /* ── Persist draft on every change (new library only) ── */
@@ -252,7 +253,6 @@ export default function AddLibraryForm({
       const res = isEditing
         ? await updateLibrary(libraryId!, payload)
         : await createLibrary(payload)
-  console.log("response ", res)
       if (res.success === false) { setError(res.error); return }
 
       try { localStorage.removeItem(DRAFT_KEY) } catch { /* ignore */ }
@@ -266,7 +266,7 @@ export default function AddLibraryForm({
   return (
     <div style={{
       minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'linear-gradient(135deg,#F4F7FB 0%,#EDE8DC 100%)',
+      background: 'var(--clay-bg)',
       fontFamily: 'DM Sans, sans-serif', padding: '24px 16px',
     }}>
       <div style={{ width: '100%', maxWidth: 560 }}>
@@ -275,9 +275,9 @@ export default function AddLibraryForm({
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
           <div style={{
-            width: 52, height: 52, borderRadius: 14, background: ACCENT,
+            width: 52, height: 52, borderRadius: 16, background: ACCENT,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 16px', boxShadow: '0 4px 18px rgba(13,124,84,.32)', fontSize: 24,
+            margin: '0 auto 16px', boxShadow: '4px 4px 12px rgba(13,124,84,.35), -3px -3px 8px rgba(255,255,255,.5)', fontSize: 24,
           }}>📚</div>
           <h1 style={{
             fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 26,
@@ -295,9 +295,9 @@ export default function AddLibraryForm({
 
         {/* Card */}
         <div style={{
-          background: '#FDFCF9', border: '1px solid #E2DDD4',
-          borderRadius: 20, padding: '28px 28px 24px',
-          boxShadow: '0 4px 28px rgba(10,13,18,.08)',
+          background: 'var(--clay-surface)', border: 'none',
+          borderRadius: 22, padding: '28px 28px 24px',
+          boxShadow: '8px 8px 20px rgba(163,177,198,.35), -6px -6px 16px rgba(255,255,255,.7)',
         }}>
           <form onSubmit={handleSubmit}>
 
@@ -415,16 +415,18 @@ export default function AddLibraryForm({
                   const selected = form.amenityIds.includes(id)
                   const emoji    = AMENITY_EMOJI[name] ?? '✦'
                   return (
-                    <button className="press"
+                    <button className="clay-interactive"
                       key={id} type="button"
                       onClick={() => toggleAmenity(id)}
                       style={{
                         padding: '6px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
                         cursor: 'pointer', fontFamily: 'DM Sans, sans-serif',
-                        border:     `1.5px solid ${selected ? ACCENT : '#E2DDD4'}`,
-                        background: selected ? ACCENT_LIGHT : '#FDFCF9',
+                        border: 'none',
+                        background: selected ? ACCENT_LIGHT : 'var(--clay-surface)',
                         color:      selected ? ACCENT       : '#6B7689',
-                        transition: 'all .15s',
+                        boxShadow: selected
+                          ? 'inset 2px 2px 5px rgba(13,124,84,.2), inset -1px -1px 4px rgba(255,255,255,.5)'
+                          : '2px 2px 6px rgba(163,177,198,.3), -2px -2px 5px rgba(255,255,255,.6)',
                       }}
                     >
                       {emoji} {name}
@@ -439,21 +441,21 @@ export default function AddLibraryForm({
             {/* Payout details now collected separately during the platform
                 subscription / go-live step, not here — a library no longer
                 needs a Razorpay linked account at creation time. */}
-            <div style={{
-              background: '#F4F7FB', border: '1px solid #E2DDD4',
-              borderRadius: 10, padding: '10px 14px', marginBottom: 16,
+            <div className="clay-raised-sm" style={{
+              background: 'var(--clay-surface)', border: 'none',
+              padding: '10px 14px', marginBottom: 16,
               fontSize: 12, color: '#6B7689',
             }}>
               💡 You'll set up your bank account / UPI for payouts and your platform subscription in a later step, right before going live.
             </div>
 
-            <div style={{ height: 1, background: '#E2DDD4', margin: '8px 0 20px' }} />
+            <div style={{ height: 1, boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.3)', margin: '8px 0 20px' }} />
 
             {/* Validation warnings — shown after first submit attempt or if any field has been touched */}
             {attempted && !valid && (
-              <div style={{
-                background: '#FFFBEB', border: '1px solid rgba(217,119,6,.25)',
-                borderRadius: 10, padding: '12px 14px', marginBottom: 16,
+              <div className="clay-raised-sm" style={{
+                background: '#FFFBEB', border: 'none',
+                padding: '12px 14px', marginBottom: 16,
               }}>
                 <p style={{ fontSize: 12, fontWeight: 700, color: '#92400E', margin: '0 0 8px', display: 'flex', alignItems: 'center', gap: 6 }}>
                   ⚠️ Complete these fields to continue:
@@ -477,9 +479,9 @@ export default function AddLibraryForm({
 
             {/* Error banner */}
             {error && (
-              <div style={{
-                background: '#FDEAEA', border: '1px solid rgba(212,43,43,.2)',
-                borderRadius: 10, padding: '10px 14px', marginBottom: 16,
+              <div className="clay-raised-sm" style={{
+                background: '#FDEAEA', border: 'none',
+                padding: '10px 14px', marginBottom: 16,
                 display: 'flex', gap: 8, alignItems: 'flex-start',
               }}>
                 <span style={{ flexShrink: 0 }}>⚠️</span>
@@ -489,27 +491,29 @@ export default function AddLibraryForm({
 
             {/* Buttons */}
             <div style={{ display: 'flex', gap: 10 }}>
-              <button className="press"
+              <button className="clay-raised-sm clay-interactive"
                 type="button" onClick={() => router.back()}
                 style={{
-                  flex: 1, padding: '13px 0', borderRadius: 10, fontSize: 14, fontWeight: 600,
-                  fontFamily: 'DM Sans, sans-serif', border: '1.5px solid #E2DDD4',
-                  background: '#FDFCF9', color: '#3A4A5C', cursor: 'pointer',
+                  flex: 1, padding: '13px 0', fontSize: 14, fontWeight: 600,
+                  fontFamily: 'DM Sans, sans-serif', border: 'none',
+                  color: '#3A4A5C', cursor: 'pointer',
                 }}
               >
                 ← Back
               </button>
-              <button className="press"
+              <button
                 type="submit"
                 onClick={() => { if (!valid) setAttempted(true) }}
                 disabled={isPending}
                 style={{
-                  flex: 2, padding: '13px 0', borderRadius: 10, fontSize: 15, fontWeight: 700,
+                  flex: 2, padding: '13px 0', borderRadius: 14, fontSize: 15, fontWeight: 700,
                   fontFamily: 'Syne, sans-serif', border: 'none',
-                  background: valid ? ACCENT    : '#C8D4C8',
+                  background: valid ? `linear-gradient(155deg, #22B37C, ${ACCENT}, #0A5E3F)` : '#C8D4C8',
                   color: '#fff',
                   cursor:    valid ? 'pointer'  : 'not-allowed',
-                  boxShadow: valid ? '0 4px 16px rgba(13,124,84,.3)' : 'none',
+                  boxShadow: valid
+                    ? '4px 4px 12px rgba(13,124,84,.35), -3px -3px 8px rgba(255,255,255,.4), inset 0 1px 1px rgba(255,255,255,.3)'
+                    : 'none',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 }}
               >

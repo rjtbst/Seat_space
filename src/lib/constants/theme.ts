@@ -14,8 +14,8 @@ export const TEXT_PRIMARY   = '#0A0D12'
 export const TEXT_SECONDARY = '#6B7689'
 export const TEXT_MUTED     = '#9AAAB8'
 export const BORDER         = '#E2DDD4'
-export const BG_CARD        = '#FDFCF9'
-export const BG_PAGE        = '#F4F7FB'
+export const BG_CARD        = 'var(--clay-surface, #F6F8FC)'
+export const BG_PAGE        = 'var(--clay-bg, #EDF1F7)'
 export const BG_HOVER       = '#F0EDE8'
 
 // ─── Status badge styles — one place, consumed everywhere ────────────────────
@@ -42,8 +42,9 @@ import type { CSSProperties } from 'react'
 
 export const INP_STYLE: CSSProperties = {
   width: '100%', padding: '10px 12px',
-  border: '1.5px solid #E2DDD4', borderRadius: 9,
+  border: 'none', borderRadius: 12,
   fontSize: 13, color: '#0A0D12', outline: 'none',
-  fontFamily: 'DM Sans, sans-serif', background: '#FDFCF9',
+  fontFamily: 'DM Sans, sans-serif', background: 'var(--clay-surface, #F6F8FC)',
+  boxShadow: 'inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6)',
   boxSizing: 'border-box',
 }

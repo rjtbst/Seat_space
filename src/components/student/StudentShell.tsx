@@ -62,7 +62,7 @@ export default function StudentShell({
 
   const currentLabel =
     NAV_ITEMS.find((n) => pathname === n.href || pathname.startsWith(n.href + '/'))?.label
-    ?? 'Seatspace'
+    ?? 'LibrarySpot'
 
   async function handleLogout() {
     const supabase = createBrowserSupabaseClient()
@@ -108,7 +108,7 @@ export default function StudentShell({
           </div>
           <div>
             <div className="font-serif text-[17px] text-[#0D1117]">
-              Seat<span className="text-[#1246FF] font-bold">Space</span>
+              Library<span className="text-[#1246FF] font-bold">Spot</span>
             </div>
             <div className="text-[9px] tracking-[.08em] uppercase text-[#9AACBE] mt-px">
               Student Dashboard

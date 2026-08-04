@@ -64,11 +64,10 @@ export function TimePicker({
     emit((h12 % 12) + (period === 'PM' ? 12 : 0), mins)
   }
 
-  const bg = variant === 'filled' ? 'bg-[#F4F7FB]' : 'bg-white'
   const selCls = [
-    bg, 'border border-[#DDE4EE] rounded-lg px-2 py-2',
+     'clay-input px-2 py-2',
     'text-[13px] font-semibold text-[#0D1117] outline-none',
-    'focus:border-[#1E5CFF] focus:bg-white transition-colors',
+    'transition-shadow',
     disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
   ].join(' ')
   const minuteSelCls = [selCls, 'tabular-nums'].join(' ')

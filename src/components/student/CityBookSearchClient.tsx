@@ -152,7 +152,8 @@ export default function CityBookSearchClient({ city }: Props) {
         {!cityOverride && !city && (
           <div style={{
             display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px',
-            background: '#FFFBEB', border: '1px solid #FCD34D', borderRadius: 8,
+            background: '#FFFBEB', border: 'none', borderRadius: 12,
+            boxShadow: '2px 2px 6px rgba(252,211,77,.25), -2px -2px 5px rgba(255,255,255,.6)',
             fontSize: 12, color: '#92400E', fontFamily: 'DM Sans, sans-serif',
           }}>
             <AlertCircle style={{ width: 13, height: 13, flexShrink: 0 }} />
@@ -168,7 +169,8 @@ export default function CityBookSearchClient({ city }: Props) {
       {searched && results.length === 0 && (
         <div style={{
           textAlign: 'center', padding: '40px 20px',
-          background: '#F8FAFC', borderRadius: 14, border: '1px solid #E4EAF2',
+          background: 'var(--clay-surface)', borderRadius: 18, border: 'none',
+          boxShadow: '5px 5px 12px rgba(163,177,198,.3), -4px -4px 10px rgba(255,255,255,.65)',
         }}>
           <BookOpen style={{ width: 32, height: 32, color: '#C7D4F7', margin: '0 auto 10px' }} />
           <div style={{ fontSize: 14, fontWeight: 700, color: '#0A0D12', fontFamily: 'Syne, sans-serif' }}>
@@ -182,14 +184,14 @@ export default function CityBookSearchClient({ city }: Props) {
 
       {Object.entries(byLibrary).map(([libId, lib]) => (
         <div key={libId} style={{
-          background: '#fff', border: '1px solid #E4EAF2', borderRadius: 14,
+          background: 'var(--clay-surface)', border: 'none', borderRadius: 18,
           marginBottom: 16, overflow: 'hidden',
-          boxShadow: '0 2px 8px rgba(10,13,18,.04)',
+          boxShadow: '5px 5px 12px rgba(163,177,198,.3), -4px -4px 10px rgba(255,255,255,.65)',
         }}>
           {/* Library header */}
           <div style={{
-            padding: '12px 16px', background: '#F8FAFC',
-            borderBottom: '1px solid #E4EAF2',
+            padding: '12px 16px',
+            boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.2)',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           }}>
             <div>
@@ -204,10 +206,11 @@ export default function CityBookSearchClient({ city }: Props) {
             </div>
             <Link
               href={`/library/${libId}`}
+              className="clay-raised-sm clay-interactive"
               style={{
                 fontSize: 11, fontWeight: 700, color: '#1E5CFF',
                 textDecoration: 'none', padding: '5px 10px',
-                background: '#EEF3FF', borderRadius: 20,
+                borderRadius: 20,
                 fontFamily: 'DM Sans, sans-serif',
               }}
             >
@@ -217,7 +220,7 @@ export default function CityBookSearchClient({ city }: Props) {
 
           {/* Book rows */}
           <div style={{ padding: '8px 0' }}>
-            {lib.books.map(r => {
+            {lib.books.map((r, ri) => {
               const key          = `${r.bookId}:${r.libraryId}`
               const isRequesting = requestingKey === key
               const isRequested  = requestedKeys.has(key)
@@ -228,7 +231,7 @@ export default function CityBookSearchClient({ city }: Props) {
                   style={{
                     display: 'flex', alignItems: 'center', gap: 12,
                     padding: '10px 16px',
-                    borderBottom: '1px solid #F4F7FB',
+                    boxShadow: ri < lib.books.length - 1 ? 'inset 0 -1px 0 rgba(163,177,198,.15)' : undefined,
                   }}
                 >
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -241,8 +244,8 @@ export default function CityBookSearchClient({ city }: Props) {
                       </div>
                     )}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
-                      <span style={{
-                        fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 20,
+                      <span className="clay-chip" style={{
+                        fontSize: 10, fontWeight: 700, padding: '2px 7px',
                         background: r.availableCopies > 0 ? '#ECFDF5' : '#FEF2F2',
                         color: r.availableCopies > 0 ? '#059669' : '#DC2626',
                         fontFamily: 'DM Sans, sans-serif',
@@ -266,20 +269,17 @@ export default function CityBookSearchClient({ city }: Props) {
                   <button
                     disabled={isRequesting || isRequested}
                     onClick={() => handleRequest(r)}
+                    className="clay-raised-sm"
                     style={{
                       flexShrink: 0,
                       padding: '8px 14px',
-                      borderRadius: 8,
-                      border: isRequested
-                        ? '1.5px solid #86EFAC'
-                        : '1.5px solid #C7D4F7',
-                      background: isRequested ? '#ECFDF5' : '#EEF3FF',
+                      border: 'none',
+                      background: isRequested ? '#ECFDF5' : undefined,
                       color:      isRequested ? '#059669' : '#1E5CFF',
                       fontSize: 12, fontWeight: 700,
                       cursor: isRequesting || isRequested ? 'default' : 'pointer',
                       fontFamily: 'DM Sans, sans-serif',
                       opacity: isRequesting ? 0.7 : 1,
-                      transition: 'all .15s',
                       whiteSpace: 'nowrap',
                     }}
                   >
@@ -296,7 +296,8 @@ export default function CityBookSearchClient({ city }: Props) {
       {!searched && !searching && (
         <div style={{
           textAlign: 'center', padding: '48px 24px',
-          background: '#F8FAFC', borderRadius: 14, border: '1px dashed #CBD5E1',
+          background: 'var(--clay-surface)', borderRadius: 18, border: 'none',
+          boxShadow: 'inset 3px 3px 8px rgba(163,177,198,.25), inset -2px -2px 6px rgba(255,255,255,.6)',
         }}>
           <Search style={{ width: 36, height: 36, color: '#C7D4F7', margin: '0 auto 12px' }} />
           <div style={{ fontSize: 14, fontWeight: 700, color: '#64748B', fontFamily: 'Syne, sans-serif' }}>
@@ -315,9 +316,10 @@ const inputBase: React.CSSProperties = {
   width: '100%',
   boxSizing: 'border-box',
   padding: '10px 12px',
-  borderRadius: 9,
-  border: '1.5px solid #E2DDD4',
-  background: '#FDFCF9',
+  borderRadius: 12,
+  border: 'none',
+  background: 'var(--clay-surface)',
+  boxShadow: 'inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6)',
   fontSize: 13,
   color: '#0A0D12',
   fontFamily: 'DM Sans, sans-serif',

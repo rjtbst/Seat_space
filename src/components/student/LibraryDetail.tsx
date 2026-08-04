@@ -65,6 +65,7 @@ import SeatGrid from './SeatGrid'
 import { SubscribeModal } from './SubscribeModal'
 import { TimePicker } from './TimePicker'
 import { describeDaysOfWeek } from '@/lib/booking/subscriptionEntitlement'
+import { cn } from '@/lib/utils'
 
 /* ─── Types ─────────────────────────────────────────────────────────────── */
 
@@ -135,7 +136,7 @@ function fmt12h(t: string): string {
 
 function ErrorBox({ msg }: { msg: string }) {
   return (
-    <div className="flex items-start gap-2 bg-[#FFF0F0] border border-[#FCA5A5] rounded-xl px-3 py-2.5 text-[12px] text-[#C5282C]">
+    <div className="clay-raised-sm flex items-start gap-2 px-3 py-2.5 text-[12px] text-[#C5282C]" style={{ background: '#FFF0F0' }}>
       <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
       <span>{msg}</span>
     </div>
@@ -583,13 +584,13 @@ export default function LibraryDetail({
           <>
             <button
               onClick={() => setImgIdx((i) => (i - 1 + library.images.length) % library.images.length)}
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 rounded-lg flex items-center justify-center shadow hover:bg-white transition-all"
+              className="clay-raised-sm clay-interactive absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={() => setImgIdx((i) => (i + 1) % library.images.length)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 rounded-lg flex items-center justify-center shadow hover:bg-white transition-all"
+              className="clay-raised-sm clay-interactive absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -639,7 +640,7 @@ export default function LibraryDetail({
 
       {/* ── Active sub badge ──────────────────────────────────────────── */}
       {activeSub && (
-        <div className="flex items-start gap-2.5 p-3.5 rounded-[10px] bg-[#E2F5EE] border border-[#0A7C5C]/20 text-[12px] text-[#0A7C5C] mb-4">
+        <div className="clay-raised-sm flex items-start gap-2.5 p-3.5 text-[12px] text-[#0A7C5C] mb-4" style={{ background: '#E2F5EE' }}>
           <span className="text-base flex-shrink-0">⭐</span>
           <div>Active <b>{activeSub.planName}</b> membership — sessions included in your plan.</div>
         </div>
@@ -651,7 +652,7 @@ export default function LibraryDetail({
           {library.amenities.map((a) => {
             const Icon = AMENITY_ICONS[a]
             return (
-              <span key={a} className="flex items-center gap-1.5 text-[11px] text-[#3A4A5C] bg-[#F4F7FB] border border-[#E4EAF2] px-2.5 py-1 rounded-[7px]">
+              <span key={a} className="clay-chip gap-1.5 text-[11px] text-[#3A4A5C] px-2.5 py-1">
                 {Icon && <Icon className="w-3 h-3 text-[#9AACBE]" />}{a}
               </span>
             )
@@ -663,10 +664,10 @@ export default function LibraryDetail({
            INLINE BOOKING PANEL
       ══════════════════════════════════════════════════════════════════ */}
       {hasAnySlots && (
-        <div className="bg-white border border-[#E4EAF2] rounded-2xl overflow-hidden mb-5 shadow-[0_2px_16px_rgba(0,0,0,0.06)]">
+        <div className="clay-raised overflow-hidden mb-5">
 
           {/* Panel header */}
-          <div className="flex items-center justify-between px-4 py-3.5 border-b border-[#F0F4F8] bg-[#FAFBFF]">
+          <div className="flex items-center justify-between px-4 py-3.5" style={{ boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.2)' }}>
             <div className="flex items-center gap-2">
               <Flash className="w-4 h-4 text-amber-500" />
               <span className="text-[13px] font-bold text-[#0D1117]">Book a Seat</span>
@@ -700,10 +701,8 @@ export default function LibraryDetail({
                     type="button"
                     onClick={() => handleSlotChange(slot.id)}
                     className={[
-                      'flex items-center justify-between rounded-xl border px-4 py-3 text-left transition-all',
-                      active
-                        ? 'border-[#1E5CFF] bg-[rgba(30,92,255,0.05)] shadow-[0_0_0_1px_#1E5CFF]'
-                        : 'border-[#DDE4EE] bg-[#F9FAFC] hover:border-[#1E5CFF] hover:bg-white',
+                      'clay-interactive flex items-center justify-between rounded-xl px-4 py-3 text-left',
+                      active ? 'clay-pressed' : 'clay-raised-sm',
                     ].join(' ')}
                   >
                     <div>
@@ -725,7 +724,7 @@ export default function LibraryDetail({
           </div>
 
           {/* ── Time + date pickers ───────────────────────────────────── */}
-          <div className="px-4 pb-4 border-t border-[#F0F4F8] pt-3">
+          <div className="px-4 pb-4 pt-3" style={{ boxShadow: 'inset 0 1px 0 rgba(163,177,198,.2)' }}>
             <p className="text-[11px] font-semibold text-[#9AACBE] uppercase tracking-widest mb-3">
               Choose Time
             </p>
@@ -746,7 +745,7 @@ export default function LibraryDetail({
                   value={selectedDate}
                   min={today}
                   onChange={(e) => handleDateChange(e.target.value)}
-                  className="w-full bg-[#F4F7FB] border border-[#DDE4EE] rounded-lg px-2 py-2 text-[13px] font-semibold text-[#0D1117] outline-none focus:border-[#1E5CFF] focus:bg-white transition-colors cursor-pointer"
+                  className="clay-input w-full px-2 py-2 text-[13px] font-semibold text-[#0D1117] cursor-pointer"
                 />
               </div>
 
@@ -774,7 +773,7 @@ export default function LibraryDetail({
 
             {/* Price preview */}
             {!timeError && durationH >= 0.5 && (
-              <div className="flex items-center justify-between bg-[rgba(30,92,255,0.06)] border border-[rgba(30,92,255,0.18)] rounded-xl px-4 py-2.5 mt-3">
+              <div className="clay-raised-sm flex items-center justify-between px-4 py-2.5 mt-3" style={{ background: 'rgba(30,92,255,0.06)' }}>
                 <div>
                   <div className="text-[11px] text-[#6E7F94]">Estimated total</div>
                   {previewLoading
@@ -796,7 +795,7 @@ export default function LibraryDetail({
 
           {/* ── Seat Map ──────────────────────────────────────────────── */}
           {bookingOpen && (
-            <div className="px-4 pb-4 border-t border-[#F0F4F8] pt-4">
+            <div className="px-4 pb-4 pt-4" style={{ boxShadow: 'inset 0 1px 0 rgba(163,177,198,.2)' }}>
               <div className="flex items-center justify-between mb-3">
                 <p className="text-[11px] font-semibold text-[#9AACBE] uppercase tracking-widest">
                   Pick a Seat
@@ -818,7 +817,7 @@ export default function LibraryDetail({
 
               {/* Selected seat pill */}
               {selectedSeat && (
-                <div className="mt-3 flex items-center justify-between bg-[rgba(30,92,255,0.05)] border border-[rgba(30,92,255,0.2)] rounded-xl px-4 py-2.5">
+                <div className="clay-raised-sm mt-3 flex items-center justify-between px-4 py-2.5" style={{ background: 'rgba(30,92,255,0.05)' }}>
                   <div className="flex items-center gap-2">
                     <Armchair className="w-4 h-4 text-[#1E5CFF]" />
                     <span className="text-[13px] font-bold text-[#0D1117]">
@@ -843,7 +842,7 @@ export default function LibraryDetail({
                 type="button"
                 onClick={handlePay}
                 disabled={!canPay}
-                className="mt-4 w-full py-3.5 rounded-xl bg-[#1E5CFF] text-white text-[14px] font-bold flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(30,92,255,.3)] hover:bg-[#1447D4] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
+                className="clay-btn-primary mt-4 w-full py-3.5 text-[14px] font-bold flex items-center justify-center gap-2 disabled:cursor-not-allowed"
               >
                 {payLoading || isPending
                   ? <><Loader2 className="w-4 h-4 animate-spin" /> Processing…</>
@@ -864,7 +863,7 @@ export default function LibraryDetail({
               <button
                 type="button"
                 onClick={() => setBookingOpen(true)}
-                className="w-full py-3.5 rounded-xl bg-[#1E5CFF] text-white text-[14px] font-bold flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(30,92,255,.3)] hover:bg-[#1447D4] transition-colors"
+                className="clay-btn-primary w-full py-3.5 text-[14px] font-bold flex items-center justify-center gap-2"
               >
                 See Available Seats <ArrowRight className="w-4 h-4" />
               </button>
@@ -875,7 +874,7 @@ export default function LibraryDetail({
 
       {/* ── Books Catalogue ───────────────────────────────────────────── */}
       {books.length > 0 && (
-        <div className="bg-white border border-[#E4EAF2] rounded-xl p-4 mb-5">
+        <div className="clay-raised p-4 mb-5">
           <div className="flex items-center justify-between mb-3">
             <div className="text-[13px] font-bold text-[#0D1117]">📚 Books Available</div>
             <span className="text-[11px] text-[#6E7F94]">{books.length} title{books.length !== 1 ? 's' : ''}</span>
@@ -898,7 +897,7 @@ export default function LibraryDetail({
               }
             }}
             placeholder="Search by title, author, or ISBN…"
-            className="w-full px-3 py-2 text-[12px] rounded-lg border border-[#E4EAF2] outline-none mb-3 focus:border-[#1E5CFF] transition-colors"
+            className="clay-input w-full px-3 py-2 text-[12px] mb-3"
             style={{ fontFamily: 'DM Sans, sans-serif' }}
           />
 
@@ -912,13 +911,13 @@ export default function LibraryDetail({
               return (
                 <div
                   key={b.id}
-                  className="flex items-center justify-between gap-3 py-2 px-3 rounded-lg border border-[#F0F4F8] hover:bg-[#F8FAFC] transition-colors"
+                  className="clay-raised-sm clay-interactive flex items-center justify-between gap-3 py-2 px-3"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="text-[13px] font-semibold text-[#0D1117] truncate">{b.title}</div>
                     {b.author && <div className="text-[11px] text-[#9AACBE] mt-0.5">{b.author}</div>}
                     <div className="flex items-center gap-2 mt-1">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                      <span className={`clay-chip text-[10px] font-bold px-2 py-0.5 ${
                         b.available_copies > 0
                           ? 'bg-[#ECFDF5] text-[#059669]'
                           : 'bg-[#FEF2F2] text-[#DC2626]'
@@ -954,11 +953,10 @@ export default function LibraryDetail({
                         setTimeout(() => setRequestErrId(null), 4000)
                       }
                     }}
-                    className="flex-shrink-0 px-3 py-1.5 text-[11px] font-bold rounded-lg border transition-all"
+                    className="clay-raised-sm flex-shrink-0 px-3 py-1.5 text-[11px] font-bold"
                     style={{
-                      background: isRequested ? '#ECFDF5' : '#F4F7FB',
+                      background: isRequested ? '#ECFDF5' : undefined,
                       color:      isRequested ? '#059669' : '#1E5CFF',
-                      border:     isRequested ? '1.5px solid #86EFAC' : '1.5px solid #C7D4F7',
                       cursor:     isRequesting || isRequested ? 'default' : 'pointer',
                       opacity:    isRequesting ? 0.7 : 1,
                     }}
@@ -974,7 +972,7 @@ export default function LibraryDetail({
 
       {/* ── Membership Plans ─────────────────────────────────────────── */}
       {plans.length > 0 && (
-        <div className="bg-white border border-[#E4EAF2] rounded-xl p-4 mb-5">
+        <div className="clay-raised p-4 mb-5">
           <div className="flex items-center justify-between mb-3">
             <div className="text-[13px] font-bold text-[#0D1117]">Membership Plans</div>
           </div>
@@ -982,11 +980,11 @@ export default function LibraryDetail({
             {plans.map((p, i) => (
               <div
                 key={p.id}
-                className="border-[1.5px] rounded-[10px] p-3 text-center cursor-pointer hover:shadow-[0_4px_24px_rgba(30,92,255,.1)] transition-all"
-                style={{
-                  borderColor: i === 1 ? '#1E5CFF' : '#E4EAF2',
-                  background:  i === 1 ? 'linear-gradient(150deg,#F0F5FF,#F8FAFF)' : 'white',
-                }}
+                className={cn(
+                  'clay-interactive rounded-[10px] p-3 text-center cursor-pointer',
+                  i === 1 ? 'clay-pressed' : 'clay-raised-sm',
+                )}
+                style={i === 1 ? { background: 'linear-gradient(150deg,#F0F5FF,#F8FAFF)' } : undefined}
                 onClick={() => setSubscribePlan(p)}
               >
                 {i === 1 && <div className="text-[9px] font-bold text-[#1E5CFF] mb-0.5">⭐ Popular</div>}
@@ -1017,7 +1015,7 @@ export default function LibraryDetail({
           { icon: Calendar, label: 'Today',      value: status.todayHoursLabel },
           { icon: Star,     label: 'Rating',     value: `${library.rating.toFixed(1)}/5` },
         ].map(({ icon: Icon, label, value }) => (
-          <div key={label} className="bg-white border border-[#E4EAF2] rounded-xl p-3 text-center flex flex-col items-center justify-center">
+          <div key={label} className="clay-raised p-3 text-center flex flex-col items-center justify-center">
             <Icon className="w-4 h-4 text-[#9AACBE] mb-1" />
             {/* WebkitLineClamp (not Tailwind's line-clamp utility, to
                 avoid depending on whether that core utility is enabled in
@@ -1040,7 +1038,7 @@ export default function LibraryDetail({
       </div>
 
       {/* ── Address ───────────────────────────────────────────────────── */}
-      <div className="bg-white border border-[#E4EAF2] rounded-xl p-4">
+      <div className="clay-raised p-4">
         <div className="flex items-center gap-1.5 text-[12px] font-bold text-[#0D1117] mb-1.5">
           <MapPin className="w-3.5 h-3.5 text-[#9AACBE]" /> Location
         </div>

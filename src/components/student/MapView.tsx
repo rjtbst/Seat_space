@@ -20,6 +20,7 @@ import { effectiveSlotRate } from '@/lib/booking/types'
 import { Navigation2, MapPin, ExternalLink, Loader2, AlertCircle, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
+import { ClayCard, ClayChip, ClayIconBadge } from '@/components/ui/Clay'
 
 declare global {
   interface Window {
@@ -62,8 +63,8 @@ function priceDisplay(library: LibraryCard): { label: string; rate: number } | n
 // ── Fallback: no API key → show list with "Open in Maps" links ────────────────
 function MapFallback({ libraries, userLat, userLng }: Props) {
   return (
-    <div className="h-full overflow-y-auto p-4 space-y-3 bg-[#F4F7FB]">
-      <div className="flex items-start gap-2 bg-[#FEF3C7] rounded-xl p-3">
+    <div className="h-full overflow-y-auto p-4 space-y-3" style={{ background: 'var(--clay-bg)' }}>
+      <div className="clay-raised-sm flex items-start gap-2 p-3" style={{ background: '#FEF3C7' }}>
         <AlertCircle className="w-4 h-4 text-[#B45309] flex-shrink-0 mt-0.5" />
         <p className="text-[12px] text-[#92400E]">
           Map view requires <code>NEXT_PUBLIC_GOOGLE_MAPS_KEY</code>. Showing list view instead.
@@ -76,7 +77,7 @@ function MapFallback({ libraries, userLat, userLng }: Props) {
         const open  = lib.status.isOpen
         const price = priceDisplay(lib)
         return (
-          <div key={lib.id} className="bg-white rounded-xl border border-[#E4EAF2] p-3 flex items-center gap-3">
+          <ClayCard key={lib.id} interactive={false} className="p-3 flex items-center gap-3">
             <div className="flex-1 min-w-0">
               <p className="text-[13px] font-semibold text-[#0D1117] truncate">{lib.name}</p>
               <p className="text-[11px] text-[#9AACBE] truncate">{[lib.area, lib.city].filter(Boolean).join(', ')}</p>
@@ -96,12 +97,12 @@ function MapFallback({ libraries, userLat, userLng }: Props) {
               href={mapsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1.5 bg-[#E8EFFE] text-[#1246FF] rounded-lg text-[11px] font-semibold hover:bg-[#1246FF] hover:text-white transition-colors"
+              className="clay-raised-sm clay-interactive flex-shrink-0 flex items-center gap-1 px-2.5 py-1.5 text-[#1246FF] text-[11px] font-semibold"
             >
               <ExternalLink className="w-3 h-3" />
               Maps
             </a>
-          </div>
+          </ClayCard>
         )
       })}
     </div>
@@ -231,13 +232,13 @@ export default function MapView({ libraries, userLat, userLng }: Props) {
   }, [initMap])
 
   return (
-    <div className="relative h-full w-full bg-[#F4F7FB]">
+    <div className="relative h-full w-full" style={{ background: 'var(--clay-bg)' }}>
       {/* Map container */}
       <div ref={mapRef} className="absolute inset-0" />
 
       {/* Loading */}
       {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-[#F4F7FB]">
+        <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'var(--clay-bg)' }}>
           <div className="flex flex-col items-center gap-3">
             <Loader2 className="w-6 h-6 animate-spin text-[#1246FF]" />
             <p className="text-[13px] text-[#9AACBE]">Loading map…</p>
@@ -247,7 +248,7 @@ export default function MapView({ libraries, userLat, userLng }: Props) {
 
       {/* Error */}
       {error && (
-        <div className="absolute inset-x-4 top-4 bg-[#FEE2E2] text-[#C5282C] px-4 py-3 rounded-xl text-[12px] flex items-center gap-2">
+        <div className="clay-raised absolute inset-x-4 top-4 text-[#C5282C] px-4 py-3 text-[12px] flex items-center gap-2" style={{ background: '#FEE2E2' }}>
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           {error}
         </div>
@@ -255,18 +256,14 @@ export default function MapView({ libraries, userLat, userLng }: Props) {
 
       {/* Selected library card overlay (bottom) */}
       {selected && (
-        <div className="absolute bottom-4 inset-x-4 bg-white rounded-2xl border border-[#E4EAF2] shadow-lg p-4 animate-in slide-in-from-bottom-2 duration-200">
+        <div className="clay-raised absolute bottom-4 inset-x-4 p-4 animate-in slide-in-from-bottom-2 duration-200">
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <h3 className="text-[14px] font-semibold text-[#0D1117] truncate">{selected.name}</h3>
-                <span className={cn('text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0',
-                  selected.status.isOpen
-                    ? 'bg-[#D1FAE5] text-[#0D7C54]'
-                    : 'bg-[#F4F7FB] text-[#9AACBE]'
-                )}>
+                <ClayChip tone={selected.status.isOpen ? 'success' : 'neutral'} className="flex-shrink-0">
                   {selected.status.isOpen ? '● Open' : '○ Closed'}
-                </span>
+                </ClayChip>
               </div>
               <p className="text-[11px] text-[#9AACBE] mt-0.5 truncate">
                 {[selected.area, selected.city].filter(Boolean).join(', ')}
@@ -291,11 +288,10 @@ export default function MapView({ libraries, userLat, userLng }: Props) {
                 )}
               </div>
             </div>
-            <button
-              onClick={() => setSelected(null)}
-              className="w-7 h-7 rounded-lg bg-[#F4F7FB] flex items-center justify-center flex-shrink-0"
-            >
-              <X className="w-3.5 h-3.5 text-[#6E7F94]" />
+            <button onClick={() => setSelected(null)} className="flex-shrink-0">
+              <ClayIconBadge interactive size="sm">
+                <X className="w-3.5 h-3.5 text-[#6E7F94]" />
+              </ClayIconBadge>
             </button>
           </div>
 
@@ -305,7 +301,7 @@ export default function MapView({ libraries, userLat, userLng }: Props) {
                 href={`https://www.google.com/maps/dir/?api=1&destination=${selected.latitude},${selected.longitude}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-[#F4F7FB] border border-[#E4EAF2] rounded-xl text-[12px] font-semibold text-[#0D1117] hover:border-[#1246FF] transition-colors"
+                className="clay-raised-sm clay-interactive flex-1 flex items-center justify-center gap-1.5 py-2 text-[12px] font-semibold text-[#0D1117]"
               >
                 <Navigation2 className="w-3.5 h-3.5" />
                 Directions
@@ -313,7 +309,7 @@ export default function MapView({ libraries, userLat, userLng }: Props) {
             )}
             <Link
               href={`/library/${selected.id}`}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-[#1246FF] rounded-xl text-[12px] font-semibold text-white hover:bg-[#0E38CC] transition-colors"
+              className="clay-btn-primary flex-1 flex items-center justify-center gap-1.5 py-2 text-[12px] font-semibold"
             >
               View &amp; Book
             </Link>
@@ -323,7 +319,7 @@ export default function MapView({ libraries, userLat, userLng }: Props) {
 
       {/* Library count badge */}
       {!loading && (
-        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full border border-[#E4EAF2] text-[11px] font-medium text-[#6E7F94]">
+        <div className="clay-raised-sm absolute top-4 left-4 px-3 py-1.5 text-[11px] font-medium text-[#6E7F94]">
           {libraries.filter(l => l.latitude != null).length} libraries on map
         </div>
       )}

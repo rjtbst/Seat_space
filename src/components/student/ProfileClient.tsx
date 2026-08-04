@@ -16,6 +16,7 @@ import { toast } from 'sonner'
 import { fmtIST, fmtISTTime } from '@/lib/ist'
 import { getInitials, avatarGradient } from '@/lib/utils'
 import { createBrowserSupabaseClient } from '@/lib/supabase/client'
+import { ClayCard, ClayChip, ClayIconBadge, ClaySelect, ClayInput } from '@/components/ui/Clay'
 
 const INDIAN_STATES = [
   'Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa',
@@ -113,7 +114,7 @@ export default function ProfileClient({
   return (
     <div className="p-5 md:p-7 max-w-2xl mx-auto space-y-5">
       {/* ── Profile header ───────────────────────────────── */}
-      <div className="bg-white rounded-xl border border-[#E4EAF2] p-5">
+      <ClayCard interactive={false} className="p-5">
         <div className="flex items-start justify-between mb-4">
           <h1 className="text-[20px] font-bold text-[#0D1117]">My Profile</h1>
           <button
@@ -128,8 +129,8 @@ export default function ProfileClient({
         <div className="flex items-start gap-4">
           {/* Avatar */}
           <div
-            className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm text-white text-[20px] font-bold"
-            style={{ background: gradient }}
+            className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 text-white text-[20px] font-bold"
+            style={{ background: gradient, boxShadow: '3px 3px 8px rgba(163,177,198,.4), -2px -2px 6px rgba(255,255,255,.5)' }}
           >
             {initials}
           </div>
@@ -164,11 +165,10 @@ export default function ProfileClient({
                   <label className="text-[10px] font-semibold text-[#9AACBE] uppercase tracking-wide block mb-1">
                     Full Name *
                   </label>
-                  <input
+                  <ClayInput
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="Your full name"
-                    className="w-full px-3 py-2 bg-[#F4F7FB] border border-[#E4EAF2] rounded-lg text-[13px] text-[#0D1117] focus:outline-none focus:border-[#1246FF] transition-colors"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-2">
@@ -176,27 +176,25 @@ export default function ProfileClient({
                     <label className="text-[10px] font-semibold text-[#9AACBE] uppercase tracking-wide block mb-1">
                       City
                     </label>
-                    <input
+                    <ClayInput
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
                       placeholder="Your city"
-                      className="w-full px-3 py-2 bg-[#F4F7FB] border border-[#E4EAF2] rounded-lg text-[13px] text-[#0D1117] focus:outline-none focus:border-[#1246FF] transition-colors"
                     />
                   </div>
                   <div>
                     <label className="text-[10px] font-semibold text-[#9AACBE] uppercase tracking-wide block mb-1">
                       State
                     </label>
-                    <select
+                    <ClaySelect
                       value={state}
                       onChange={(e) => setState(e.target.value)}
-                      className="w-full px-3 py-2 bg-[#F4F7FB] border border-[#E4EAF2] rounded-lg text-[13px] text-[#0D1117] focus:outline-none focus:border-[#1246FF] transition-colors appearance-none cursor-pointer"
                     >
                       <option value="">State</option>
                       {INDIAN_STATES.map((s) => (
                         <option key={s} value={s}>{s}</option>
                       ))}
-                    </select>
+                    </ClaySelect>
                   </div>
                 </div>
               </div>
@@ -206,24 +204,22 @@ export default function ProfileClient({
           {/* Edit / Save / Cancel buttons */}
           <div className="flex gap-1.5 flex-shrink-0">
             {!editing ? (
-              <button
-                onClick={() => setEditing(true)}
-                className="w-8 h-8 rounded-xl bg-[#F4F7FB] border border-[#E4EAF2] flex items-center justify-center hover:border-[#1246FF] hover:bg-[#E8EFFE] transition-all"
-              >
-                <Edit3 className="w-3.5 h-3.5 text-[#6E7F94]" />
+              <button onClick={() => setEditing(true)}>
+                <ClayIconBadge interactive size="sm">
+                  <Edit3 className="w-3.5 h-3.5 text-[#6E7F94]" />
+                </ClayIconBadge>
               </button>
             ) : (
               <>
-                <button
-                  onClick={cancelEdit}
-                  className="w-8 h-8 rounded-xl bg-[#F4F7FB] border border-[#E4EAF2] flex items-center justify-center hover:bg-[#FEE2E2] transition-all"
-                >
-                  <X className="w-3.5 h-3.5 text-[#C5282C]" />
+                <button onClick={cancelEdit}>
+                  <ClayIconBadge interactive size="sm">
+                    <X className="w-3.5 h-3.5 text-[#C5282C]" />
+                  </ClayIconBadge>
                 </button>
                 <button
                   onClick={handleSave}
                   disabled={isPending}
-                  className="w-8 h-8 rounded-xl bg-[#1246FF] flex items-center justify-center hover:bg-[#0E38CC] transition-all disabled:opacity-50"
+                  className="clay-btn-primary w-8 h-8 flex items-center justify-center disabled:opacity-50"
                 >
                   {isPending
                     ? <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -236,32 +232,32 @@ export default function ProfileClient({
         </div>
 
         {profile.created_at && (
-          <p className="text-[10px] text-[#9AACBE] mt-4 pt-3 border-t border-[#F4F7FB]">
+          <p className="text-[10px] text-[#9AACBE] mt-4 pt-3" style={{ boxShadow: 'inset 0 1px 0 rgba(163,177,198,.25)' }}>
             Member since{' '}
             {new Date((profile.created_at) + '+05:30').toLocaleDateString('en-IN', {
               month: 'long', year: 'numeric',
             })}
           </p>
         )}
-      </div>
+      </ClayCard>
 
       {/* ── Stats grid ───────────────────────────────────── */}
       <div className="grid grid-cols-2 gap-3">
         {statCards.map(({ label, value, icon: Icon, bg, color }) => (
-          <div key={label} className="bg-white rounded-xl border border-[#E4EAF2] p-4">
-            <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center mb-2.5', bg)}>
+          <ClayCard key={label} interactive={false} className="p-4">
+            <ClayIconBadge size="md" className={cn('mb-2.5', bg)}>
               <Icon className={cn('w-4 h-4', color)} />
-            </div>
+            </ClayIconBadge>
             <div className="text-[22px] font-extrabold text-[#0D1117]">{value}</div>
             <div className="text-[11px] text-[#9AACBE] mt-0.5">{label}</div>
-          </div>
+          </ClayCard>
         ))}
       </div>
 
       {/* ── Next sessions ────────────────────────────────── */}
       {upcomingBookings.length > 0 && (
-        <div className="bg-white rounded-xl border border-[#E4EAF2] overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-[#F4F7FB]">
+        <ClayCard interactive={false} className="overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3" style={{ boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.2)' }}>
             <h3 className="text-[13px] font-semibold text-[#0D1117]">Next Sessions</h3>
             <button
               onClick={() => router.push('/bookings')}
@@ -270,29 +266,27 @@ export default function ProfileClient({
               View all <ChevronRight className="w-3 h-3" />
             </button>
           </div>
-          <div className="divide-y divide-[#F4F7FB]">
-            {upcomingBookings.map((b) => (
-              <div key={b.id} className="flex items-center gap-3 px-4 py-3">
-                <div className="w-9 h-9 rounded-xl bg-[#E8EFFE] flex items-center justify-center flex-shrink-0">
+          <div>
+            {upcomingBookings.map((b, i) => (
+              <div key={b.id} className="flex items-center gap-3 px-4 py-3" style={i < upcomingBookings.length - 1 ? { boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.15)' } : undefined}>
+                <ClayIconBadge size="md" className="bg-[#E8EFFE]">
                   <Calendar className="w-4 h-4 text-[#1246FF]" />
-                </div>
+                </ClayIconBadge>
                 <div className="flex-1 min-w-0">
                   <p className="text-[13px] font-semibold text-[#0D1117] truncate">{b.library_name}</p>
                   <p className="text-[11px] text-[#9AACBE]">
                     Seat {b.seat_label} · {fmtIST(b.start_time).split(',').slice(0, 2).join(',')}
                   </p>
                 </div>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#D1FAE5] text-[#0D7C54] flex-shrink-0">
-                  Confirmed
-                </span>
+                <ClayChip tone="success" className="flex-shrink-0">Confirmed</ClayChip>
               </div>
             ))}
           </div>
-        </div>
+        </ClayCard>
       )}
 
       {/* ── Quick links ──────────────────────────────────── */}
-      <div className="bg-white rounded-xl border border-[#E4EAF2] overflow-hidden">
+      <ClayCard interactive={false} className="overflow-hidden">
         {[
           { label: 'My Bookings',        desc: 'View all sessions',        icon: Calendar,  href: '/bookings'      },
           { label: 'Membership Plans',   desc: 'Manage subscriptions',     icon: CreditCard, href: '/subscriptions' },
@@ -302,14 +296,12 @@ export default function ProfileClient({
           <button
             key={href}
             onClick={() => router.push(href)}
-            className={cn(
-              'w-full flex items-center gap-3 px-4 py-3.5 hover:bg-[#F4F7FB] transition-colors text-left',
-              i > 0 && 'border-t border-[#F4F7FB]',
-            )}
+            className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-black/[0.02] transition-colors text-left"
+            style={i > 0 ? { boxShadow: 'inset 0 1px 0 rgba(163,177,198,.2)' } : undefined}
           >
-            <div className="w-9 h-9 rounded-xl bg-[#F4F7FB] flex items-center justify-center flex-shrink-0">
+            <ClayIconBadge size="md">
               <Icon className="w-4 h-4 text-[#6E7F94]" />
-            </div>
+            </ClayIconBadge>
             <div className="flex-1 min-w-0">
               <p className="text-[13px] font-semibold text-[#0D1117]">{label}</p>
               <p className="text-[11px] text-[#9AACBE]">{desc}</p>
@@ -317,7 +309,7 @@ export default function ProfileClient({
             <ChevronRight className="w-4 h-4 text-[#C4CDD8]" />
           </button>
         ))}
-      </div>
+      </ClayCard>
     </div>
   )
 }

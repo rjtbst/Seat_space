@@ -29,6 +29,7 @@ import {
   getAvailableSeatsForPlan,
 } from '@/lib/actions/students/student-subscriptions'
 import { describeDaysOfWeek } from '@/lib/booking/subscriptionEntitlement'
+import { ClayButton, ClayInput } from '@/components/ui/Clay'
 
 export type SubscribeModalPlan = {
   id:            string
@@ -121,10 +122,10 @@ export function SubscribeModal({ plan, libraryId, libraryName, onClose }: Subscr
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[500] flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <div className="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden">
+      <div className="clay-raised w-full sm:max-w-md overflow-hidden" style={{ background: 'var(--clay-surface)' }}>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#F0F4F8]">
+        <div className="flex items-center justify-between px-5 py-4" style={{ boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.2)' }}>
           <div>
             <div className="text-[14px] font-bold text-[#0D1117]">Subscribe to {plan.name}</div>
             <div className="text-[11px] text-[#9AACBE] mt-0.5">{libraryName}</div>
@@ -145,7 +146,7 @@ export function SubscribeModal({ plan, libraryId, libraryName, onClose }: Subscr
           )}
 
           {error && (
-            <div className="flex items-center gap-2 text-[12px] text-[#C5282C] bg-[#FFF0F0] border border-[#FCA5A5] rounded-xl p-3">
+            <div className="clay-raised-sm flex items-center gap-2 text-[12px] text-[#C5282C] p-3" style={{ background: '#FFF0F0' }}>
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               {error}
             </div>
@@ -159,19 +160,16 @@ export function SubscribeModal({ plan, libraryId, libraryName, onClose }: Subscr
                 Your {plan.name} membership is active — Seat {selectedSeat?.label}. Find your QR
                 digital pass under "My Subscriptions" and show it at the library.
               </div>
-              <button
-                onClick={onClose}
-                className="mt-2 px-6 py-2.5 rounded-xl bg-[#1E5CFF] text-white text-[13px] font-bold"
-              >
+              <ClayButton onClick={onClose} className="mt-2 px-6 py-2.5">
                 Done
-              </button>
+              </ClayButton>
             </div>
           )}
 
           {/* ── STEP: seat picker ── */}
           {stage === 'seat' && (
             <>
-              <div className="rounded-xl border border-[#E4EAF2] p-3.5 space-y-1.5">
+              <div className="clay-pressed p-3.5 space-y-1.5">
                 <div className="flex justify-between text-[13px]">
                   <span className="text-[#6E7F94]">Plan price</span>
                   <span className="font-semibold text-[#0D1117]">₹{plan.price}</span>
@@ -213,10 +211,10 @@ export function SubscribeModal({ plan, libraryId, libraryName, onClose }: Subscr
                       <button
                         key={s.id}
                         onClick={() => setSeatId(s.id)}
-                        className={`py-2 rounded-lg text-[12px] font-bold border-[1.5px] transition-colors ${
+                        className={`clay-interactive py-2 rounded-lg text-[12px] font-bold ${
                           seatId === s.id
-                            ? 'bg-[#1E5CFF] border-[#1E5CFF] text-white'
-                            : 'bg-white border-[#DDE4EE] text-[#0D1117] hover:border-[#1E5CFF]'
+                            ? 'bg-gradient-to-br from-[#4D78FF] to-[#0D3AE0] text-white'
+                            : 'clay-raised-sm text-[#0D1117]'
                         }`}
                       >
                         {s.label}
@@ -234,29 +232,30 @@ export function SubscribeModal({ plan, libraryId, libraryName, onClose }: Subscr
                   <Calendar className="w-3.5 h-3.5" />
                   Start date
                 </label>
-                <input
+                <ClayInput
                   type="date"
                   value={startDate}
                   min={todayISO()}
                   onChange={e => setStartDate(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-lg border border-[#DDE4EE] text-[13px] font-semibold outline-none focus:border-[#1E5CFF] transition-colors"
+                  className="py-2.5 font-semibold"
                 />
               </div>
 
-              <button
+              <ClayButton
                 onClick={() => { if (!seatId) { setError('Please select a seat'); return }; setError(null); setStage('form') }}
                 disabled={!seats?.length}
-                className="w-full py-3 rounded-xl bg-[#1E5CFF] text-white text-[13px] font-bold disabled:opacity-60"
+                size="lg"
+                className="w-full"
               >
                 Continue
-              </button>
+              </ClayButton>
             </>
           )}
 
           {/* ── STEP: coupon + confirm ── */}
           {stage === 'form' && (
             <>
-              <div className="rounded-xl border border-[#E4EAF2] p-3.5 space-y-1.5">
+              <div className="clay-pressed p-3.5 space-y-1.5">
                 <div className="flex justify-between text-[13px]">
                   <span className="text-[#6E7F94]">Plan price</span>
                   <span className="font-semibold text-[#0D1117]">₹{plan.price}</span>
@@ -277,12 +276,12 @@ export function SubscribeModal({ plan, libraryId, libraryName, onClose }: Subscr
                   <Tag className="w-3.5 h-3.5" />
                   Have a coupon code?
                 </label>
-                <input
+                <ClayInput
                   type="text"
                   value={couponCode}
                   onChange={e => setCoupon(e.target.value.toUpperCase())}
                   placeholder="Optional"
-                  className="w-full px-3 py-2.5 rounded-lg border border-[#DDE4EE] text-[13px] font-semibold tracking-wide outline-none focus:border-[#1E5CFF] transition-colors"
+                  className="font-semibold tracking-wide"
                   maxLength={40}
                 />
                 <div className="text-[10.5px] text-[#9AACBE] mt-1">
@@ -291,18 +290,12 @@ export function SubscribeModal({ plan, libraryId, libraryName, onClose }: Subscr
               </div>
 
               <div className="flex gap-2">
-                <button
-                  onClick={() => setStage('seat')}
-                  className="px-4 py-3 rounded-xl border border-[#DDE4EE] text-[#0D1117] text-[13px] font-bold"
-                >
+                <ClayButton variant="flat" onClick={() => setStage('seat')} size="lg">
                   Back
-                </button>
-                <button
-                  onClick={handleSubscribe}
-                  className="flex-1 py-3 rounded-xl bg-[#1E5CFF] text-white text-[13px] font-bold disabled:opacity-60"
-                >
+                </ClayButton>
+                <ClayButton onClick={handleSubscribe} size="lg" className="flex-1">
                   Continue to payment
-                </button>
+                </ClayButton>
               </div>
             </>
           )}

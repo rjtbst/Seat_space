@@ -4,6 +4,7 @@
 import type { PaymentRecord } from '@/lib/actions/students/student-profile'
 import { Receipt, CheckCircle2, XCircle, Clock3, ExternalLink, Copy } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ClayCard, ClayChip, ClayIconBadge } from '@/components/ui/Clay'
 import { fmtIST } from '@/lib/ist'
 import { toast } from 'sonner'
 
@@ -29,25 +30,25 @@ function PaymentCard({ payment }: { payment: PaymentRecord }) {
   const StatusIcon = cfg.Icon
 
   return (
-    <div className="bg-white rounded-xl border border-[#E4EAF2] p-4 space-y-3">
+    <ClayCard interactive={false} className="p-4 space-y-3">
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
             <span className="text-[17px] font-extrabold text-[#0D1117]">
               ₹{payment.amount.toLocaleString('en-IN')}
             </span>
-            <span className={cn('text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1', cfg.cls)}>
+            <ClayChip className={cn('gap-1', cfg.cls)}>
               <StatusIcon className="w-2.5 h-2.5" />
               {cfg.label}
-            </span>
+            </ClayChip>
           </div>
           <p className="text-[11px] text-[#9AACBE] mt-0.5">
             {fmtIST(payment.created_at)}
           </p>
         </div>
-        <div className="w-9 h-9 rounded-xl bg-[#F4F7FB] flex items-center justify-center flex-shrink-0">
+        <ClayIconBadge size="md">
           <Receipt className="w-4 h-4 text-[#6E7F94]" />
-        </div>
+        </ClayIconBadge>
       </div>
 
       {payment.base_amount != null && payment.platform_fee != null && (
@@ -59,7 +60,7 @@ function PaymentCard({ payment }: { payment: PaymentRecord }) {
       )}
 
       {payment.refunded_amount > 0 && (
-        <div className="flex items-center justify-between text-[11px] bg-[#F3E8FF] text-[#6B3FD4] rounded-lg px-2.5 py-1.5">
+        <div className="clay-raised-sm flex items-center justify-between text-[11px] text-[#6B3FD4] px-2.5 py-1.5">
           <span>Refunded</span>
           <span className="font-semibold">
             ₹{payment.refunded_amount}{payment.refunded_amount < payment.amount && ` · Net paid ₹${payment.amount - payment.refunded_amount}`}
@@ -68,7 +69,7 @@ function PaymentCard({ payment }: { payment: PaymentRecord }) {
       )}
 
       {payment.booking && (
-        <div className="bg-[#F4F7FB] rounded-xl p-3 space-y-1">
+        <div className="clay-pressed p-3 space-y-1">
           <p className="text-[12px] font-semibold text-[#0D1117]">{payment.booking.library_name}</p>
           <p className="text-[11px] text-[#6E7F94]">
             Seat {payment.booking.seat_label} · {fmtIST(payment.booking.start_time).split(',').slice(0, 2).join(',')}
@@ -86,11 +87,10 @@ function PaymentCard({ payment }: { payment: PaymentRecord }) {
             <p className="text-[9px] text-[#9AACBE] uppercase tracking-wide mb-0.5">Razorpay Payment ID</p>
             <p className="text-[11px] font-mono text-[#0D1117] truncate">{payment.razorpay_payment_id}</p>
           </div>
-          <button
-            onClick={() => copyToClipboard(payment.razorpay_payment_id!)}
-            className="flex-shrink-0 w-7 h-7 rounded-lg bg-[#F4F7FB] border border-[#E4EAF2] flex items-center justify-center hover:border-[#1246FF] transition-colors"
-          >
-            <Copy className="w-3 h-3 text-[#6E7F94]" />
+          <button onClick={() => copyToClipboard(payment.razorpay_payment_id!)} className="flex-shrink-0">
+            <ClayIconBadge interactive size="sm">
+              <Copy className="w-3 h-3 text-[#6E7F94]" />
+            </ClayIconBadge>
           </button>
         </div>
       )}
@@ -101,15 +101,14 @@ function PaymentCard({ payment }: { payment: PaymentRecord }) {
             <p className="text-[9px] text-[#9AACBE] uppercase tracking-wide mb-0.5">Order ID</p>
             <p className="text-[11px] font-mono text-[#0D1117] truncate">{payment.razorpay_order_id}</p>
           </div>
-          <button
-            onClick={() => copyToClipboard(payment.razorpay_order_id!)}
-            className="flex-shrink-0 w-7 h-7 rounded-lg bg-[#F4F7FB] border border-[#E4EAF2] flex items-center justify-center hover:border-[#1246FF] transition-colors"
-          >
-            <Copy className="w-3 h-3 text-[#6E7F94]" />
+          <button onClick={() => copyToClipboard(payment.razorpay_order_id!)} className="flex-shrink-0">
+            <ClayIconBadge interactive size="sm">
+              <Copy className="w-3 h-3 text-[#6E7F94]" />
+            </ClayIconBadge>
           </button>
         </div>
       )}
-    </div>
+    </ClayCard>
   )
 }
 
@@ -131,9 +130,9 @@ export default function PaymentsClient({ payments }: { payments: PaymentRecord[]
 
       {payments.length === 0 ? (
         <div className="flex flex-col items-center py-20 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-[#F4F7FB] flex items-center justify-center mb-4">
+          <ClayIconBadge size="lg" className="mb-4">
             <Receipt className="w-6 h-6 text-[#C4CDD8]" />
-          </div>
+          </ClayIconBadge>
           <h3 className="text-[14px] font-semibold text-[#0D1117] mb-1">No Payments Yet</h3>
           <p className="text-[12px] text-[#9AACBE] max-w-xs">
             Your payment history will appear here after your first booking.

@@ -51,7 +51,7 @@ export function BookingQRCode({ bookingId }: { bookingId: string }) {
 
   return (
     <div className="flex flex-col items-center gap-3 py-2">
-      <div className="bg-white p-3 rounded-2xl border border-[#E4EAF2] shadow-sm">
+      <div className="clay-raised p-3">
         <canvas ref={canvasRef} width={200} height={200} className={ready ? '' : 'opacity-0'} />
         {!ready && (
           <div className="w-[200px] h-[200px] flex items-center justify-center text-[11px] text-[#9AACBE]">
@@ -66,7 +66,7 @@ export function BookingQRCode({ bookingId }: { bookingId: string }) {
 
       <button
         onClick={handleCopy}
-        className="flex items-center gap-1.5 text-[11px] font-mono text-[#6E7F94] bg-[#F4F7FB] hover:bg-[#E8EFFE] px-3 py-1.5 rounded-lg transition-colors"
+        className="clay-raised-sm clay-interactive flex items-center gap-1.5 text-[11px] font-mono text-[#6E7F94] px-3 py-1.5"
         title="Copy booking ID"
       >
         {copied ? <Check className="w-3 h-3 text-[#0D7C54]" /> : <Copy className="w-3 h-3" />}
@@ -107,7 +107,7 @@ export function BookingQRModal({
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl max-w-[340px] w-full p-5 relative"
+        className="clay-raised max-w-[340px] w-full p-5 relative"
         onClick={(e) => e.stopPropagation()}
       >
         <button

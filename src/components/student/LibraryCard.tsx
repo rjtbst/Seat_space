@@ -112,10 +112,10 @@ export default function LibraryCardTile({ library }: { library: LibraryCard }) {
         </div>
 
         {/* Today's hours — derived from slot_configs (lib/booking/libraryStatus.ts) */}
-        {/* <div className="flex items-center gap-1.5 mt-2 text-[11px] text-[#6B6560]">
+        <div className="flex items-center gap-1.5 mt-2 text-[11px] text-[#6B6560]">
           <Clock className="w-3 h-3 flex-shrink-0" />
           {library.status.todayHoursLabel}
-        </div> */}
+        </div>
 
         {/* Seat availability bar — sunken clay groove with a raised fill */}
         {library.total_seats > 0 && (

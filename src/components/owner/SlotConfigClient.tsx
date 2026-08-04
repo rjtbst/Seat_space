@@ -106,10 +106,10 @@ export default function SlotConfigClient({
         title="Slot Configuration"
         subtitle={`${libraryName} · Set time slots and pricing`}
         action={
-          <button className="press" onClick={openAdd} style={{
-            padding: '9px 16px', borderRadius: 9, fontSize: 13, fontWeight: 700,
-            background: ACCENT, color: '#fff', border: 'none', cursor: 'pointer',
-            fontFamily: FONT_DISPLAY, boxShadow: '0 2px 10px rgba(13,124,84,.25)',
+          <button className="clay-btn-primary" onClick={openAdd} style={{
+            padding: '9px 16px', fontSize: 13, fontWeight: 700,
+            border: 'none', cursor: 'pointer',
+            fontFamily: FONT_DISPLAY, background: `linear-gradient(155deg, #22B37C, ${ACCENT}, #0A5E3F)`,
           }}>
             + Add Slot
           </button>
@@ -131,9 +131,10 @@ export default function SlotConfigClient({
             title="No slots configured yet"
             subtitle="Add your first time slot to define when students can book"
             action={
-              <button className="press" onClick={openAdd} style={{
-                padding: '9px 20px', borderRadius: 9, fontSize: 13, fontWeight: 700,
-                background: ACCENT, color: '#fff', border: 'none', cursor: 'pointer', fontFamily: FONT_DISPLAY,
+              <button className="clay-btn-primary" onClick={openAdd} style={{
+                padding: '9px 20px', fontSize: 13, fontWeight: 700,
+                border: 'none', cursor: 'pointer', fontFamily: FONT_DISPLAY,
+                background: `linear-gradient(155deg, #22B37C, ${ACCENT}, #0A5E3F)`,
               }}>
                 + Add First Slot
               </button>
@@ -148,7 +149,7 @@ export default function SlotConfigClient({
                     <th key={h} style={{
                       textAlign: 'left', padding: '10px 16px', fontSize: 11, fontWeight: 700,
                       color: TEXT_MUTED, textTransform: 'uppercase', letterSpacing: '.05em',
-                      borderBottom: `1px solid ${BORDER}`, background: '#F9F8F5', whiteSpace: 'nowrap',
+                      boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.3)', whiteSpace: 'nowrap',
                     }}>
                       {h}
                     </th>
@@ -157,7 +158,7 @@ export default function SlotConfigClient({
               </thead>
               <tbody>
                 {slots.map(slot => (
-                  <tr key={slot.id} style={{ borderBottom: '1px solid #F0EDE8' }}>
+                  <tr key={slot.id} style={{ boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.18)' }}>
                     <td style={{ padding: '13px 16px', fontWeight: 700, color: TEXT_PRIMARY, whiteSpace: 'nowrap' }}>
                       {slot.start} – {slot.end}
                     </td>
@@ -170,9 +171,9 @@ export default function SlotConfigClient({
                       <Toggle on={slot.is_active} onChange={v => handleToggle(slot, v)} disabled={isPending} />
                     </td>
                     <td style={{ padding: '13px 16px' }}>
-                      <button className="press" onClick={() => openEdit(slot)} style={{
-                        padding: '5px 12px', borderRadius: 7, fontSize: 12, fontWeight: 600,
-                        border: `1.5px solid ${BORDER}`, background: BG_CARD, color: '#3A4A5C',
+                      <button className="clay-raised-sm clay-interactive" onClick={() => openEdit(slot)} style={{
+                        padding: '5px 12px', fontSize: 12, fontWeight: 600,
+                        border: 'none', color: '#3A4A5C',
                         cursor: 'pointer', fontFamily: FONT_BODY,
                       }}>
                         Edit
@@ -193,9 +194,9 @@ export default function SlotConfigClient({
             <div style={{ fontSize: 15, fontWeight: 700, color: TEXT_PRIMARY }}>
               {editing ? `Edit Slot — ${editing.start} – ${editing.end}` : 'Add New Slot'}
             </div>
-            <button className="press" onClick={() => { setShowForm(false); setEditing(null) }} style={{
-              width: 28, height: 28, borderRadius: '50%', border: `1.5px solid ${BORDER}`,
-              background: BG_CARD, color: TEXT_SECONDARY, cursor: 'pointer', fontSize: 16,
+            <button className="clay-icon-badge clay-interactive" onClick={() => { setShowForm(false); setEditing(null) }} style={{
+              width: 28, height: 28, border: 'none',
+              color: TEXT_SECONDARY, cursor: 'pointer', fontSize: 16,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>×</button>
           </div>
@@ -223,12 +224,16 @@ export default function SlotConfigClient({
               {DAYS.map((day, idx) => {
                 const on = form.days.includes(idx)
                 return (
-                  <button className="press" key={day} type="button" onClick={() => toggleDay(idx)} style={{
-                    width: 40, height: 40, borderRadius: 9, fontSize: 12, fontWeight: 600,
+                  <button className="clay-interactive" key={day} type="button" onClick={() => toggleDay(idx)} style={{
+                    width: 40, height: 40, borderRadius: 12, fontSize: 12, fontWeight: 600,
                     cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    border: `1.5px solid ${on ? BLUE : BORDER}`,
-                    background: on ? BLUE_LIGHT : '#F9F8F5',
-                    color: on ? BLUE : TEXT_MUTED, transition: 'all .12s', fontFamily: FONT_BODY,
+                    border: 'none',
+                    background: on ? BLUE_LIGHT : 'var(--clay-surface)',
+                    color: on ? BLUE : TEXT_MUTED,
+                    boxShadow: on
+                      ? 'inset 2px 2px 5px rgba(30,92,255,.2), inset -1px -1px 4px rgba(255,255,255,.5)'
+                      : '2px 2px 6px rgba(163,177,198,.3), -2px -2px 5px rgba(255,255,255,.6)',
+                    fontFamily: FONT_BODY,
                   }}>
                     {day}
                   </button>
@@ -257,9 +262,9 @@ export default function SlotConfigClient({
 
           {/* Preview */}
           {form.price && form.start && form.end && (
-            <div style={{
-              background: ACCENT_LIGHT, border: `1px solid rgba(13,124,84,.2)`,
-              borderRadius: 10, padding: '10px 14px', marginBottom: 16, fontSize: 12, color: '#0A5E3F',
+            <div className="clay-raised-sm" style={{
+              background: ACCENT_LIGHT, border: 'none',
+              padding: '10px 14px', marginBottom: 16, fontSize: 12, color: '#0A5E3F',
             }}>
               <strong>Preview:</strong> {form.start}–{form.end} · {daysDisplay(form.days)} · ₹{form.price}/hr
               {form.discount ? ` · ₹${form.discount} discount` : ''}
@@ -269,16 +274,16 @@ export default function SlotConfigClient({
           <ErrorBanner error={error} />
 
           <div style={{ display: 'flex', gap: 10 }}>
-            <button className="press" onClick={() => { setShowForm(false); setEditing(null) }} style={{
-              flex: 1, padding: '11px 0', borderRadius: 9, fontSize: 13, fontWeight: 600,
-              border: `1.5px solid ${BORDER}`, background: BG_CARD, color: '#3A4A5C',
+            <button className="clay-raised-sm clay-interactive" onClick={() => { setShowForm(false); setEditing(null) }} style={{
+              flex: 1, padding: '11px 0', fontSize: 13, fontWeight: 600,
+              border: 'none', color: '#3A4A5C',
               cursor: 'pointer', fontFamily: FONT_BODY,
             }}>Cancel</button>
-            <button className="press" onClick={handleSave} disabled={isPending} style={{
-              flex: 2, padding: '11px 0', borderRadius: 9, fontSize: 14, fontWeight: 700,
-              border: 'none', background: ACCENT, color: '#fff',
+            <button className="clay-btn-primary" onClick={handleSave} disabled={isPending} style={{
+              flex: 2, padding: '11px 0', fontSize: 14, fontWeight: 700,
+              border: 'none', background: `linear-gradient(155deg, #22B37C, ${ACCENT}, #0A5E3F)`,
               cursor: isPending ? 'not-allowed' : 'pointer', fontFamily: FONT_DISPLAY,
-              boxShadow: '0 2px 10px rgba(13,124,84,.25)', opacity: isPending ? 0.7 : 1,
+              opacity: isPending ? 0.7 : 1,
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
             }}>
               {isPending && <Spinner />}

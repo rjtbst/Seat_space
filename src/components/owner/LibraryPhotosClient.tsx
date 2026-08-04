@@ -31,9 +31,11 @@ function Steps() {
             <div style={{
               width: 26, height: 26, borderRadius: '50%', display: 'flex',
               alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700,
-              background: s.done || s.active ? ACCENT : '#E2DDD4',
+              background: s.done || s.active ? ACCENT : 'var(--clay-surface)',
               color:      s.done || s.active ? '#fff'  : '#9AAAB8',
-              boxShadow:  s.active ? `0 0 0 3px ${ACCENT_LIGHT}` : 'none',
+              boxShadow:  s.done || s.active
+                ? '2px 2px 6px rgba(13,124,84,.35), -1px -1px 4px rgba(255,255,255,.4)'
+                : 'inset 2px 2px 5px rgba(163,177,198,.35), inset -1px -1px 3px rgba(255,255,255,.6)',
             }}>
               {s.done ? '✓' : i + 1}
             </div>
@@ -83,10 +85,13 @@ function DropZone({ label, hint, onFiles, children, aspect }: {
         onDragLeave={() => setOver(false)}
         onDrop={e => { e.preventDefault(); setOver(false); if (e.dataTransfer.files.length) onFiles(e.dataTransfer.files) }}
         style={{
-          border: `2px dashed ${over ? ACCENT : '#E2DDD4'}`,
+          border: 'none',
           borderRadius: 12, padding: children ? 0 : 32,
           textAlign: 'center', cursor: 'pointer',
-          background: over ? ACCENT_LIGHT : '#F9F8F5',
+          background: over ? ACCENT_LIGHT : 'var(--clay-surface)',
+          boxShadow: over
+            ? 'inset 2px 2px 6px rgba(13,124,84,.2), inset -1px -1px 5px rgba(255,255,255,.5)'
+            : 'inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6)',
           transition: 'all .15s', aspectRatio: aspect,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           overflow: 'hidden', position: 'relative',
@@ -201,7 +206,7 @@ export default function LibraryPhotosClient() {
     return (
       <div style={{
         minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: 'linear-gradient(135deg,#F4F7FB 0%,#EDE8DC 100%)',
+        background: 'var(--clay-bg)',
         fontFamily: 'DM Sans, sans-serif',
       }}>
         <div style={{ textAlign: 'center' }}>
@@ -216,7 +221,7 @@ export default function LibraryPhotosClient() {
   return (
     <div style={{
       minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'linear-gradient(135deg,#F4F7FB 0%,#EDE8DC 100%)',
+      background: 'var(--clay-bg)',
       fontFamily: 'DM Sans, sans-serif', padding: '24px 16px',
     }}>
       <div style={{ width: '100%', maxWidth: 560 }}>
@@ -224,9 +229,9 @@ export default function LibraryPhotosClient() {
 
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
           <div style={{
-            width: 52, height: 52, borderRadius: 14, background: ACCENT,
+            width: 52, height: 52, borderRadius: 16, background: ACCENT,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 16px', boxShadow: '0 4px 18px rgba(13,124,84,.32)', fontSize: 24,
+            margin: '0 auto 16px', boxShadow: '4px 4px 12px rgba(13,124,84,.35), -3px -3px 8px rgba(255,255,255,.5)', fontSize: 24,
           }}>📸</div>
           <h1 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 26, color: '#0A0D12', letterSpacing: '-0.04em', marginBottom: 6 }}>
             Upload library photos
@@ -236,10 +241,14 @@ export default function LibraryPhotosClient() {
           </p>
         </div>
 
-        <div style={{ background: '#FDFCF9', border: '1px solid #E2DDD4', borderRadius: 20, padding: '28px 28px 24px', boxShadow: '0 4px 28px rgba(10,13,18,.08)' }}>
+        <div style={{
+          background: 'var(--clay-surface)', border: 'none', borderRadius: 22,
+          padding: '28px 28px 24px',
+          boxShadow: '8px 8px 20px rgba(163,177,198,.35), -6px -6px 16px rgba(255,255,255,.7)',
+        }}>
 
           {/* Info banner */}
-          <div style={{ background: ACCENT_LIGHT, border: `1px solid rgba(13,124,84,.2)`, borderRadius: 12, padding: '12px 14px', marginBottom: 20, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+          <div className="clay-raised-sm" style={{ background: ACCENT_LIGHT, border: 'none', padding: '12px 14px', marginBottom: 20, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
             <span style={{ fontSize: 16, flexShrink: 0 }}>💡</span>
             <p style={{ fontSize: 13, color: '#0A5E3F', margin: 0, lineHeight: 1.5 }}>
               Upload at least 1 cover photo to go live. Aim for <strong>4+ photos</strong> — main hall, entrance, seating area, amenities. JPG/PNG/WebP, max 10 MB each.
@@ -262,11 +271,12 @@ export default function LibraryPhotosClient() {
               ) : cover ? (
                 <>
                   <img src={cover.previewUrl} alt="cover" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  <button className="press"
+                  <button
                     onClick={e => { e.stopPropagation(); remove(cover, false) }}
+                    className="clay-raised-sm clay-interactive"
                     style={{ position: 'absolute', top: 8, right: 8, width: 28, height: 28, borderRadius: '50%', background: '#C5282C', border: 'none', color: '#fff', fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   >×</button>
-                  <div style={{ position: 'absolute', bottom: 8, left: 8, background: ACCENT, color: '#fff', fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 6, letterSpacing: '.04em' }}>
+                  <div className="dash-badge" style={{ position: 'absolute', bottom: 8, left: 8, background: ACCENT, color: '#fff', letterSpacing: '.04em' }}>
                     COVER
                   </div>
                 </>
@@ -306,8 +316,9 @@ export default function LibraryPhotosClient() {
                       Make cover
                     </span>
                   </div>
-                  <button className="press"
+                  <button
                     onClick={e => { e.stopPropagation(); remove(photo, true, idx) }}
+                    className="clay-raised-sm clay-interactive"
                     style={{ position: 'absolute', top: 4, right: 4, width: 20, height: 20, borderRadius: '50%', background: '#C5282C', border: 'none', color: '#fff', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}
                   >×</button>
                 </div>
@@ -315,7 +326,7 @@ export default function LibraryPhotosClient() {
 
               {/* Uploading slot */}
               {uploading?.startsWith('extra-') && (
-                <div style={{ aspectRatio: '1', borderRadius: 10, background: ACCENT_LIGHT, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div className="clay-pressed" style={{ aspectRatio: '1', borderRadius: 10, background: ACCENT_LIGHT, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <div style={{ width: 20, height: 20, border: `2px solid ${ACCENT_LIGHT}`, borderTopColor: ACCENT, borderRadius: '50%', animation: 'spin .65s linear infinite' }} />
                 </div>
               )}
@@ -324,12 +335,11 @@ export default function LibraryPhotosClient() {
               {extras.length < 8 && Array.from({
                 length: Math.min(8 - extras.length - (uploading?.startsWith('extra-') ? 1 : 0), 8),
               }).map((_, i) => (
-                <label key={`empty-${i}`} style={{
+                <label key={`empty-${i}`} className="clay-pressed" style={{
                   aspectRatio: '1', borderRadius: 10,
-                  border: '2px dashed #E2DDD4', display: 'flex',
+                  border: 'none', display: 'flex',
                   alignItems: 'center', justifyContent: 'center',
                   fontSize: 22, color: '#9AAAB8', cursor: 'pointer',
-                  background: '#F9F8F5', transition: 'all .15s',
                 }}>
                   <input type="file" accept="image/jpeg,image/png,image/webp" style={{ display: 'none' }}
                     onChange={e => {
@@ -354,39 +364,39 @@ export default function LibraryPhotosClient() {
           )}
 
           {error && (
-            <div style={{ background: '#FDEAEA', border: '1px solid rgba(212,43,43,.2)', borderRadius: 10, padding: '10px 14px', marginBottom: 16, display: 'flex', gap: 8 }}>
+            <div className="clay-raised-sm" style={{ background: '#FDEAEA', border: 'none', padding: '10px 14px', marginBottom: 16, display: 'flex', gap: 8 }}>
               <span>⚠️</span>
               <p style={{ fontSize: 13, color: '#9B1C1C', margin: 0 }}>{error}</p>
             </div>
           )}
 
-          <div style={{ height: 1, background: '#E2DDD4', margin: '4px 0 20px' }} />
+          <div style={{ height: 1, boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.3)', margin: '4px 0 20px' }} />
 
           <div style={{ display: 'flex', gap: 10 }}>
-            <button className="press"
+            <button className="clay-raised-sm clay-interactive"
               type="button"
               onClick={() => router.push(`/onboarding/add-library?id=${libraryId}`)}
               style={{
-                flex: 1, padding: '13px 0', borderRadius: 10, fontSize: 14, fontWeight: 600,
-                fontFamily: 'DM Sans, sans-serif', border: '1.5px solid #E2DDD4',
-                background: '#FDFCF9', color: '#3A4A5C', cursor: 'pointer',
+                flex: 1, padding: '13px 0', fontSize: 14, fontWeight: 600,
+                fontFamily: 'DM Sans, sans-serif', border: 'none',
+                color: '#3A4A5C', cursor: 'pointer',
               }}
             >
               ← Back
             </button>
-            <button className="press"
+            <button
               onClick={() => startTransition(() => router.push(`/onboarding/go-live?id=${libraryId}`))}
               disabled={!canContinue || isPending}
               style={{
-                flex: 2, padding: '13px 0', borderRadius: 10, fontSize: 15,
+                flex: 2, padding: '13px 0', borderRadius: 14, fontSize: 15,
                 fontWeight: 700, fontFamily: 'Syne, sans-serif', border: 'none',
-                background: canContinue ? ACCENT : '#C8D4C8', color: '#fff',
+                background: canContinue ? `linear-gradient(155deg, #22B37C, ${ACCENT}, ${ACCENT_DARK})` : '#C8D4C8', color: '#fff',
                 cursor: canContinue ? 'pointer' : 'not-allowed',
-                boxShadow: canContinue ? '0 4px 16px rgba(13,124,84,.3)' : 'none',
+                boxShadow: canContinue
+                  ? '4px 4px 12px rgba(13,124,84,.35), -3px -3px 8px rgba(255,255,255,.4), inset 0 1px 1px rgba(255,255,255,.3)'
+                  : 'none',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
               }}
-              onMouseEnter={e => { if (canContinue) e.currentTarget.style.background = ACCENT_DARK }}
-              onMouseLeave={e => { if (canContinue) e.currentTarget.style.background = ACCENT }}
             >
               {isPending && <span style={{ width: 15, height: 15, border: '2px solid rgba(255,255,255,.35)', borderTopColor: '#fff', borderRadius: '50%', display: 'inline-block', animation: 'spin .65s linear infinite' }} />}
               {isPending ? 'Saving…' : 'Save & Continue →'}

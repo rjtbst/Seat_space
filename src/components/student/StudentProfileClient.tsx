@@ -26,9 +26,11 @@ function Steps() {
             <div style={{
               width: 28, height: 28, borderRadius: '50%', display: 'flex', alignItems: 'center',
               justifyContent: 'center', fontSize: 11, fontWeight: 700,
-              background: s.done ? ACCENT : s.active ? ACCENT : '#E2DDD4',
+              background: s.done || s.active ? ACCENT : 'var(--clay-surface)',
               color: s.done || s.active ? '#fff' : '#9AAAB8',
-              boxShadow: s.active ? `0 0 0 4px ${ACCENT_LIGHT}` : 'none',
+              boxShadow: s.done || s.active
+                ? '2px 2px 6px rgba(30,92,255,.35), -1px -1px 4px rgba(255,255,255,.4)'
+                : 'inset 2px 2px 5px rgba(163,177,198,.35), inset -1px -1px 3px rgba(255,255,255,.6)',
               transition: 'all .2s',
             }}>
               {s.done ? '✓' : i + 1}
@@ -58,15 +60,16 @@ function Steps() {
 const inpBase: React.CSSProperties = {
   width: '100%',
   padding: '11px 13px',
-  border: '1.5px solid #E2DDD4',
-  borderRadius: 10,
+  border: 'none',
+  borderRadius: 12,
   fontSize: 14,
   color: '#0A0D12',
   outline: 'none',
   fontFamily: 'DM Sans, sans-serif',
-  background: '#FDFCF9',
+  background: 'var(--clay-surface)',
   boxSizing: 'border-box',
-  transition: 'border-color .15s, box-shadow .15s',
+  boxShadow: 'inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6)',
+  transition: 'box-shadow .15s',
   appearance: 'none' as const,
 }
 
@@ -103,12 +106,10 @@ export default function StudentProfileClient() {
   const valid = firstName.trim().length >= 1 && !!city
 
   const onFocus = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
-    e.target.style.borderColor = ACCENT
-    e.target.style.boxShadow   = `0 0 0 3px ${ACCENT_LIGHT}`
+    e.target.style.boxShadow = `inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6), 0 0 0 3px ${ACCENT_LIGHT}`
   }
   const onBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
-    e.target.style.borderColor = '#E2DDD4'
-    e.target.style.boxShadow   = 'none'
+    e.target.style.boxShadow = 'inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6)'
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -150,9 +151,11 @@ export default function StudentProfileClient() {
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
           <div style={{
-            width: 52, height: 52, borderRadius: 14, background: ACCENT,
+            width: 52, height: 52, borderRadius: 16, background: ACCENT,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 16px', boxShadow: '0 4px 18px rgba(30,92,255,.32)', fontSize: 24,
+            margin: '0 auto 16px',
+            boxShadow: '4px 4px 12px rgba(30,92,255,.35), -3px -3px 8px rgba(255,255,255,.5)',
+            fontSize: 24,
           }}>
             🎓
           </div>
@@ -169,9 +172,9 @@ export default function StudentProfileClient() {
 
         {/* Card */}
         <div style={{
-          background: '#FDFCF9', border: '1px solid #E2DDD4',
-          borderRadius: 20, padding: '28px 28px 24px',
-          boxShadow: '0 4px 28px rgba(10,13,18,.08)',
+          background: 'var(--clay-surface)', border: 'none',
+          borderRadius: 22, padding: '28px 28px 24px',
+          boxShadow: '8px 8px 20px rgba(163,177,198,.35), -6px -6px 16px rgba(255,255,255,.7)',
         }}>
           <form onSubmit={handleSubmit}>
 
@@ -249,10 +252,12 @@ export default function StudentProfileClient() {
                       onClick={() => setExamGoal(selected ? '' : goal)}
                       style={{
                         padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600,
-                        cursor: 'pointer', fontFamily: 'DM Sans, sans-serif',
-                        border: `1.5px solid ${selected ? ACCENT : '#E2DDD4'}`,
-                        background: selected ? ACCENT_LIGHT : '#FDFCF9',
+                        cursor: 'pointer', fontFamily: 'DM Sans, sans-serif', border: 'none',
+                        background: selected ? ACCENT_LIGHT : 'var(--clay-surface)',
                         color: selected ? ACCENT : '#6B7689',
+                        boxShadow: selected
+                          ? 'inset 2px 2px 5px rgba(30,92,255,.2), inset -1px -1px 4px rgba(255,255,255,.5)'
+                          : '2px 2px 6px rgba(163,177,198,.3), -2px -2px 5px rgba(255,255,255,.6)',
                         transition: 'all .15s',
                       }}
                     >
@@ -265,9 +270,10 @@ export default function StudentProfileClient() {
 
             {error && (
               <div style={{
-                background: '#FDEAEA', border: '1px solid rgba(212,43,43,.2)',
-                borderRadius: 10, padding: '10px 14px', marginBottom: 16,
+                background: '#FDEAEA', border: 'none',
+                borderRadius: 12, padding: '10px 14px', marginBottom: 16,
                 display: 'flex', gap: 8, alignItems: 'flex-start',
+                boxShadow: '2px 2px 6px rgba(212,43,43,.15), -2px -2px 5px rgba(255,255,255,.5)',
               }}>
                 <span style={{ flexShrink: 0 }}>⚠️</span>
                 <p style={{ fontSize: 13, color: '#9B1C1C', margin: 0, lineHeight: 1.4 }}>{error}</p>
@@ -278,16 +284,17 @@ export default function StudentProfileClient() {
               type="submit"
               disabled={!valid || isPending}
               style={{
-                width: '100%', padding: '13px 0', borderRadius: 10, fontSize: 15,
+                width: '100%', padding: '13px 0', borderRadius: 14, fontSize: 15,
                 fontWeight: 700, fontFamily: 'Syne, sans-serif', border: 'none',
-                background: valid ? ACCENT : '#C8D4C8', color: '#fff',
+                background: valid ? `linear-gradient(155deg, #4D78FF, ${ACCENT}, ${ACCENT_DARK})` : '#C8D4C8',
+                color: '#fff',
                 cursor: valid ? 'pointer' : 'not-allowed',
-                boxShadow: valid ? '0 4px 16px rgba(30,92,255,.3)' : 'none',
+                boxShadow: valid
+                  ? '4px 4px 12px rgba(30,92,255,.35), -3px -3px 8px rgba(255,255,255,.4), inset 0 1px 1px rgba(255,255,255,.3)'
+                  : 'none',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 transition: 'all .2s',
               }}
-              onMouseEnter={e => { if (valid) e.currentTarget.style.background = ACCENT_DARK }}
-              onMouseLeave={e => { if (valid) e.currentTarget.style.background = ACCENT }}
             >
               {isPending && (
                 <span style={{

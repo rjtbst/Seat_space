@@ -88,7 +88,7 @@ export default function NotificationBell() {
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={handleOpen}
-          className="relative w-9 h-9 rounded-[9px] bg-[#F4F7FB] border-[1.5px] border-[#E4EAF2] flex items-center justify-center text-[#6E7F94] hover:bg-[#E8EDF5] hover:border-[#B8C4D4] transition-all"
+          className="clay-icon-badge clay-interactive relative w-9 h-9 flex items-center justify-center text-[#6E7F94]"
           aria-label="Notifications"
         >
           <Bell className="w-[15px] h-[15px]" />
@@ -101,10 +101,10 @@ export default function NotificationBell() {
 
         {/* Dropdown */}
         {open && (
-          <div className="absolute right-0 top-11 w-[340px] max-h-[480px] bg-white border border-[#E4EAF2] rounded-2xl shadow-[0_8px_40px_rgba(13,17,23,.14)] z-[300] flex flex-col overflow-hidden">
+          <div className="clay-raised absolute right-0 top-11 w-[340px] max-h-[480px] z-[300] flex flex-col overflow-hidden">
 
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-[#F0F4F8]">
+            <div className="flex items-center justify-between px-4 py-3" style={{ boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.25)' }}>
               <span className="text-[13px] font-bold text-[#0D1117]">Notifications</span>
               <div className="flex items-center gap-2">
                 {unreadCount > 0 && (
@@ -149,14 +149,15 @@ export default function NotificationBell() {
                     key={n.id}
                     onClick={() => handleNotificationClick(n)}
                     className={[
-                      'flex gap-3 px-4 py-3 border-b border-[#F8FAFB] cursor-pointer transition-colors',
+                      'flex gap-3 px-4 py-3 cursor-pointer transition-colors',
                       isUnread
                         ? 'bg-[#F0F5FF] hover:bg-[#E8EFFE]'
                         : 'hover:bg-[#F8FAFB]',
                     ].join(' ')}
+                    style={{ boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.18)' }}
                   >
                     {/* Icon */}
-                    <div className="w-8 h-8 rounded-full bg-white border border-[#E4EAF2] flex items-center justify-center text-base flex-shrink-0 mt-0.5">
+                    <div className="clay-icon-badge w-8 h-8 !rounded-full flex items-center justify-center text-base flex-shrink-0 mt-0.5">
                       {eventIcon(n.event)}
                     </div>
 
@@ -202,7 +203,7 @@ export default function NotificationBell() {
 
             {/* Footer */}
             {notifications.length > 0 && (
-              <div className="px-4 py-2.5 border-t border-[#F0F4F8] text-center">
+              <div className="px-4 py-2.5 text-center" style={{ boxShadow: 'inset 0 1px 0 rgba(163,177,198,.25)' }}>
                 <span className="text-[11px] text-[#9AACBE]">
                   Showing last {notifications.length} notifications
                 </span>

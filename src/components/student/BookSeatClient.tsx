@@ -167,8 +167,8 @@ function TimePicker({ value, onChange, minMins, maxMins, disabled, id }: TimePic
   }
 
   const selStyle = [
-    'bg-white border border-[#DDE4EE] rounded-lg px-2 py-2 text-[13px] font-semibold',
-    'text-[#0D1117] outline-none focus:border-[#1E5CFF] transition-colors',
+    'clay-input px-2 py-2 text-[13px] font-semibold',
+    'text-[#0D1117] outline-none transition-shadow',
     disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
   ].join(' ')
 
@@ -259,7 +259,7 @@ const STEP_LABELS = ['Slot & Time', 'Pick Seat', 'Confirm & Pay'] as const
 
 function StepBar({ current }: { current: 1 | 2 | 3 }) {
   return (
-    <div className="flex items-center px-4 py-3 bg-white border-b border-[#E4EAF2]">
+    <div className="flex items-center px-4 py-3" style={{ background: 'var(--clay-surface)', boxShadow: '0 4px 12px rgba(163,177,198,.2)' }}>
       {STEP_LABELS.map((label, idx) => {
         const step = (idx + 1) as 1 | 2 | 3
         const done   = step < current
@@ -271,8 +271,8 @@ function StepBar({ current }: { current: 1 | 2 | 3 }) {
                 className={[
                   'w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold transition-all',
                   done   ? 'bg-[#1E5CFF] text-white'
-                  : active ? 'bg-[#1E5CFF] text-white shadow-[0_0_0_3px_rgba(30,92,255,0.2)]'
-                  : 'bg-[#F4F7FB] text-[#9AACBE] border border-[#DDE4EE]',
+                  : active ? 'clay-pressed text-[#1E5CFF]'
+                  : 'clay-raised-sm text-[#9AACBE]',
                 ].join(' ')}
               >
                 {done ? <CheckCircle className="w-3.5 h-3.5" /> : step}
@@ -307,7 +307,7 @@ function StepBar({ current }: { current: 1 | 2 | 3 }) {
 
 function ErrorBox({ msg }: { msg: string }) {
   return (
-    <div className="flex items-start gap-2 bg-[#FFF0F0] border border-[#FCA5A5] rounded-xl px-3 py-2.5 text-[12px] text-[#C5282C]">
+    <div className="clay-raised-sm flex items-start gap-2 px-3 py-2.5 text-[12px] text-[#C5282C]" style={{ background: '#FFF0F0' }}>
       <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
       <span>{msg}</span>
     </div>
@@ -824,15 +824,15 @@ export default function BookSeatClient({
      RENDER
   ══════════════════════════════════════════════════════════════════════ */
   return (
-    <div className="min-h-screen bg-[#F4F7FB] flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ background: 'var(--clay-bg)' }}>
 
       {/* Sticky header */}
-      <div className="sticky top-0 z-20 bg-white border-b border-[#E4EAF2] shadow-sm">
+      <div className="sticky top-0 z-20" style={{ background: 'var(--clay-surface)', boxShadow: '0 4px 14px rgba(163,177,198,.25)' }}>
         <div className="flex items-center gap-3 px-4 py-3">
           <button
             type="button"
             onClick={handleBack}
-            className="w-8 h-8 rounded-lg border border-[#DDE4EE] flex items-center justify-center text-[#6E7F94] hover:bg-[#F4F7FB] transition-colors flex-shrink-0"
+            className="clay-icon-badge clay-interactive w-8 h-8 flex items-center justify-center text-[#6E7F94] flex-shrink-0"
             aria-label="Go back"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -845,7 +845,7 @@ export default function BookSeatClient({
           </div>
           <span
             className={[
-              'text-[11px] font-bold px-2.5 py-1 rounded-full flex-shrink-0',
+              'clay-chip text-[11px] font-bold px-2.5 py-1 flex-shrink-0',
               library.status.isOpen
                 ? 'bg-[#E2F5EE] text-[#0D7C54]'
                 : 'bg-[#FEE2E2] text-[#C5282C]',
@@ -877,10 +877,8 @@ export default function BookSeatClient({
                     type="button"
                     onClick={() => handleSlotSelect(slot.id)}
                     className={[
-                      'press w-full flex items-center justify-between rounded-xl border px-4 py-3.5 text-left transition-all',
-                      active
-                        ? 'border-[#1E5CFF] bg-[rgba(30,92,255,0.05)] shadow-[0_0_0_1px_#1E5CFF]'
-                        : 'border-[#DDE4EE] bg-white hover:border-[#1E5CFF]',
+                      'clay-interactive w-full flex items-center justify-between rounded-xl px-4 py-3.5 text-left',
+                      active ? 'clay-pressed' : 'clay-raised-sm',
                     ].join(' ')}
                   >
                     <div>
@@ -916,10 +914,10 @@ export default function BookSeatClient({
             <p className="text-[11px] font-semibold text-[#9AACBE] uppercase tracking-widest mb-3">
               Choose your time
             </p>
-            <div className="bg-white border border-[#DDE4EE] rounded-xl overflow-hidden divide-y divide-[#F0F4F8]">
+            <div className="clay-raised overflow-hidden">
 
               {/* Date */}
-              <div className="flex items-center gap-3 px-4 py-3">
+              <div className="flex items-center gap-3 px-4 py-3" style={{ boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.2)' }}>
                 <Calendar className="w-4 h-4 text-[#9AACBE] flex-shrink-0" />
                 <span className="text-[12px] text-[#9AACBE] w-14 flex-shrink-0">Date</span>
                 <input
@@ -932,7 +930,7 @@ export default function BookSeatClient({
               </div>
 
               {/* Start time */}
-              <div className="flex items-center gap-3 px-4 py-3 flex-wrap sm:flex-nowrap">
+              <div className="flex items-center gap-3 px-4 py-3 flex-wrap sm:flex-nowrap" style={{ boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.2)' }}>
                 <Clock className="w-4 h-4 text-[#9AACBE] flex-shrink-0" />
                 <span className="text-[12px] text-[#9AACBE] w-14 flex-shrink-0">Start</span>
                 <div className="flex-1">
@@ -976,7 +974,7 @@ export default function BookSeatClient({
 
           {/* Price preview */}
           {!step1Error && durationH >= 0.5 && (
-            <div className="bg-[rgba(30,92,255,0.06)] border border-[rgba(30,92,255,0.18)] rounded-xl px-4 py-3 flex items-center justify-between">
+            <div className="clay-raised-sm px-4 py-3 flex items-center justify-between" style={{ background: 'rgba(30,92,255,0.06)' }}>
               <div>
                 <div className="text-[11px] text-[#6E7F94]">Estimated total</div>
                 {previewLoading
@@ -1004,7 +1002,7 @@ export default function BookSeatClient({
             type="button"
             onClick={goToStep2}
             disabled={!!step1Error || !startTime || !endTime || previewLoading || (!pricePreview && !step1Error)}
-            className="press w-full py-3.5 rounded-xl bg-[#1E5CFF] text-white text-[14px] font-bold flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(30,92,255,.3)] hover:bg-[#1447D4] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
+            className="clay-btn-primary w-full py-3.5 text-[14px] font-bold flex items-center justify-center gap-2 disabled:cursor-not-allowed"
           >
             {previewLoading
               ? <><Loader2 className="w-4 h-4 animate-spin" /> Calculating price…</>
@@ -1020,16 +1018,16 @@ export default function BookSeatClient({
 
           {/* Time summary pills */}
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 bg-white border border-[#DDE4EE] rounded-full px-3 py-1 text-[12px] font-medium text-[#3A4A5C]">
+            <span className="clay-chip gap-1.5 px-3 py-1 text-[12px] font-medium text-[#3A4A5C]">
               <Calendar className="w-3.5 h-3.5 text-[#9AACBE]" />
               {fmtDate(`${selectedDate}T${startTime}`)}
             </span>
-            <span className="inline-flex items-center gap-1.5 bg-white border border-[#DDE4EE] rounded-full px-3 py-1 text-[12px] font-medium text-[#3A4A5C]">
+            <span className="clay-chip gap-1.5 px-3 py-1 text-[12px] font-medium text-[#3A4A5C]">
               <Clock className="w-3.5 h-3.5 text-[#9AACBE]" />
               {fmt12h(startTime)} – {timeToMinutes(endTime) === 0 ? '12:00 AM' : fmt12h(endTime)}
             </span>
             {pricePreview && (
-              <span className="inline-flex items-center gap-1.5 bg-[rgba(30,92,255,0.08)] border border-[rgba(30,92,255,0.2)] rounded-full px-3 py-1 text-[12px] font-bold text-[#1E5CFF]">
+              <span className="clay-chip gap-1.5 px-3 py-1 text-[12px] font-bold text-[#1E5CFF]" style={{ background: 'rgba(30,92,255,0.08)' }}>
                 <Tag className="w-3.5 h-3.5" />
                 ₹{pricePreview.amount}
               </span>
@@ -1047,7 +1045,7 @@ export default function BookSeatClient({
           </p>
 
           {/* SeatGrid */}
-          <div className="bg-white border border-[#DDE4EE] rounded-xl p-4">
+          <div className="clay-raised p-4">
             <SeatGrid
               seats={seats}
               selectedId={selectedSeatId}
@@ -1067,7 +1065,7 @@ export default function BookSeatClient({
 
           {/* Selected seat summary */}
           {selectedSeat && (
-            <div className="bg-[rgba(30,92,255,0.05)] border border-[rgba(30,92,255,0.2)] rounded-xl px-4 py-3 flex items-center justify-between">
+            <div className="clay-raised-sm px-4 py-3 flex items-center justify-between" style={{ background: 'rgba(30,92,255,0.05)' }}>
               <div className="flex items-center gap-2">
                 <Armchair className="w-4 h-4 text-[#1E5CFF]" />
                 <span className="text-[13px] font-bold text-[#0D1117]">
@@ -1089,7 +1087,7 @@ export default function BookSeatClient({
             type="button"
             onClick={goToStep3}
             disabled={!selectedSeatId || seatsLoading}
-            className="press w-full py-3.5 rounded-xl bg-[#1E5CFF] text-white text-[14px] font-bold flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(30,92,255,.3)] hover:bg-[#1447D4] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
+            className="clay-btn-primary w-full py-3.5 text-[14px] font-bold flex items-center justify-center gap-2 disabled:cursor-not-allowed"
           >
             Continue to Payment
             <ArrowRight className="w-4 h-4" />
@@ -1097,7 +1095,7 @@ export default function BookSeatClient({
           <button
             type="button"
             onClick={handleBack}
-            className="press w-full py-3 rounded-xl bg-white border border-[#DDE4EE] text-[13px] font-medium text-[#6E7F94] hover:bg-[#F4F7FB] transition-colors"
+            className="clay-raised-sm clay-interactive w-full py-3 text-[13px] font-medium text-[#6E7F94]"
           >
             Back
           </button>
@@ -1113,7 +1111,7 @@ export default function BookSeatClient({
           </p>
 
           {/* Summary card */}
-          <div className="bg-white border border-[#DDE4EE] rounded-xl overflow-hidden divide-y divide-[#F0F4F8]">
+          <div className="clay-raised overflow-hidden">
             {[
               { icon: MapPin,   label: 'Library',  value: library.name },
               { icon: MapPin,   label: 'Address',  value: `${library.area}, ${library.city}` },
@@ -1122,8 +1120,8 @@ export default function BookSeatClient({
               { icon: Clock,    label: 'Time',     value: `${fmt12h(startTime)} – ${timeToMinutes(endTime) === 0 ? '12:00 AM' : fmt12h(endTime)}` },
               { icon: Clock,    label: 'Duration', value: `${durationH.toFixed(1)} hrs` },
               { icon: Tag,      label: 'Slot rate',value: `₹${effectiveRate}/hr` },
-            ].map(({ icon: Icon, label, value }) => (
-              <div key={label} className="flex items-center gap-3 px-4 py-3">
+            ].map(({ icon: Icon, label, value }, i, arr) => (
+              <div key={label} className="flex items-center gap-3 px-4 py-3" style={i < arr.length - 1 ? { boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.2)' } : undefined}>
                 <Icon className="w-4 h-4 text-[#9AACBE] flex-shrink-0" />
                 <span className="text-[12px] text-[#9AACBE] w-20 flex-shrink-0">{label}</span>
                 <span className="text-[13px] font-semibold text-[#0D1117] flex-1 text-right">{value}</span>
@@ -1133,7 +1131,7 @@ export default function BookSeatClient({
 
           {/* Subscription option — only rendered when eligible for the currently selected time */}
           {subsForCurrentTime.length > 0 && (
-            <div className="bg-[#F0F9F4] border border-[#B8E6C9] rounded-xl px-4 py-3.5 space-y-2.5">
+            <div className="clay-raised-sm px-4 py-3.5 space-y-2.5" style={{ background: '#F0F9F4' }}>
               <label className="flex items-start gap-2.5 cursor-pointer">
                 <input
                   type="checkbox"
@@ -1163,7 +1161,7 @@ export default function BookSeatClient({
                 <select
                   value={useSubId}
                   onChange={e => setUseSubId(e.target.value)}
-                  className="w-full px-2.5 py-2 rounded-lg border border-[#B8E6C9] bg-white text-[12px] font-medium text-[#0A5C3E]"
+                  className="clay-input w-full px-2.5 py-2 text-[12px] font-medium text-[#0A5C3E]"
                 >
                   {subsForCurrentTime.map(s => (
                     <option key={s.id} value={s.id}>
@@ -1180,7 +1178,7 @@ export default function BookSeatClient({
               free-with-membership option isn't showing, instead of
               silently hiding it with no context. */}
           {subsForCurrentTime.length === 0 && eligibleSubs.length > 0 && startTime && endTime && (
-            <div className="bg-[#FFF7ED] border border-[#FDE3C5] rounded-xl px-4 py-3 text-[12px] text-[#92400E]">
+            <div className="clay-raised-sm px-4 py-3 text-[12px] text-[#92400E]" style={{ background: '#FFF7ED' }}>
               {eligibleSubs.length === 1
                 ? (() => {
                     const s = eligibleSubs[0]
@@ -1197,14 +1195,14 @@ export default function BookSeatClient({
           {/* Price breakdown — hidden when booking via subscription, since
               nothing is charged */}
           {useSubId ? (
-            <div className="bg-white border border-[#DDE4EE] rounded-xl px-4 py-4">
+            <div className="clay-raised px-4 py-4">
               <div className="flex justify-between items-center">
                 <span className="text-[14px] font-bold text-[#0D1117]">Total payable</span>
                 <span className="text-[20px] font-bold text-[#0D7C54]">Covered by plan</span>
               </div>
             </div>
           ) : (
-            <div className="bg-white border border-[#DDE4EE] rounded-xl px-4 py-4 space-y-2">
+            <div className="clay-raised px-4 py-4 space-y-2">
               <div className="flex justify-between text-[12px] text-[#6E7F94]">
                 <span>₹{effectiveRate} × {durationH.toFixed(1)} hr</span>
                 <span>₹{pricePreview?.amount ?? '—'}</span>
@@ -1213,7 +1211,7 @@ export default function BookSeatClient({
                 <span>Platform fee</span>
                 <span>₹{pricePreview?.platformFee ?? '—'}</span>
               </div>
-              <div className="flex justify-between items-center border-t border-[#F0F4F8] pt-3 mt-2">
+              <div className="flex justify-between items-center pt-3 mt-2" style={{ boxShadow: 'inset 0 1px 0 rgba(163,177,198,.25)' }}>
                 <span className="text-[14px] font-bold text-[#0D1117]">Total payable</span>
                 <span className="text-[22px] font-bold text-[#1E5CFF]">₹{pricePreview?.totalPayable ?? '—'}</span>
               </div>
@@ -1237,9 +1235,10 @@ export default function BookSeatClient({
             disabled={payLoading || isPending || (!useSubId && !pricePreview)}
             className={
               useSubId
-                ? "press w-full py-3.5 rounded-xl bg-[#0D7C54] text-white text-[14px] font-bold flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(13,124,84,.3)] hover:bg-[#0A5C3E] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                : "press w-full py-3.5 rounded-xl bg-[#1E5CFF] text-white text-[14px] font-bold flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(30,92,255,.3)] hover:bg-[#1447D4] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                ? "clay-btn-primary w-full py-3.5 text-[14px] font-bold flex items-center justify-center gap-2 disabled:cursor-not-allowed"
+                : "clay-btn-primary w-full py-3.5 text-[14px] font-bold flex items-center justify-center gap-2 disabled:cursor-not-allowed"
             }
+            style={useSubId ? { background: 'linear-gradient(155deg, #22B37C 0%, #0D7C54 60%, #0A5C3E 100%)' } : undefined}
           >
             {payLoading || isPending
               ? <><Loader2 className="w-4 h-4 animate-spin" /> Processing…</>
@@ -1253,7 +1252,7 @@ export default function BookSeatClient({
             type="button"
             onClick={handleBack}
             disabled={payLoading || isPending}
-            className="press w-full py-3 rounded-xl bg-white border border-[#DDE4EE] text-[13px] font-medium text-[#6E7F94] hover:bg-[#F4F7FB] transition-colors disabled:opacity-50"
+            className="clay-raised-sm clay-interactive w-full py-3 text-[13px] font-medium text-[#6E7F94] disabled:opacity-50"
           >
             Back
           </button>

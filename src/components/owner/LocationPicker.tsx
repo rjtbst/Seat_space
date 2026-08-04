@@ -102,10 +102,10 @@ export default function LocationPicker({ lat, lng, onChange }: Props) {
   }
 
   // ── Shared style helpers ───────────────────────────────────────────
-  const card  = 'border border-[#E2DDD4] rounded-xl p-4 bg-[#FDFCF9]'
+  const card  = 'clay-raised p-4'
   const label = 'text-[12px] font-semibold text-[#3A4A5C] block mb-1'
-  const inp   = 'w-full px-3 py-2.5 bg-[#F4F7FB] border border-[#E4EAF2] rounded-lg text-[13px] text-[#0D1117] placeholder:text-[#9AACBE] focus:outline-none focus:border-[#1246FF] transition-colors'
-  const btn   = 'inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-[13px] font-semibold transition-colors'
+  const inp   = 'clay-input w-full px-3 py-2.5 text-[13px] text-[#0D1117] placeholder:text-[#9AACBE]'
+  const btn   = 'clay-interactive inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-[13px] font-semibold'
 
   return (
     <div className={card}>
@@ -117,7 +117,7 @@ export default function LocationPicker({ lat, lng, onChange }: Props) {
       {/* Set state */}
       {mode === 'set' && lat != null && lng != null && (
         <div className="flex items-center justify-between gap-3 mt-1">
-          <div className="flex items-center gap-2 bg-[#D1FAE5] text-[#0D7C54] px-3 py-2 rounded-lg flex-1">
+          <div className="clay-chip flex items-center gap-2 bg-[#D1FAE5] text-[#0D7C54] px-3 py-2 flex-1">
             <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
             <div className="min-w-0">
               <p className="text-[12px] font-semibold">Location set</p>
@@ -127,7 +127,7 @@ export default function LocationPicker({ lat, lng, onChange }: Props) {
           <button
             type="button"
             onClick={clear}
-            className="press w-8 h-8 rounded-lg bg-white border border-[#E4EAF2] flex items-center justify-center hover:border-[#C5282C] hover:bg-[#FEE2E2] transition-colors flex-shrink-0"
+            className="clay-icon-badge clay-interactive w-8 h-8 flex items-center justify-center flex-shrink-0"
           >
             <X className="w-3.5 h-3.5 text-[#6E7F94]" />
           </button>
@@ -141,7 +141,7 @@ export default function LocationPicker({ lat, lng, onChange }: Props) {
             <button
               type="button"
               onClick={requestGeo}
-              className={`press ${btn} bg-[#1246FF] text-white hover:bg-[#0E38CC] flex-1`}
+              className={`${btn} clay-btn-primary flex-1`}
             >
               <Navigation className="w-3.5 h-3.5" />
               Use My Location
@@ -149,14 +149,14 @@ export default function LocationPicker({ lat, lng, onChange }: Props) {
             <button
               type="button"
               onClick={() => { setMode('map-input'); setError('') }}
-              className={`press ${btn} bg-[#F4F7FB] text-[#0D1117] border border-[#E4EAF2] hover:border-[#1246FF] flex-1`}
+              className={`${btn} clay-raised-sm text-[#0D1117] flex-1`}
             >
               <Link2 className="w-3.5 h-3.5" />
               Paste Maps Link
             </button>
           </div>
           {error && (
-            <p className="text-[11px] text-[#C5282C] bg-[#FEE2E2] px-3 py-2 rounded-lg leading-relaxed">
+            <p className="clay-raised-sm text-[11px] text-[#C5282C] px-3 py-2 leading-relaxed" style={{ background: '#FEE2E2' }}>
               {error}
             </p>
           )}
@@ -189,7 +189,7 @@ export default function LocationPicker({ lat, lng, onChange }: Props) {
             <button
               type="button"
               onClick={() => { setMode('idle'); setError(''); setMapsLink('') }}
-              className={`press ${btn} bg-[#F4F7FB] text-[#6E7F94] border border-[#E4EAF2]`}
+              className={`${btn} clay-raised-sm text-[#6E7F94]`}
             >
               Cancel
             </button>
@@ -197,7 +197,7 @@ export default function LocationPicker({ lat, lng, onChange }: Props) {
               type="button"
               onClick={handleMapsLink}
               disabled={!mapsLink.trim()}
-              className={`press ${btn} bg-[#1246FF] text-white hover:bg-[#0E38CC] disabled:opacity-50 disabled:cursor-not-allowed flex-1`}
+              className={`${btn} clay-btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex-1`}
             >
               <MapPin className="w-3.5 h-3.5" />
               Set Location

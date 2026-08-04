@@ -64,13 +64,15 @@ export function LibraryPicker({
           <button
             key={lib.id}
             onClick={() => handleClick(lib.id)}
+            className="clay-interactive"
             style={{
-              padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600,
-              border: `1.5px solid ${active ? activeColor : BORDER}`,
+              padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, border: 'none',
               background: active ? activeBg : BG_CARD,
               color: active ? activeColor : TEXT_SECONDARY,
+              boxShadow: active
+                ? `inset 2px 2px 5px rgba(0,0,0,.08), inset -1px -1px 4px rgba(255,255,255,.4)`
+                : '2px 2px 6px rgba(163,177,198,.3), -2px -2px 5px rgba(255,255,255,.6)',
               cursor: 'pointer', fontFamily: FONT_BODY,
-              transition: 'all .12s',
             }}
           >
             {lib.name}
@@ -125,10 +127,10 @@ function LibraryDropdown({
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
+        className="clay-raised-sm clay-interactive"
         style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          gap: 10, width: '100%', padding: '8px 12px', borderRadius: 10,
-          border: `1.5px solid ${open ? activeColor : BORDER}`,
+          gap: 10, width: '100%', padding: '8px 12px', border: 'none',
           background: BG_CARD, color: TEXT_PRIMARY,
           fontSize: 13, fontWeight: 600, fontFamily: FONT_BODY,
           cursor: 'pointer',
@@ -144,21 +146,23 @@ function LibraryDropdown({
 
       {open && (
         <div
+          className="clay-raised"
           style={{
             position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 6,
-            background: '#fff', border: `1px solid ${BORDER}`, borderRadius: 10,
-            boxShadow: SHADOW_MD, zIndex: 40, overflow: 'hidden',
+            background: 'var(--clay-surface, #fff)', border: 'none',
+            zIndex: 40, overflow: 'hidden',
           }}
         >
-          <div style={{ padding: 8, borderBottom: `1px solid ${BORDER}` }}>
+          <div style={{ padding: 8, boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.25)' }}>
             <input
               ref={inputRef}
               value={query}
               onChange={e => setQuery(e.target.value)}
               placeholder="Search libraries…"
+              className="clay-input"
               style={{
-                width: '100%', padding: '7px 10px', borderRadius: 7,
-                border: `1px solid ${BORDER}`, fontSize: 13, fontFamily: FONT_BODY,
+                width: '100%', padding: '7px 10px',
+                fontSize: 13, fontFamily: FONT_BODY,
                 outline: 'none', boxSizing: 'border-box',
               }}
             />

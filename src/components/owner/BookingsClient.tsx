@@ -22,10 +22,7 @@ function PayoutBadge({ status, amount }: { status: TodayBooking['payout_status']
   const c = cfg[status]
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      <span style={{
-        display: 'inline-block', padding: '2px 8px', borderRadius: 6, fontSize: 11,
-        fontWeight: 700, background: c.bg, color: c.color, whiteSpace: 'nowrap',
-      }}>
+      <span className="dash-badge" style={{ background: c.bg, color: c.color, whiteSpace: 'nowrap' }}>
         {c.label}
       </span>
       {amount != null && status !== 'not_applicable' && (
@@ -90,10 +87,10 @@ export default function BookingsClient({
         title="Today's Bookings"
         subtitle={`${libraryName} · ${fmtISTDate()}`}
         action={
-          <a href="/staff/scanner" style={{
-            padding: '9px 16px', borderRadius: 9, fontSize: 13, fontWeight: 700,
-            background: ACCENT, color: '#fff', textDecoration: 'none',
-            fontFamily: 'Syne, sans-serif', boxShadow: '0 2px 10px rgba(13,124,84,.25)',
+          <a href="/staff/scanner" className="clay-btn-primary" style={{
+            padding: '9px 16px', fontSize: 13, fontWeight: 700,
+            color: '#fff', textDecoration: 'none',
+            fontFamily: 'Syne, sans-serif', background: `linear-gradient(155deg, #22B37C, ${ACCENT}, #0A5E3F)`,
             display: 'inline-block',
           }}>
             📷 QR Scanner
@@ -111,11 +108,13 @@ export default function BookingsClient({
       {/* Slot tabs */}
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20 }}>
         {slotTabs.map(slot => (
-          <button className="press" key={slot} onClick={() => setActiveSlot(slot)} style={{
-            padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600,
-            border: `1.5px solid ${activeSlot === slot ? BLUE : '#E2DDD4'}`,
-            background: activeSlot === slot ? BLUE_LIGHT : '#FDFCF9',
+          <button className="clay-interactive" key={slot} onClick={() => setActiveSlot(slot)} style={{
+            padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, border: 'none',
+            background: activeSlot === slot ? BLUE_LIGHT : 'var(--clay-surface)',
             color: activeSlot === slot ? BLUE : '#6B7689',
+            boxShadow: activeSlot === slot
+              ? 'inset 2px 2px 5px rgba(30,92,255,.2), inset -1px -1px 4px rgba(255,255,255,.5)'
+              : '2px 2px 6px rgba(163,177,198,.3), -2px -2px 5px rgba(255,255,255,.6)',
             cursor: 'pointer',
           }}>
             {slot}
@@ -131,9 +130,8 @@ export default function BookingsClient({
           { value: summary.checkedIn, label: 'Checked-in'  },
           { value: summary.noShows,   label: 'No-shows'    },
         ].map(({ value, label }) => (
-          <div key={label} style={{
-            flex: 1, minWidth: 80, background: '#FDFCF9',
-            border: '1px solid #E2DDD4', borderRadius: 12,
+          <div key={label} className="dash-card" style={{
+            flex: 1, minWidth: 80,
             padding: '12px 14px', textAlign: 'center',
           }}>
             <div style={{ fontSize: 22, fontWeight: 800, fontFamily: 'Syne, sans-serif', color: '#0A0D12' }}>{value}</div>
@@ -156,7 +154,7 @@ export default function BookingsClient({
                       textAlign: 'left', padding: '10px 14px',
                       fontSize: 11, fontWeight: 700, color: '#9AAAB8',
                       textTransform: 'uppercase', letterSpacing: '.05em',
-                      borderBottom: '1px solid #E2DDD4', background: '#F9F8F5',
+                      boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.3)',
                     }}>
                       {h}
                     </th>
@@ -165,9 +163,9 @@ export default function BookingsClient({
               </thead>
               <tbody>
                 {filtered.map(b => (
-                  <tr key={b.id} style={{ borderBottom: '1px solid #F0EDE8' }}>
+                  <tr key={b.id} style={{ boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.18)' }}>
                     <td style={{ padding: '11px 14px' }}>
-                      <span style={{ padding: '3px 9px', borderRadius: 6, fontSize: 12, fontWeight: 700, background: BLUE_LIGHT, color: BLUE }}>
+                      <span className="dash-badge" style={{ background: BLUE_LIGHT, color: BLUE }}>
                         {b.seat_label}
                       </span>
                     </td>
@@ -185,13 +183,12 @@ export default function BookingsClient({
                     </td>
                     <td style={{ padding: '11px 14px' }}>
                       {b.status === 'confirmed' && (
-                        <button className="press"
+                        <button className="clay-raised-sm clay-interactive"
                           disabled={isPending}
                           onClick={() => handleCheckIn(b.id)}
                           style={{
-                            padding: '5px 12px', borderRadius: 7, fontSize: 12, fontWeight: 600,
-                            background: ACCENT_LIGHT, color: ACCENT,
-                            border: `1px solid rgba(13,124,84,.2)`,
+                            padding: '5px 12px', fontSize: 12, fontWeight: 600,
+                            background: ACCENT_LIGHT, color: ACCENT, border: 'none',
                             cursor: 'pointer',
                           }}
                         >

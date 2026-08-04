@@ -37,9 +37,11 @@ function Steps() {
             <div style={{
               width: 26, height: 26, borderRadius: '50%', display: 'flex',
               alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700,
-              background: s.done ? ACCENT : s.active ? ACCENT : '#E2DDD4',
+              background: s.done || s.active ? ACCENT : 'var(--clay-surface)',
               color: s.done || s.active ? '#fff' : '#9AAAB8',
-              boxShadow: s.active ? `0 0 0 3px ${ACCENT_LIGHT}` : 'none',
+              boxShadow: s.done || s.active
+                ? '2px 2px 6px rgba(13,124,84,.35), -1px -1px 4px rgba(255,255,255,.4)'
+                : 'inset 2px 2px 5px rgba(163,177,198,.35), inset -1px -1px 3px rgba(255,255,255,.6)',
               transition: 'all .2s',
             }}>
               {s.done ? '✓' : i + 1}
@@ -67,10 +69,11 @@ function Steps() {
 
 const inpBase: React.CSSProperties = {
   width: '100%', padding: '11px 13px',
-  border: '1.5px solid #E2DDD4', borderRadius: 10,
+  border: 'none', borderRadius: 12,
   fontSize: 14, color: '#0A0D12', outline: 'none',
-  fontFamily: 'DM Sans, sans-serif', background: '#FDFCF9',
-  boxSizing: 'border-box', transition: 'border-color .15s, box-shadow .15s',
+  fontFamily: 'DM Sans, sans-serif', background: 'var(--clay-surface)',
+  boxSizing: 'border-box', boxShadow: 'inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6)',
+  transition: 'box-shadow .15s',
   appearance: 'none' as const,
 }
 
@@ -102,12 +105,10 @@ export default function OwnerProfileClient() {
   const valid = firstName.trim().length >= 1 && !!state && !!city
 
   const onFocus = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
-    e.target.style.borderColor = ACCENT
-    e.target.style.boxShadow   = `0 0 0 3px ${ACCENT_LIGHT}`
+    e.target.style.boxShadow = `inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6), 0 0 0 3px ${ACCENT_LIGHT}`
   }
   const onBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
-    e.target.style.borderColor = '#E2DDD4'
-    e.target.style.boxShadow   = 'none'
+    e.target.style.boxShadow = 'inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6)'
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -153,9 +154,11 @@ export default function OwnerProfileClient() {
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
           <div style={{
-            width: 52, height: 52, borderRadius: 14, background: ACCENT,
+            width: 52, height: 52, borderRadius: 16, background: ACCENT,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 16px', boxShadow: '0 4px 18px rgba(13,124,84,.32)', fontSize: 24,
+            margin: '0 auto 16px',
+            boxShadow: '4px 4px 12px rgba(13,124,84,.35), -3px -3px 8px rgba(255,255,255,.5)',
+            fontSize: 24,
           }}>
             🏛️
           </div>
@@ -174,9 +177,9 @@ export default function OwnerProfileClient() {
 
         {/* Card */}
         <div style={{
-          background: '#FDFCF9', border: '1px solid #E2DDD4',
-          borderRadius: 20, padding: '28px 28px 24px',
-          boxShadow: '0 4px 28px rgba(10,13,18,.08)',
+          background: 'var(--clay-surface)', border: 'none',
+          borderRadius: 22, padding: '28px 28px 24px',
+          boxShadow: '8px 8px 20px rgba(163,177,198,.35), -6px -6px 16px rgba(255,255,255,.7)',
         }}>
           <form onSubmit={handleSubmit}>
 
@@ -205,8 +208,9 @@ export default function OwnerProfileClient() {
             <Field label="Phone number" optional>
               <div style={{ display: 'flex', gap: 8 }}>
                 <div style={{
-                  padding: '11px 13px', background: '#F4F7FB',
-                  border: '1.5px solid #E2DDD4', borderRadius: 10,
+                  padding: '11px 13px', background: 'var(--clay-surface)',
+                  border: 'none', borderRadius: 12,
+                  boxShadow: 'inset 2px 2px 5px rgba(163,177,198,.3), inset -1px -1px 4px rgba(255,255,255,.6)',
                   fontSize: 14, fontWeight: 600, color: '#3A4A5C',
                   flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6,
                   userSelect: 'none',
@@ -253,29 +257,31 @@ export default function OwnerProfileClient() {
 
             {error && (
               <div style={{
-                background: '#FDEAEA', border: '1px solid rgba(212,43,43,.2)',
-                borderRadius: 10, padding: '10px 14px', marginBottom: 16,
+                background: '#FDEAEA', border: 'none',
+                borderRadius: 12, padding: '10px 14px', marginBottom: 16,
                 display: 'flex', gap: 8, alignItems: 'flex-start',
+                boxShadow: '2px 2px 6px rgba(212,43,43,.15), -2px -2px 5px rgba(255,255,255,.5)',
               }}>
                 <span style={{ flexShrink: 0 }}>⚠️</span>
                 <p style={{ fontSize: 13, color: '#9B1C1C', margin: 0, lineHeight: 1.4 }}>{error}</p>
               </div>
             )}
 
-            <button className="press"
+            <button
               type="submit"
               disabled={!valid || isPending}
               style={{
-                width: '100%', padding: '13px 0', borderRadius: 10, fontSize: 15,
+                width: '100%', padding: '13px 0', borderRadius: 14, fontSize: 15,
                 fontWeight: 700, fontFamily: 'Syne, sans-serif', border: 'none',
-                background: valid ? ACCENT : '#C8D4C8', color: '#fff',
+                background: valid ? `linear-gradient(155deg, #22B37C, ${ACCENT}, ${ACCENT_DARK})` : '#C8D4C8',
+                color: '#fff',
                 cursor: valid ? 'pointer' : 'not-allowed',
-                boxShadow: valid ? '0 4px 16px rgba(13,124,84,.3)' : 'none',
+                boxShadow: valid
+                  ? '4px 4px 12px rgba(13,124,84,.35), -3px -3px 8px rgba(255,255,255,.4), inset 0 1px 1px rgba(255,255,255,.3)'
+                  : 'none',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 transition: 'all .2s',
               }}
-              onMouseEnter={e => { if (valid) e.currentTarget.style.background = ACCENT_DARK }}
-              onMouseLeave={e => { if (valid) e.currentTarget.style.background = ACCENT }}
             >
               {isPending && (
                 <span style={{

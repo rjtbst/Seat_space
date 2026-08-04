@@ -6,6 +6,7 @@ import type { BookIssue } from '@/lib/actions/students/student-books'
 import { BookOpen, Calendar, CheckCircle2, AlertCircle, Clock, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { fmtIST } from '@/lib/ist'
+import { ClayCard, ClayChip, ClayIconBadge, ClayButton } from '@/components/ui/Clay'
 
 function BookIssueCard({ issue }: { issue: BookIssue }) {
   const returned  = !!issue.returned_at
@@ -16,40 +17,31 @@ function BookIssueCard({ issue }: { issue: BookIssue }) {
     : null
 
   return (
-    <div className={cn(
-      'bg-white rounded-xl border overflow-hidden',
-      overdue ? 'border-[#FCA5A5]' : 'border-[#E4EAF2]',
-    )}>
+    <ClayCard interactive={false}>
       {overdue && (
         <div className="h-1 bg-[#FCA5A5]" />
       )}
       <div className="p-4">
         <div className="flex items-start gap-3">
-          <div className={cn(
-            'w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0',
+          <ClayIconBadge size="md" className={cn(
             returned ? 'bg-[#D1FAE5]' : overdue ? 'bg-[#FEE2E2]' : 'bg-[#E8EFFE]',
           )}>
             <BookOpen className={cn(
               'w-[18px] h-[18px]',
               returned ? 'text-[#0D7C54]' : overdue ? 'text-[#C5282C]' : 'text-[#1246FF]',
             )} />
-          </div>
+          </ClayIconBadge>
 
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
               <h3 className="text-[13px] font-semibold text-[#0D1117] leading-snug line-clamp-2">
                 {issue.book_title}
               </h3>
-              <span className={cn(
-                'text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 flex items-center gap-1',
-                returned  ? 'bg-[#D1FAE5] text-[#0D7C54]'  :
-                overdue   ? 'bg-[#FEE2E2] text-[#C5282C]'  :
-                            'bg-[#E8EFFE] text-[#1246FF]',
-              )}>
+              <ClayChip tone={returned ? 'success' : overdue ? 'danger' : 'info'} className="flex-shrink-0">
                 {returned  ? <><CheckCircle2 className="w-2.5 h-2.5" />Returned</> :
                  overdue   ? <><AlertCircle  className="w-2.5 h-2.5" />Overdue</>  :
                              <><Clock        className="w-2.5 h-2.5" />Issued</>}
-              </span>
+              </ClayChip>
             </div>
 
             {issue.author && (
@@ -89,7 +81,7 @@ function BookIssueCard({ issue }: { issue: BookIssue }) {
         </div>
 
         {overdue && (
-          <div className="mt-3 flex items-start gap-2 bg-[#FEE2E2] rounded-xl p-3">
+          <div className="clay-pressed mt-3 flex items-start gap-2 p-3">
             <AlertCircle className="w-3.5 h-3.5 text-[#C5282C] flex-shrink-0 mt-0.5" />
             <p className="text-[11px] text-[#9B1C1C] leading-relaxed">
               This book is overdue. Please return it to the library as soon as possible to avoid penalties.
@@ -97,7 +89,7 @@ function BookIssueCard({ issue }: { issue: BookIssue }) {
           </div>
         )}
       </div>
-    </div>
+    </ClayCard>
   )
 }
 
@@ -119,29 +111,24 @@ export default function MyBooksClient({ issues }: { issues: BookIssue[] }) {
             </span>
           )}
           {overdue.length > 0 && (
-            <span className="text-[11px] font-semibold bg-[#FEE2E2] text-[#C5282C] px-2 py-0.5 rounded-full">
-              {overdue.length} overdue
-            </span>
+            <ClayChip tone="danger">{overdue.length} overdue</ClayChip>
           )}
         </div>
       </div>
 
       {issues.length === 0 ? (
         <div className="flex flex-col items-center py-20 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-[#F4F7FB] flex items-center justify-center mb-4">
+          <ClayIconBadge size="lg" className="mb-4">
             <BookOpen className="w-6 h-6 text-[#C4CDD8]" />
-          </div>
+          </ClayIconBadge>
           <h3 className="text-[14px] font-semibold text-[#0D1117] mb-1">No Books Borrowed</h3>
           <p className="text-[12px] text-[#9AACBE] max-w-xs mb-4">
             Visit a library, request a book, and it will appear here once issued.
           </p>
-          <button
-            onClick={() => router.push('/explore')}
-            className="flex items-center gap-1.5 px-5 py-2.5 bg-[#1246FF] text-white rounded-xl text-[13px] font-semibold hover:bg-[#0E38CC] transition-colors"
-          >
+          <ClayButton onClick={() => router.push('/explore')}>
             Explore Libraries
             <ArrowRight className="w-3.5 h-3.5" />
-          </button>
+          </ClayButton>
         </div>
       ) : (
         <div className="space-y-5">

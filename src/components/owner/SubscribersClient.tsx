@@ -66,10 +66,7 @@ function SubStatusBadge({ status }: { status: string }) {
     ? { bg: '#F0F4F8', color: '#6E7F94', label: 'Expired' }
     : { bg: '#FEE2E2', color: '#9B1C1C', label: 'Cancelled' }
   return (
-    <span style={{
-      padding: '2px 8px', borderRadius: 20, fontSize: 10, fontWeight: 700,
-      background: style.bg, color: style.color,
-    }}>
+    <span className="dash-badge" style={{ background: style.bg, color: style.color }}>
       {style.label}
     </span>
   )
@@ -133,7 +130,7 @@ function SubscriberRow({ s }: { s: LibrarySubscriber }) {
       </div>
 
       {expanded && s.attendance.length > 0 && (
-        <div style={{ borderTop: '1px solid #F0F4F8', padding: '10px 14px', background: '#FBFAF8' }}>
+        <div style={{ boxShadow: 'inset 0 1px 0 rgba(163,177,198,.25)', padding: '10px 14px' }}>
           <div style={{ fontSize: 10, fontWeight: 700, color: TEXT_MUTED, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.04em' }}>
             Check-in / Check-out records
           </div>

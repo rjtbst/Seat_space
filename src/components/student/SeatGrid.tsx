@@ -19,6 +19,7 @@
 
 import { cn } from '@/lib/utils'
 import type { SeatAvailability } from '@/lib/actions/students/student-discovery'
+import { ClayIconBadge, ClayChip } from '@/components/ui/Clay'
 
 interface Props {
   seats:      SeatAvailability[]
@@ -70,7 +71,7 @@ export default function SeatGrid({ seats, selectedId, onSelect, loading }: Props
   if (!seats.length) {
     return (
       <div className="flex flex-col items-center py-10 text-center">
-        <div className="w-12 h-12 rounded-2xl bg-[#F4F7FB] flex items-center justify-center text-2xl mb-3">🪑</div>
+        <ClayIconBadge size="lg" className="text-2xl mb-3">🪑</ClayIconBadge>
         <p className="text-[13px] font-medium text-[#3A4A5C]">No seats configured</p>
         <p className="text-[11px] text-[#9AACBE] mt-1">Please contact the library to set up seats.</p>
       </div>
@@ -91,15 +92,15 @@ export default function SeatGrid({ seats, selectedId, onSelect, loading }: Props
       {/* ── Legend ──────────────────────────────────────────────────── */}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 pb-1">
         <LegendItem
-          color="bg-[#DCFCE7] border border-[#86EFAC]"
+          color="bg-[#DCFCE7]"
           label={`Available (${availCount})`}
         />
         <LegendItem
-          color="bg-[#FEE2E2] border border-[#FCA5A5]"
+          color="bg-[#FEE2E2]"
           label={`Occupied (${takenCount})`}
         />
         <LegendItem
-          color="bg-[#1246FF] border border-[#1246FF]"
+          color="bg-[#1246FF]"
           label="Selected"
         />
         <span className="ml-auto text-[11px] text-[#9AACBE] flex-shrink-0">
@@ -109,7 +110,7 @@ export default function SeatGrid({ seats, selectedId, onSelect, loading }: Props
 
       {/* ── All-taken warning ───────────────────────────────────────── */}
       {allTaken && (
-        <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#FFF7ED] border border-[#FED7AA] text-[12px] text-[#92400E]">
+        <div className="clay-raised-sm flex items-center gap-2 px-3 py-2 text-[12px] text-[#92400E]">
           <span className="text-[15px]">⏰</span>
           All seats are booked for this time window — try a different time or date.
         </div>
@@ -118,9 +119,9 @@ export default function SeatGrid({ seats, selectedId, onSelect, loading }: Props
       {/* ── Front of library ───────────────────────────────────────── */}
       <div className="flex items-center gap-2 pt-1">
         <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#DDE4EE] to-transparent" />
-        <span className="text-[10px] font-semibold text-[#9AACBE] uppercase tracking-wider px-3 py-1 bg-[#F4F7FB] rounded-full border border-[#E4EAF2]">
+        <ClayChip tone="neutral" className="text-[10px] uppercase tracking-wider">
           🖥️ Front / Board
-        </span>
+        </ClayChip>
         <div className="flex-1 h-px bg-gradient-to-r from-[#DDE4EE] via-[#DDE4EE] to-transparent" />
       </div>
 
@@ -225,9 +226,10 @@ function SeatButton({
         className={cn(
           'w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center',
           'text-[11px] font-bold select-none',
-          'bg-[#FEE2E2] text-[#C5282C] border border-[#FCA5A5]',
+          'bg-[#FEE2E2] text-[#C5282C]',
           'cursor-not-allowed',
         )}
+        style={{ boxShadow: 'inset 2px 2px 5px rgba(197,40,44,.18), inset -1px -1px 3px rgba(255,255,255,.4)' }}
       >
         {seat.column_number}
       </div>
@@ -246,10 +248,10 @@ function SeatButton({
         className={cn(
           'w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center',
           'text-[11px] font-bold select-none transition-all duration-150',
-          'bg-[#1246FF] text-white border-2 border-[#1246FF]',
-          'shadow-[0_0_0_3px_rgba(18,70,255,0.25),0_2px_8px_rgba(18,70,255,0.4)]',
+          'bg-gradient-to-br from-[#4D78FF] to-[#0D3AE0] text-white',
           'scale-110',
         )}
+        style={{ boxShadow: '3px 3px 8px rgba(18,70,255,.4), -2px -2px 6px rgba(255,255,255,.3), inset 0 1px 1px rgba(255,255,255,.35)' }}
       >
         {seat.column_number}
       </button>
@@ -265,12 +267,12 @@ function SeatButton({
       title={`Seat ${label} — Available`}
       onClick={() => onSelect(seat.id)}
       className={cn(
-        'w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center',
-        'text-[11px] font-bold select-none transition-all duration-150',
-        'bg-[#DCFCE7] text-[#15803D] border border-[#86EFAC]',
-        'hover:bg-[#BBF7D0] hover:border-[#4ADE80] hover:scale-110 hover:shadow-[0_2px_8px_rgba(34,197,94,0.3)]',
-        'active:scale-95 cursor-pointer',
+        'clay-interactive w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center',
+        'text-[11px] font-bold select-none',
+        'bg-[#DCFCE7] text-[#15803D]',
+        'hover:scale-110 active:scale-95 cursor-pointer',
       )}
+      style={{ boxShadow: '2px 2px 6px rgba(34,197,94,.22), -2px -2px 5px rgba(255,255,255,.5)' }}
     >
       {seat.column_number}
     </button>

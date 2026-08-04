@@ -103,11 +103,11 @@ export default function CouponsClient({
         title="Coupons"
         subtitle="Create discount codes for your membership plans — share manually over WhatsApp or email with loyal students."
         action={
-          <button className="press"
+          <button className="clay-btn-primary"
             onClick={() => setFormOpen(o => !o)}
             style={{
-              padding: '9px 16px', borderRadius: 9, border: 'none',
-              background: ACCENT, color: '#fff', fontSize: 13, fontWeight: 700,
+              padding: '9px 16px', border: 'none',
+              fontSize: 13, fontWeight: 700,
               cursor: 'pointer', fontFamily: FONT_BODY,
             }}
           >
@@ -198,12 +198,12 @@ export default function CouponsClient({
             </Field>
           </div>
 
-          <button className="press"
+          <button className="clay-btn-primary"
             onClick={handleCreate}
             disabled={pending}
             style={{
-              marginTop: 16, padding: '10px 20px', borderRadius: 9, border: 'none',
-              background: ACCENT, color: '#fff', fontSize: 13, fontWeight: 700,
+              marginTop: 16, padding: '10px 20px', border: 'none',
+              fontSize: 13, fontWeight: 700,
               cursor: pending ? 'default' : 'pointer', opacity: pending ? 0.7 : 1,
               fontFamily: FONT_BODY,
             }}
@@ -228,10 +228,7 @@ export default function CouponsClient({
                   <span style={{ fontFamily: FONT_DISPLAY, fontWeight: 800, fontSize: 15, color: TEXT_PRIMARY, letterSpacing: '0.02em' }}>
                     {c.code}
                   </span>
-                  <span style={{
-                    padding: '2px 8px', borderRadius: 20, fontSize: 10, fontWeight: 700,
-                    background: ACCENT_LIGHT, color: ACCENT,
-                  }}>
+                  <span className="dash-badge" style={{ background: ACCENT_LIGHT, color: ACCENT }}>
                     {c.discountType === 'percent' ? `${c.discountValue}% off` : `₹${c.discountValue} off`}
                   </span>
                 </div>
