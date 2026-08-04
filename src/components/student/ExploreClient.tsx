@@ -39,7 +39,9 @@ interface Props {
 }
 
 const LIMIT = 12
-const LOC_PREF_KEY = 'ls_loc_pref'
+const LOC_PREF_KEY   = 'ls_loc_pref'
+const LOC_COOKIE_KEY = 'ls_loc'          // "lat,lng" — read server-side too
+const LOC_COOKIE_MAX_AGE = 15 * 60       // 15 min — location goes stale, then re-resolved
 
 function readLocPref(): boolean | null {
   try {
@@ -56,6 +58,34 @@ function writeLocPref(enabled: boolean) {
   try {
     window.localStorage.setItem(LOC_PREF_KEY, enabled ? 'on' : 'off')
   } catch { /* ignore quota/availability errors */ }
+}
+
+// The localStorage flag above is client-only and invisible to the server
+// component that decides `location_mode` on first paint. These cookie
+// helpers mirror the same "user wants Near Me + last known coords" state
+// into a cookie the server CAN read (see app/(student)/explore/page.tsx),
+// so a fresh visit to /explore can render GPS results immediately instead
+// of painting city/state results first and then re-fetching once geo
+// resolves client-side.
+function writeLocCookie(lat: number, lng: number) {
+  try {
+    document.cookie = `${LOC_COOKIE_KEY}=${lat},${lng}; path=/; max-age=${LOC_COOKIE_MAX_AGE}; samesite=lax`
+  } catch { /* ignore */ }
+}
+
+function clearLocCookie() {
+  try {
+    document.cookie = `${LOC_COOKIE_KEY}=; path=/; max-age=0`
+  } catch { /* ignore */ }
+}
+
+function writeLocPrefCookie(enabled: boolean) {
+  try {
+    // 1 year — mirrors the intent of localStorage's ls_loc_pref, just
+    // readable by the server. Explicit "off" should stick until the user
+    // turns it back on, regardless of how stale any cached coords get.
+    document.cookie = `${LOC_PREF_KEY}=${enabled ? 'on' : 'off'}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`
+  } catch { /* ignore */ }
 }
 
 /* ─── Location mode banner ───────────────────────────────────── */
@@ -146,15 +176,28 @@ export default function ExploreClient({
   // `true` to match server-rendered output exactly (avoids a hydration
   // mismatch) -- if the user previously turned Near Me off, that's
   // corrected a moment later from localStorage, in the effect below.
+  //
+  // NOTE: as of the cookie fix, the server (page.tsx) now ALSO knows the
+  // user's Near Me preference and last-known coords via cookies, so in
+  // the common case (returning user, cookie present) the server has
+  // already rendered GPS results and `locationMode === 'gps'` on first
+  // paint — this client-side state just needs to stay consistent with
+  // that, not re-derive it from scratch.
   const [locEnabled, setLocEnabled] = useState(true)
 
   // On mount: apply any saved Near Me preference (localStorage isn't
   // available during SSR, so this necessarily happens client-side, after
   // the server-rendered fallback has already painted once) and, unless
-  // the user explicitly turned it off last time, request geo. Previously
+  // the user explicitly turned it off last time, refresh geo. Previously
   // this fired unconditionally on every mount -- turning Near Me off and
   // then reloading the page silently turned it back on and re-navigated
   // to nearby results, overriding what the user had just chosen.
+  //
+  // If the server already rendered us in GPS mode (locationMode === 'gps',
+  // meaning it had a fresh-enough cookie), we still refresh geo in the
+  // background to keep coords current, but there's no more "flip from
+  // city to nearby" flicker for the user to see — they already see nearby
+  // results, this just re-syncs the cookie so it doesn't go stale as fast.
   useEffect(() => {
     const pref = readLocPref()
     if (pref === false) {
@@ -222,21 +265,27 @@ export default function ExploreClient({
   // Turning ON   → if already granted use immediately; otherwise request once
   // Either way this is a direct, deliberate user action, so it pushes a
   // normal history entry (unlike the automatic on-mount apply below) and
-  // persists the choice so it's remembered on the next visit.
+  // persists the choice — both to localStorage (existing) and the cookie
+  // (new, so the SERVER also knows next time) — so it's remembered on
+  // the next visit and doesn't silently flip back on.
   const handleEnableLocation = useCallback(() => {
     if (locEnabled) {
       // User is turning Near Me OFF — fall back to city/state, don't clear geo cache
       explicitEnableRef.current = false
       setLocEnabled(false)
       writeLocPref(false)
+      writeLocPrefCookie(false)
+      clearLocCookie()
       buildAndNavigate({ locEnabled: false, lat: null, lng: null })
       return
     }
     // User is turning Near Me ON
     setLocEnabled(true)
     writeLocPref(true)
+    writeLocPrefCookie(true)
     if (geo.status === 'granted') {
       // Coords already available — apply synchronously, no prompt
+      writeLocCookie(geo.lat, geo.lng)
       buildAndNavigate({ locEnabled: true, lat: geo.lat, lng: geo.lng })
     } else {
       // Haven't asked yet (or was denied and user retries) — request
@@ -247,24 +296,35 @@ export default function ExploreClient({
     }
   }, [locEnabled, geo, buildAndNavigate, requestGeo])
 
-  // ── When geo resolves (first grant) push coords immediately ──
+  // ── When geo resolves (first grant, or a background refresh) ─────────
   // This only fires on the transition to 'granted', not on every render.
   // locEnabled is intentionally not a dep — we read it via the closure
   // captured at grant-time, which is always true (we only call requestGeo
-  // when locEnabled is being set to true).
+  // when locEnabled is being set to true, or in the background-refresh
+  // effect above which already checked locPref !== false before calling).
   //
   // Mode depends on how this grant was triggered: the silent automatic
-  // request on mount refines the page the user is already on (city
-  // results → nearby results) and uses `replace` so it doesn't add a
-  // back-button entry that just re-triggers the same transition on its
-  // way "back". An explicit click on the Near Me toggle is a deliberate
-  // action, though, and should behave like one -- `push`, so Back
-  // actually undoes it -- even though the permission grant itself is
-  // just as asynchronous either way.
+  // request on mount refines the page the user is already on and uses
+  // `replace` so it doesn't add a back-button entry that just re-triggers
+  // the same transition on its way "back". An explicit click on the Near
+  // Me toggle is a deliberate action, though, and should behave like one
+  // -- `push`, so Back actually undoes it.
+  //
+  // writeLocPref/writeLocCookie now fire on BOTH paths (previously only
+  // the explicit-click path wrote the localStorage flag) — this was the
+  // root cause of the "searches city, then nearby, every single time"
+  // bug: on a normal first-grant via the automatic mount effect, neither
+  // the localStorage pref nor any server-visible signal was ever
+  // persisted, so every fresh mount of this component repeated the full
+  // city→gps cycle instead of the server just rendering GPS results
+  // straight away next time.
   useEffect(() => {
     if (geo.status === 'granted' && locEnabled) {
       const mode = explicitEnableRef.current ? 'push' : 'replace'
       explicitEnableRef.current = false
+      writeLocPref(true)
+      writeLocPrefCookie(true)
+      writeLocCookie(geo.lat, geo.lng)
       buildAndNavigate({ locEnabled: true, lat: geo.lat, lng: geo.lng, mode })
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
