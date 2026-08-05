@@ -27,9 +27,8 @@ function StatCard({
   delta?: string; deltaColor?: string; sub?: string
 }) {
   return (
-    <div style={{
-      background: BG_CARD, border: `1px solid ${BORDER}`, borderRadius: 14,
-      padding: '16px 18px', boxShadow: SHADOW_SM, flex: 1, minWidth: 0,
+    <div className="clay-raised" style={{
+      padding: '16px 18px', flex: 1, minWidth: 0,
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
         <span style={{ fontSize: 11, fontWeight: 600, color: TEXT_SECONDARY, textTransform: 'uppercase', letterSpacing: '.05em' }}>
@@ -57,7 +56,7 @@ function RevenueChart({ data }: { data: MonthRevPoint[] }) {
   const prev    = data[data.length - 2]
 
   return (
-    <div style={{ background: BG_CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: '18px 20px', boxShadow: SHADOW_SM }}>
+    <div style={{ background: BG_CARD, borderRadius: 20, padding: '18px 20px', boxShadow: '6px 6px 14px rgba(163,177,198,.32), -5px -5px 12px rgba(255,255,255,.7)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div style={{ fontSize: 14, fontWeight: 700, color: TEXT_PRIMARY }}>Monthly Revenue</div>
         <span style={{ fontSize: 11, color: TEXT_MUTED, fontWeight: 500 }}>Last 7 months</span>
@@ -117,7 +116,7 @@ function OccupancyDonut({ stats }: { stats: DashboardStats }) {
   const pct = stats.occupancy_pct / 100
 
   return (
-    <div style={{ background: BG_CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: '18px 20px', boxShadow: SHADOW_SM }}>
+    <div style={{ background: BG_CARD, borderRadius: 20, padding: '18px 20px', boxShadow: '6px 6px 14px rgba(163,177,198,.32), -5px -5px 12px rgba(255,255,255,.7)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
         <div style={{ fontSize: 14, fontWeight: 700, color: TEXT_PRIMARY }}>Seat Occupancy — Live</div>
         <div style={{
@@ -164,7 +163,7 @@ function OccupancyDonut({ stats }: { stats: DashboardStats }) {
 /* ─── Slot heatmap ─────────────────────────────────────────────────────────── */
 function SlotHeatmap({ data }: { data: SlotBand[] }) {
   return (
-    <div style={{ background: BG_CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: '18px 20px', boxShadow: SHADOW_SM }}>
+    <div style={{ background: BG_CARD, borderRadius: 20, padding: '18px 20px', boxShadow: '6px 6px 14px rgba(163,177,198,.32), -5px -5px 12px rgba(255,255,255,.7)' }}>
       <div style={{ fontSize: 14, fontWeight: 700, color: TEXT_PRIMARY, marginBottom: 14 }}>Slot Popularity</div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {data.map(band => (
@@ -212,7 +211,7 @@ function BookingsTable({
           const st         = STATUS_STYLE[b.status] ?? STATUS_STYLE.confirmed
           const canCheckIn = b.status === 'confirmed'
           return (
-            <div key={b.id} style={{ padding: '12px 16px', borderBottom: '1px solid #F0EDE8' }}>
+            <div key={b.id} style={{ padding: '12px 16px', boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.2)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 700, color: TEXT_PRIMARY, marginBottom: 2 }}>{b.student}</div>
@@ -222,20 +221,20 @@ function BookingsTable({
                   </div>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-                  <span style={{ padding: '2px 7px', borderRadius: 5, fontSize: 11, fontWeight: 700, background: BLUE_LIGHT, color: BLUE }}>
+                  <span className="dash-badge" style={{ background: BLUE_LIGHT, color: BLUE, borderRadius: 5, padding: '2px 7px' }}>
                     {b.seat_label}
                   </span>
-                  <span style={{ padding: '2px 8px', borderRadius: 20, fontSize: 10, fontWeight: 600, background: st.bg, color: st.color }}>
+                  <span className="dash-badge" style={{ background: st.bg, color: st.color }}>
                     {st.label}
                   </span>
                 </div>
               </div>
               {canCheckIn && (
-                <button className="press"
+                <button className="clay-raised-sm clay-interactive"
                   onClick={() => onCheckIn(b.id)}
                   style={{
-                    width: '100%', padding: '7px 0', borderRadius: 8, fontSize: 12, fontWeight: 600,
-                    background: ACCENT_LIGHT, color: ACCENT, border: `1px solid rgba(13,124,84,.2)`,
+                    width: '100%', padding: '7px 0', fontSize: 12, fontWeight: 600,
+                    background: ACCENT_LIGHT, color: ACCENT, border: 'none',
                     cursor: 'pointer', fontFamily: FONT_BODY, marginTop: 4,
                   }}
                 >
@@ -260,7 +259,7 @@ function BookingsTable({
                 textAlign: 'left', padding: '8px 12px',
                 fontSize: 11, fontWeight: 700, color: TEXT_MUTED,
                 textTransform: 'uppercase', letterSpacing: '.05em',
-                borderBottom: `1px solid ${BORDER}`,
+                boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.3)',
               }}>
                 {h}
               </th>
@@ -272,7 +271,7 @@ function BookingsTable({
             const st         = STATUS_STYLE[b.status] ?? STATUS_STYLE.confirmed
             const canCheckIn = b.status === 'confirmed'
             return (
-              <tr key={b.id} style={{ borderBottom: '1px solid #F0EDE8' }}>
+              <tr key={b.id} style={{ boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.18)' }}>
                 <td style={{ padding: '10px 12px', color: TEXT_SECONDARY, whiteSpace: 'nowrap' }}>
                   {fmtTime(b.start_time)}–{fmtTime(b.end_time)}
                 </td>
@@ -281,23 +280,23 @@ function BookingsTable({
                   {b.phone && <div style={{ fontSize: 11, fontWeight: 400, color: TEXT_MUTED }}>{b.phone}</div>}
                 </td>
                 <td style={{ padding: '10px 12px' }}>
-                  <span style={{ padding: '3px 8px', borderRadius: 6, fontSize: 12, fontWeight: 700, background: BLUE_LIGHT, color: BLUE }}>
+                  <span className="dash-badge" style={{ background: BLUE_LIGHT, color: BLUE, borderRadius: 6, padding: '3px 8px' }}>
                     {b.seat_label}
                   </span>
                 </td>
                 <td style={{ padding: '10px 12px', color: TEXT_SECONDARY }}>{b.plan}</td>
                 <td style={{ padding: '10px 12px' }}>
-                  <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: st.bg, color: st.color }}>
+                  <span className="dash-badge" style={{ background: st.bg, color: st.color }}>
                     {st.label}
                   </span>
                 </td>
                 <td style={{ padding: '10px 12px' }}>
                   {canCheckIn && (
-                    <button className="press"
+                    <button className="clay-raised-sm clay-interactive"
                       onClick={() => onCheckIn(b.id)}
                       style={{
-                        padding: '4px 10px', borderRadius: 7, fontSize: 12, fontWeight: 600,
-                        background: ACCENT_LIGHT, color: ACCENT, border: `1px solid rgba(13,124,84,.2)`,
+                        padding: '4px 10px', fontSize: 12, fontWeight: 600,
+                        background: ACCENT_LIGHT, color: ACCENT, border: 'none',
                         cursor: 'pointer', fontFamily: FONT_BODY,
                       }}
                     >
@@ -331,30 +330,19 @@ function QuickActions() {
   }, [router])
 
   return (
-    <div style={{ background: BG_CARD, border: `1px solid ${BORDER}`, borderRadius: 14, padding: '18px 20px', boxShadow: SHADOW_SM }}>
+    <div className="clay-raised" style={{ padding: '18px 20px' }}>
       <div style={{ fontSize: 14, fontWeight: 700, color: TEXT_PRIMARY, marginBottom: 12 }}>Quick Actions</div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {actions.map(a => (
-          <button className="press"
+          <button className="clay-raised-sm clay-interactive"
             key={a.href}
             onClick={() => navigate(a.href)}
             style={{
               display: 'flex', alignItems: 'center', gap: 10,
-              padding: '10px 12px', borderRadius: 9, textAlign: 'left',
-              border: `1.5px solid ${BORDER}`, background: BG_CARD,
+              padding: '10px 12px', textAlign: 'left',
+              border: 'none', background: BG_CARD,
               cursor: 'pointer', fontFamily: FONT_BODY,
               fontSize: 13, fontWeight: 500, color: '#3A4A5C',
-              transition: 'all .12s',
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.borderColor = ACCENT
-              e.currentTarget.style.color = ACCENT
-              e.currentTarget.style.background = ACCENT_LIGHT
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.borderColor = BORDER
-              e.currentTarget.style.color = '#3A4A5C'
-              e.currentTarget.style.background = BG_CARD
             }}
           >
             <span style={{ fontSize: 18 }}>{a.icon}</span>
@@ -429,14 +417,13 @@ export default function DashboardClient({
             {libraryName} · {fmtISTDate()}
           </div>
         </div>
-        <button className="press"
+        <button className="clay-btn-primary"
           onClick={() => navigate('/onboarding/add-library')}
           style={{
             padding: isMobile ? '8px 12px' : '9px 16px',
-            borderRadius: 9, fontSize: isMobile ? 12 : 13, fontWeight: 700,
-            background: ACCENT, color: '#fff', border: 'none',
-            cursor: 'pointer', fontFamily: FONT_DISPLAY,
-            boxShadow: '0 2px 10px rgba(13,124,84,.25)',
+            fontSize: isMobile ? 12 : 13, fontWeight: 700,
+            border: 'none', cursor: 'pointer', fontFamily: FONT_DISPLAY,
+            background: `linear-gradient(155deg, #22B37C, ${ACCENT}, #0A5E3F)`,
           }}
         >
           + Add Library
@@ -499,22 +486,22 @@ export default function DashboardClient({
           <RevenueChart data={revenue} />
 
           {/* Today's bookings */}
-          <div style={{ background: BG_CARD, border: `1px solid ${BORDER}`, borderRadius: 14, overflow: 'hidden', boxShadow: SHADOW_SM }}>
+          <div className="clay-raised" style={{ overflow: 'hidden' }}>
             <div style={{
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
               padding: isMobile ? '12px 14px' : '16px 20px',
-              borderBottom: `1px solid ${BORDER}`, flexWrap: 'wrap', gap: 8,
+              boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.25)', flexWrap: 'wrap', gap: 8,
             }}>
               <div style={{ fontSize: 14, fontWeight: 700, color: TEXT_PRIMARY }}>Today's Bookings</div>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600, background: BLUE_LIGHT, color: BLUE }}>
+                <span className="dash-badge" style={{ background: BLUE_LIGHT, color: BLUE }}>
                   {s.today_bookings} total
                 </span>
-                <button className="press"
+                <button className="clay-raised-sm clay-interactive"
                   onClick={() => navigate('/dashboard/bookings')}
                   style={{
-                    padding: '5px 12px', borderRadius: 7, fontSize: 12, fontWeight: 600,
-                    border: `1.5px solid ${BORDER}`, background: BG_CARD,
+                    padding: '5px 12px', fontSize: 12, fontWeight: 600,
+                    border: 'none', background: BG_CARD,
                     color: '#3A4A5C', cursor: 'pointer', fontFamily: FONT_BODY,
                   }}
                 >
