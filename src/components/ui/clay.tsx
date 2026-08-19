@@ -214,7 +214,7 @@ export const ClaySelect = React.forwardRef<HTMLSelectElement, React.SelectHTMLAt
         {...rest}
       >
         {children}
-      </select>
+      </select> 
     )
   },
 )
