@@ -14,10 +14,11 @@ const GREEN_LIGHT  = '#D1FAE5'
 
 const inp: React.CSSProperties = {
   width: '100%', padding: '11px 13px',
-  border: '1.5px solid #E2DDD4', borderRadius: 10,
+  border: 'none', borderRadius: 12,
   fontSize: 14, color: '#0A0D12', outline: 'none',
-  fontFamily: 'DM Sans, sans-serif', background: '#FDFCF9',
-  boxSizing: 'border-box', transition: 'border-color .15s, box-shadow .15s',
+  fontFamily: 'DM Sans, sans-serif', background: 'var(--clay-surface)',
+  boxSizing: 'border-box', boxShadow: 'inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6)',
+  transition: 'box-shadow .15s',
 }
 
 export default function LibraryRequestClient({
@@ -86,12 +87,11 @@ export default function LibraryRequestClient({
         fontFamily: 'DM Sans, sans-serif',
       }}>
         <div style={{ maxWidth: 380, width: '100%', textAlign: 'center' }}>
-          <div style={{
+          <div className="clay-raised" style={{
             width: 72, height: 72, borderRadius: '50%',
             background: GREEN_LIGHT, display: 'flex',
             alignItems: 'center', justifyContent: 'center',
             fontSize: 36, margin: '0 auto 16px',
-            border: '2px solid rgba(13,124,84,.2)',
           }}>
             ✓
           </div>
@@ -105,20 +105,20 @@ export default function LibraryRequestClient({
             Your request to join <strong style={{ color: '#0A0D12' }}>{selected?.name}</strong> has been
             sent. The owner will review it and you'll get access once approved.
           </p>
-          <div style={{
-            background: ACCENT_LIGHT, border: '1px solid rgba(5,151,167,.2)',
-            borderRadius: 12, padding: '12px 14px', marginBottom: 20,
+          <div className="clay-raised-sm" style={{
+            background: ACCENT_LIGHT, border: 'none',
+            padding: '12px 14px', marginBottom: 20,
             fontSize: 13, color: '#0A5F6B', lineHeight: 1.6, textAlign: 'left',
           }}>
             💡 Share your registered phone number with the library owner to help them find your request quickly.
           </div>
-          <button className="press"
+          <button className="clay-btn-primary"
             onClick={() => router.push('/staff')}
             style={{
-              width: '100%', padding: '12px 0', borderRadius: 10,
-              border: 'none', background: ACCENT, color: '#fff',
+              width: '100%', padding: '12px 0',
+              border: 'none', background: `linear-gradient(155deg, #22D9EA, ${ACCENT}, #05707D)`,
               fontSize: 14, fontWeight: 700, fontFamily: 'Syne, sans-serif',
-              cursor: 'pointer', boxShadow: '0 4px 16px rgba(5,151,167,.3)',
+              cursor: 'pointer',
             }}
           >
             View Request Status →
@@ -134,17 +134,16 @@ export default function LibraryRequestClient({
       minHeight: '100vh', display: 'flex', alignItems: 'center',
       justifyContent: 'center', padding: '24px 20px',
       fontFamily: 'DM Sans, sans-serif',
-      background: 'linear-gradient(135deg,#F4F7FB,#EDE8DC)',
+      background: 'var(--clay-bg)',
     }}>
       <div style={{ width: '100%', maxWidth: 440 }}>
 
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
-          <div style={{
-            width: 52, height: 52, borderRadius: 14, background: ACCENT,
+          <div className="clay-raised" style={{
+            width: 52, height: 52, background: ACCENT,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             margin: '0 auto 16px', fontSize: 24,
-            boxShadow: '0 4px 18px rgba(5,151,167,.3)',
           }}>
             🔍
           </div>
@@ -163,9 +162,9 @@ export default function LibraryRequestClient({
 
         {/* Rejection notice */}
         {wasRejected && (
-          <div style={{
-            background: '#FEE2E2', border: '1px solid rgba(220,38,38,.2)',
-            borderRadius: 12, padding: '10px 14px', marginBottom: 16,
+          <div className="clay-raised-sm" style={{
+            background: '#FEE2E2', border: 'none',
+            padding: '10px 14px', marginBottom: 16,
             fontSize: 13, color: '#9B1C1C', display: 'flex', gap: 8,
           }}>
             <span>ℹ️</span>
@@ -174,10 +173,8 @@ export default function LibraryRequestClient({
         )}
 
         {/* Form card */}
-        <div style={{
-          background: '#FDFCF9', border: '1px solid #E2DDD4',
-          borderRadius: 20, padding: '24px',
-          boxShadow: '0 4px 28px rgba(10,13,18,.08)',
+        <div className="clay-raised" style={{
+          background: 'var(--clay-surface)', padding: '24px',
         }}>
 
           {/* Search field */}
@@ -191,18 +188,16 @@ export default function LibraryRequestClient({
                 onChange={e => { setQuery(e.target.value); setSelected(null) }}
                 placeholder="Type library name, city or area…"
                 style={inp}
-                onFocus={e => { e.target.style.borderColor = ACCENT; e.target.style.boxShadow = `0 0 0 3px ${ACCENT_LIGHT}` }}
-                onBlur={e => { e.target.style.borderColor = '#E2DDD4'; e.target.style.boxShadow = 'none' }}
+                onFocus={e => { e.target.style.boxShadow = `inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6), 0 0 0 3px ${ACCENT_LIGHT}` }}
+                onBlur={e => { e.target.style.boxShadow = 'inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6)' }}
                 autoFocus
               />
 
               {/* Dropdown */}
               {(results.length > 0 || searching) && !selected && (
-                <div style={{
+                <div className="clay-raised" style={{
                   position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50,
-                  background: '#FDFCF9', border: '1.5px solid #E2DDD4',
-                  borderRadius: 10, marginTop: 4,
-                  boxShadow: '0 8px 24px rgba(10,13,18,.12)',
+                  background: 'var(--clay-surface)', marginTop: 4,
                   overflow: 'hidden',
                 }}>
                   {searching ? (
@@ -213,14 +208,15 @@ export default function LibraryRequestClient({
                       }} />
                       Searching…
                     </div>
-                  ) : results.map(lib => (
-                    <button className="press"
+                  ) : results.map((lib, i) => (
+                    <button
                       key={lib.id}
                       onMouseDown={() => handleSelect(lib)}
                       style={{
                         display: 'block', width: '100%', padding: '10px 14px',
                         textAlign: 'left', border: 'none', background: 'transparent',
-                        cursor: 'pointer', borderBottom: '1px solid #F0EDE8',
+                        cursor: 'pointer',
+                        boxShadow: i < results.length - 1 ? 'inset 0 -1px 0 rgba(163,177,198,.2)' : undefined,
                         fontFamily: 'DM Sans, sans-serif',
                         transition: 'background .1s',
                       }}
@@ -244,17 +240,17 @@ export default function LibraryRequestClient({
 
             {/* Selected confirmation */}
             {selected && (
-              <div style={{
+              <div className="clay-raised-sm" style={{
                 marginTop: 8, padding: '8px 12px',
-                background: GREEN_LIGHT, border: '1px solid rgba(13,124,84,.2)',
-                borderRadius: 8, display: 'flex', alignItems: 'center', gap: 8,
+                background: GREEN_LIGHT, border: 'none',
+                display: 'flex', alignItems: 'center', gap: 8,
               }}>
                 <span style={{ color: GREEN, fontSize: 14 }}>✓</span>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: GREEN }}>{selected.name}</div>
                   <div style={{ fontSize: 11, color: '#6B7689' }}>{[selected.area, selected.city].filter(Boolean).join(', ')}</div>
                 </div>
-                <button className="press"
+                <button
                   onClick={() => { setSelected(null); setQuery('') }}
                   style={{ marginLeft: 'auto', border: 'none', background: 'none', cursor: 'pointer', color: '#9AAAB8', fontSize: 16, padding: '0 4px' }}
                 >
@@ -284,9 +280,9 @@ export default function LibraryRequestClient({
 
           {/* Error */}
           {error && (
-            <div style={{
-              background: '#FEE2E2', border: '1px solid rgba(220,38,38,.2)',
-              borderRadius: 9, padding: '9px 12px', marginBottom: 14,
+            <div className="clay-raised-sm" style={{
+              background: '#FEE2E2', border: 'none',
+              padding: '9px 12px', marginBottom: 14,
               fontSize: 12, color: '#9B1C1C', display: 'flex', gap: 6,
             }}>
               <span>⚠️</span> {error}
@@ -294,23 +290,23 @@ export default function LibraryRequestClient({
           )}
 
           {/* Submit */}
-          <button className="press"
+          <button
             onClick={handleSubmit}
             disabled={!selected || isPending}
             style={{
-              width: '100%', padding: '13px 0', borderRadius: 10,
+              width: '100%', padding: '13px 0', borderRadius: 14,
               border: 'none',
-              background: selected ? ACCENT : '#C0CDD9',
+              background: selected ? `linear-gradient(155deg, #22D9EA, ${ACCENT}, #05707D)` : '#C0CDD9',
               color: '#fff', fontSize: 15, fontWeight: 700,
               fontFamily: 'Syne, sans-serif',
               cursor: selected ? 'pointer' : 'not-allowed',
               opacity: isPending ? 0.7 : 1,
-              boxShadow: selected ? '0 4px 16px rgba(5,151,167,.28)' : 'none',
+              boxShadow: selected
+                ? '4px 4px 12px rgba(5,151,167,.3), -3px -3px 8px rgba(255,255,255,.4), inset 0 1px 1px rgba(255,255,255,.3)'
+                : 'none',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-              transition: 'all .2s',
+              transition: 'transform .15s, box-shadow .15s',
             }}
-            onMouseEnter={e => { if (selected) e.currentTarget.style.background = ACCENT_DARK }}
-            onMouseLeave={e => { if (selected) e.currentTarget.style.background = ACCENT }}
           >
             {isPending && (
               <span style={{

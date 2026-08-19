@@ -2,12 +2,11 @@
 'use client'
 
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
 import type { LibraryCard } from '@/lib/actions/students/student-discovery'
 import { effectiveSlotRate } from '@/lib/booking/types'
-import { MapPin, Star, Navigation2, ArrowRight } from 'lucide-react'
+import { MapPin, Star, Clock, Navigation2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { ClayCard, ClayChip, ClayButton } from '@/components/ui/Clay'
+import { ClayCard, ClayChip } from '@/components/ui/clay'
 
 const AMENITY_ICON: Record<string, string> = {
   WiFi: '📶', AC: '❄️', Parking: '🅿️', Cafeteria: '☕',
@@ -46,28 +45,16 @@ function priceDisplay(library: LibraryCard): { label: string; rate: number } | n
 }
 
 export default function LibraryCardTile({ library }: { library: LibraryCard }) {
-  const router    = useRouter()
   const open      = library.status.isOpen
   const occupancy = library.total_seats > 0
     ? Math.round(((library.total_seats - library.available_seats) / library.total_seats) * 100)
     : 0
   const price = priceDisplay(library)
-  const isFull = library.available_seats === 0 && library.total_seats > 0
-
-  const handleBookSeat = (e: React.MouseEvent) => {
-    // ClayCard already wraps this whole tile in a link to the same
-    // destination — stop it from also firing/nesting and navigate once.
-    e.preventDefault()
-    e.stopPropagation()
-    router.push(`/library/${library.id}`)
-  }
 
   return (
     <ClayCard href={`/library/${library.id}`} className="group block">
-      {/* Image — aspect-ratio based instead of a fixed px height, so it
-          scales proportionally with card width instead of looking
-          short-and-wide on larger cards */}
-      <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] bg-[#F0EDE8] rounded-t-[20px] overflow-hidden">
+      {/* Image */}
+      <div className="relative h-44 bg-[#F0EDE8] rounded-t-[20px] overflow-hidden">
         {library.cover_url ? (
           <Image
             src={library.cover_url}
@@ -86,7 +73,7 @@ export default function LibraryCardTile({ library }: { library: LibraryCard }) {
         </div>
 
         {/* Full badge */}
-        {isFull && (
+        {library.available_seats === 0 && library.total_seats > 0 && (
           <div className="absolute top-2.5 right-2.5">
             <ClayChip tone="danger">Full</ClayChip>
           </div>
@@ -122,6 +109,12 @@ export default function LibraryCardTile({ library }: { library: LibraryCard }) {
           <span className="line-clamp-1">
             {[library.area, library.city].filter(Boolean).join(', ')}
           </span>
+        </div>
+
+        {/* Today's hours — derived from slot_configs (lib/booking/libraryStatus.ts) */}
+        <div className="flex items-center gap-1.5 mt-2 text-[11px] text-[#6B6560]">
+          <Clock className="w-3 h-3 flex-shrink-0" />
+          {library.status.todayHoursLabel}
         </div>
 
         {/* Seat availability bar — sunken clay groove with a raised fill */}
@@ -171,40 +164,27 @@ export default function LibraryCardTile({ library }: { library: LibraryCard }) {
           </div>
         )}
 
-        {/* Price + Book a Seat — same row, price on the left, button on the right */}
+        {/* Price — slot-based, see priceDisplay() above */}
         <div
-          className="flex items-center justify-between gap-2 mt-3 pt-3"
+          className="flex items-center justify-between mt-3 pt-3"
           style={{ boxShadow: 'inset 0 1px 0 rgba(163,177,198,.25)' }}
         >
-          <div className="flex flex-col gap-0.5">
+          <div>
             {price ? (
-              <div>
+              <>
                 <span className="text-[10px] text-[#9B9591] mr-1">{price.label}</span>
                 <span className="text-[13px] font-bold text-[#1A1714]">₹{price.rate}</span>
                 <span className="text-[10px] text-[#9B9591]">/hr</span>
-              </div>
+              </>
             ) : (
               <span className="text-[11px] text-[#9B9591]">No slots configured</span>
             )}
-            {library.plans.length > 0 && (
-              <span className="text-[9px] text-[#9B9591]">
-                {library.plans.length} plan{library.plans.length > 1 ? 's' : ''} available
-              </span>
-            )}
           </div>
-
-          <ClayButton
-            onClick={handleBookSeat}
-            disabled={isFull}
-            size="sm"
-            className={cn(
-              'flex-shrink-0 flex items-center justify-center gap-1',
-              isFull && 'opacity-50 cursor-not-allowed',
-            )}
-          >
-            {isFull ? 'Full' : 'Book a Seat'}
-            {!isFull && <ArrowRight className="w-3.5 h-3.5" />}
-          </ClayButton>
+          {library.plans.length > 0 && (
+            <ClayChip tone="info">
+              {library.plans.length} plan{library.plans.length > 1 ? 's' : ''}
+            </ClayChip>
+          )}
         </div>
       </div>
     </ClayCard>

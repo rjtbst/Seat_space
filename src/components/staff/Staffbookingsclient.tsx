@@ -119,11 +119,11 @@ export default function StaffBookingsClient({
 
       {/* Toast */}
       {toast && (
-        <div style={{
+        <div className="clay-raised" style={{
           position: 'fixed', bottom: 80, left: '50%', transform: 'translateX(-50%)',
           zIndex: 100, background: '#0A0D12', color: '#fff',
-          padding: '10px 20px', borderRadius: 10, fontSize: 13, fontWeight: 600,
-          boxShadow: '0 4px 20px rgba(0,0,0,.2)', whiteSpace: 'nowrap',
+          padding: '10px 20px', fontSize: 13, fontWeight: 600,
+          whiteSpace: 'nowrap',
           animation: 'fadeUp .2s ease',
         }}>
           {toast}
@@ -144,13 +144,13 @@ export default function StaffBookingsClient({
       {/* Summary pills */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
         {[
-          { value: bookings.length, label: 'Total',   bg: '#F9F8F5',   color: '#0A0D12' },
+          { value: bookings.length, label: 'Total',   bg: 'var(--clay-surface)', color: '#0A0D12' },
           { value: checkedIn,       label: 'In',      bg: GREEN_LIGHT, color: GREEN     },
           { value: pendingCheckIns, label: 'Pending', bg: ACCENT_LIGHT, color: ACCENT  },
         ].map(({ value, label, bg, color }) => (
-          <div key={label} style={{
+          <div key={label} className="clay-raised" style={{
             flex: 1, textAlign: 'center', padding: '10px 8px',
-            background: bg, borderRadius: 12, border: '1px solid #E2DDD4',
+            background: bg,
           }}>
             <div style={{ fontSize: 24, fontWeight: 800, fontFamily: 'Syne, sans-serif', color }}>
               {value}
@@ -199,12 +199,9 @@ export default function StaffBookingsClient({
             return (
               <div
                 key={b.id}
+                className="clay-raised"
                 style={{
-                  background:   '#FDFCF9',
-                  border:       `1.5px solid ${canCheckIn ? 'rgba(5,151,167,.3)' : '#E2DDD4'}`,
-                  borderRadius: 14,
                   padding:      '14px 16px',
-                  boxShadow:    '0 1px 4px rgba(10,13,18,.04)',
                 }}
               >
                 <div style={{
@@ -216,8 +213,7 @@ export default function StaffBookingsClient({
                     <div style={{
                       display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3,
                     }}>
-                      <span style={{
-                        padding: '2px 8px', borderRadius: 6, fontSize: 11, fontWeight: 700,
+                      <span className="dash-badge" style={{
                         background: BLUE_LIGHT, color: BLUE,
                       }}>
                         {b.seatLabel}
@@ -241,8 +237,7 @@ export default function StaffBookingsClient({
                   </div>
 
                   {/* Status badge */}
-                  <span style={{
-                    padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600,
+                  <span className="dash-badge" style={{
                     background: st.bg, color: st.color, flexShrink: 0, marginLeft: 8,
                   }}>
                     {st.label}
@@ -251,12 +246,12 @@ export default function StaffBookingsClient({
 
                 {/* Check-in button */}
                 {canCheckIn && (
-                  <button className="press"
+                  <button className="clay-btn-primary"
                     disabled={isPending}
                     onClick={() => handleCheckIn(b.id, b.studentName)}
                     style={{
-                      width: '100%', padding: '10px 0', borderRadius: 10,
-                      border: 'none', background: ACCENT, color: '#fff',
+                      width: '100%', padding: '10px 0',
+                      border: 'none', background: `linear-gradient(155deg, #22D9EA, ${ACCENT}, #05707D)`,
                       fontSize: 13, fontWeight: 700, fontFamily: 'Syne, sans-serif',
                       cursor: 'pointer', marginTop: 4,
                       opacity: isPending ? 0.7 : 1,
@@ -289,16 +284,19 @@ function SlotTab({
   const ACCENT       = '#0597A7'
   const ACCENT_LIGHT = '#E0F6F8'
   return (
-    <button className="press"
+    <button className="clay-interactive"
       onClick={onClick}
       style={{
         padding:      '5px 12px',
         borderRadius: 20,
         fontSize:     11,
         fontWeight:   600,
-        border:       `1.5px solid ${active ? ACCENT : '#E2DDD4'}`,
-        background:   active ? ACCENT_LIGHT : '#FDFCF9',
+        border:       'none',
+        background:   active ? ACCENT_LIGHT : 'var(--clay-surface)',
         color:        active ? ACCENT : '#6B7689',
+        boxShadow:    active
+          ? 'inset 2px 2px 5px rgba(5,151,167,.2), inset -1px -1px 4px rgba(255,255,255,.5)'
+          : '2px 2px 6px rgba(163,177,198,.28), -2px -2px 5px rgba(255,255,255,.55)',
         cursor:       'pointer',
         whiteSpace:   'nowrap',
         fontFamily:   'DM Sans, sans-serif',

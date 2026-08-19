@@ -24,9 +24,11 @@ function Steps() {
             <div style={{
               width: 28, height: 28, borderRadius: '50%', display: 'flex',
               alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700,
-              background: s.done ? ACCENT : s.active ? ACCENT : '#E2DDD4',
+              background: s.done || s.active ? ACCENT : 'var(--clay-surface)',
               color: s.done || s.active ? '#fff' : '#9AAAB8',
-              boxShadow: s.active ? `0 0 0 4px ${ACCENT_LIGHT}` : 'none',
+              boxShadow: s.done || s.active
+                ? '2px 2px 6px rgba(5,151,167,.35), -1px -1px 4px rgba(255,255,255,.4)'
+                : 'inset 2px 2px 5px rgba(163,177,198,.35), inset -1px -1px 3px rgba(255,255,255,.6)',
               transition: 'all .2s',
             }}>
               {s.done ? '✓' : i + 1}
@@ -42,7 +44,7 @@ function Steps() {
           {i < arr.length - 1 && (
             <div style={{
               width: 40, height: 2,
-              background: s.done ? ACCENT : '#E2DDD4',
+              background: s.done ? ACCENT : '#DDE3EC',
               margin: '0 4px', marginBottom: 18, transition: 'background .3s',
             }} />
           )}
@@ -54,10 +56,11 @@ function Steps() {
 
 const inpBase: React.CSSProperties = {
   width: '100%', padding: '11px 13px',
-  border: '1.5px solid #E2DDD4', borderRadius: 10,
+  border: 'none', borderRadius: 12,
   fontSize: 14, color: '#0A0D12', outline: 'none',
-  fontFamily: 'DM Sans, sans-serif', background: '#FDFCF9',
-  boxSizing: 'border-box', transition: 'border-color .15s, box-shadow .15s',
+  fontFamily: 'DM Sans, sans-serif', background: 'var(--clay-surface)',
+  boxSizing: 'border-box', boxShadow: 'inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6)',
+  transition: 'box-shadow .15s',
   appearance: 'none' as const,
 }
 
@@ -112,12 +115,10 @@ export default function StaffProfileClient() {
   }, [])
 
   const onFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    e.target.style.borderColor = ACCENT
-    e.target.style.boxShadow   = `0 0 0 3px ${ACCENT_LIGHT}`
+    e.target.style.boxShadow = `inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6), 0 0 0 3px ${ACCENT_LIGHT}`
   }
   const onBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    e.target.style.borderColor = '#E2DDD4'
-    e.target.style.boxShadow   = 'none'
+    e.target.style.boxShadow = 'inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6)'
   }
 
   const formatPhone = (p: string) =>
@@ -179,24 +180,18 @@ export default function StaffProfileClient() {
   return (
     <div style={{
       minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'linear-gradient(135deg,#F4F7FB 0%,#EDE8DC 100%)',
+      background: 'var(--clay-bg)',
       fontFamily: 'DM Sans, sans-serif', padding: '24px 16px', position: 'relative',
     }}>
-      {/* Blobs */}
-      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
-        <div style={{ position: 'absolute', width: 500, height: 500, top: -150, right: -100, borderRadius: '50%', background: 'radial-gradient(circle,rgba(5,151,167,.05),transparent 70%)' }} />
-        <div style={{ position: 'absolute', width: 400, height: 400, bottom: -100, left: -80, borderRadius: '50%', background: 'radial-gradient(circle,rgba(18,70,255,.04),transparent 70%)' }} />
-      </div>
-
       <div style={{ width: '100%', maxWidth: 480, position: 'relative', zIndex: 1 }}>
         <Steps />
 
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
           <div style={{
-            width: 52, height: 52, borderRadius: 14, background: ACCENT,
+            width: 52, height: 52, borderRadius: 16, background: ACCENT,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 16px', boxShadow: '0 4px 18px rgba(5,151,167,.3)', fontSize: 24,
+            margin: '0 auto 16px', boxShadow: '4px 4px 12px rgba(5,151,167,.35), -3px -3px 8px rgba(255,255,255,.5)', fontSize: 24,
           }}>
             🔑
           </div>
@@ -212,9 +207,9 @@ export default function StaffProfileClient() {
         </div>
 
         {/* Info banner */}
-        <div style={{
-          background: ACCENT_LIGHT, border: `1px solid rgba(5,151,167,.25)`,
-          borderRadius: 12, padding: '12px 14px', marginBottom: 20,
+        <div className="clay-raised-sm" style={{
+          background: ACCENT_LIGHT, border: 'none',
+          padding: '12px 14px', marginBottom: 20,
           display: 'flex', gap: 10, alignItems: 'flex-start',
         }}>
           <span style={{ fontSize: 18, flexShrink: 0 }}>📨</span>
@@ -226,34 +221,31 @@ export default function StaffProfileClient() {
 
         {/* Card */}
         <div style={{
-          background: '#FDFCF9', border: '1px solid #E2DDD4',
-          borderRadius: 20, padding: '28px 28px 24px',
-          boxShadow: '0 4px 28px rgba(10,13,18,.08)',
+          background: 'var(--clay-surface)', border: 'none',
+          borderRadius: 22, padding: '28px 28px 24px',
+          boxShadow: '8px 8px 20px rgba(163,177,198,.35), -6px -6px 16px rgba(255,255,255,.7)',
         }}>
           <form onSubmit={handleSubmit}>
 
             {/* Phone — read-only if OTP-verified, editable +91 input if signed in via Google */}
             <Field label="Phone number" required>
               {!phoneLoaded ? (
-                <div style={{
-                  padding: '11px 13px', borderRadius: 10,
-                  border: '1.5px solid #E2DDD4', background: '#F3F6F5',
+                <div className="clay-pressed" style={{
+                  padding: '11px 13px',
                   fontSize: 14, color: '#9AAAB8',
                 }}>
                   Loading…
                 </div>
               ) : hasVerifiedPhone ? (
-                <div style={{
+                <div className="clay-pressed" style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  gap: 10, padding: '11px 13px', borderRadius: 10,
-                  border: '1.5px solid #E2DDD4', background: '#F3F6F5',
+                  gap: 10, padding: '11px 13px',
                 }}>
                   <span style={{ fontSize: 14, color: '#3A4A5C', fontWeight: 500 }}>
                     {formatPhone(phone)}
                   </span>
-                  <span style={{
+                  <span className="dash-badge" style={{
                     display: 'inline-flex', alignItems: 'center', gap: 3,
-                    padding: '3px 9px', borderRadius: 20, fontSize: 11, fontWeight: 600,
                     background: '#E2F5EE', color: '#065F46', flexShrink: 0,
                   }}>
                     Verified ✓
@@ -261,17 +253,18 @@ export default function StaffProfileClient() {
                 </div>
               ) : (
                 <>
-                  <div style={{
+                  <div className="clay-input" style={{
                     display: 'flex', alignItems: 'stretch',
-                    border: `1.5px solid ${phoneFocused ? ACCENT : '#E2DDD4'}`,
-                    boxShadow: phoneFocused ? `0 0 0 3px ${ACCENT_LIGHT}` : 'none',
-                    borderRadius: 10, overflow: 'hidden', background: '#FDFCF9',
-                    transition: 'border-color .15s, box-shadow .15s',
+                    boxShadow: phoneFocused
+                      ? `inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6), 0 0 0 3px ${ACCENT_LIGHT}`
+                      : 'inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6)',
+                    overflow: 'hidden', background: 'var(--clay-surface)',
+                    transition: 'box-shadow .15s', padding: 0,
                   }}>
                     <span style={{
                       display: 'flex', alignItems: 'center',
-                      padding: '0 12px', background: '#F3F6F5',
-                      borderRight: '1.5px solid #E2DDD4',
+                      padding: '0 12px',
+                      boxShadow: 'inset -1px 0 0 rgba(163,177,198,.3)',
                       fontSize: 14, fontWeight: 600, color: '#3A4A5C',
                     }}>
                       +91
@@ -286,7 +279,7 @@ export default function StaffProfileClient() {
                       onBlur={() => setPhoneFocused(false)}
                       style={{
                         ...inpBase, border: 'none', borderRadius: 0, flex: 1,
-                        background: 'transparent',
+                        background: 'transparent', boxShadow: 'none',
                       }}
                     />
                   </div>
@@ -342,11 +335,11 @@ export default function StaffProfileClient() {
                   {libraries.map(lib => (
                     <div
                       key={lib.id}
+                      className={lib.assigned ? 'clay-pressed' : 'clay-raised-sm'}
                       style={{
-                        border: `1.5px solid ${lib.assigned ? '#1E5CFF' : '#E2DDD4'}`,
-                        borderRadius: 9, padding: '10px 14px',
+                        padding: '10px 14px',
                         display: 'flex', alignItems: 'center', gap: 10,
-                        background: lib.assigned ? '#E8EFFE' : '#FDFCF9',
+                        background: lib.assigned ? '#E8EFFE' : undefined,
                       }}
                     >
                       <span style={{ fontSize: 16 }}>📚</span>
@@ -359,18 +352,16 @@ export default function StaffProfileClient() {
                         </div>
                       </div>
                       {lib.assigned ? (
-                        <span style={{
+                        <span className="dash-badge" style={{
                           display: 'inline-flex', alignItems: 'center', gap: 3,
-                          padding: '3px 9px', borderRadius: 20, fontSize: 11, fontWeight: 600,
                           background: '#E2F5EE', color: '#065F46',
                         }}>
                           Assigned ✓
                         </span>
                       ) : (
-                        <span style={{
+                        <span className="dash-badge" style={{
                           display: 'inline-flex', alignItems: 'center', gap: 3,
-                          padding: '3px 9px', borderRadius: 20, fontSize: 11, fontWeight: 600,
-                          background: '#EEF2F8', color: '#6E7F94', border: '1px solid #E4EAF2',
+                          background: '#EEF2F8', color: '#6E7F94',
                         }}>
                           Not assigned
                         </span>
@@ -381,12 +372,12 @@ export default function StaffProfileClient() {
               </div>
             )}
 
-            <div style={{ height: 1, background: '#E2DDD4', margin: '20px 0' }} />
+            <div style={{ height: 1, boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.3)', margin: '20px 0' }} />
 
             {error && (
-              <div style={{
-                background: '#FDEAEA', border: '1px solid rgba(212,43,43,.2)',
-                borderRadius: 10, padding: '10px 14px', marginBottom: 16,
+              <div className="clay-raised-sm" style={{
+                background: '#FDEAEA', border: 'none',
+                padding: '10px 14px', marginBottom: 16,
                 display: 'flex', gap: 8, alignItems: 'flex-start',
               }}>
                 <span style={{ flexShrink: 0 }}>⚠️</span>
@@ -394,21 +385,19 @@ export default function StaffProfileClient() {
               </div>
             )}
 
-            <button className="press"
+            <button
               type="submit"
               disabled={isPending}
               style={{
-                width: '100%', padding: '13px 0', borderRadius: 10, fontSize: 15,
+                width: '100%', padding: '13px 0', borderRadius: 14, fontSize: 15,
                 fontWeight: 700, fontFamily: 'Syne, sans-serif', border: 'none',
-                background: ACCENT, color: '#fff',
+                background: `linear-gradient(155deg, #22D9EA, ${ACCENT}, ${ACCENT_DARK})`, color: '#fff',
                 cursor: isPending ? 'not-allowed' : 'pointer',
                 opacity: isPending ? 0.85 : 1,
-                boxShadow: '0 4px 16px rgba(5,151,167,.28)',
+                boxShadow: '4px 4px 12px rgba(5,151,167,.35), -3px -3px 8px rgba(255,255,255,.4), inset 0 1px 1px rgba(255,255,255,.3)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                transition: 'all .2s',
+                transition: 'transform .15s, box-shadow .15s',
               }}
-              onMouseEnter={e => { if (!isPending) e.currentTarget.style.background = ACCENT_DARK }}
-              onMouseLeave={e => { if (!isPending) e.currentTarget.style.background = ACCENT }}
             >
               {isPending && (
                 <span style={{

@@ -30,10 +30,11 @@ function defaultTimes() {
 
 const inp: React.CSSProperties = {
   width: '100%', padding: '10px 12px',
-  border: '1.5px solid #E2DDD4', borderRadius: 9,
+  border: 'none', borderRadius: 12,
   fontSize: 13, color: '#0A0D12', outline: 'none',
-  fontFamily: 'DM Sans, sans-serif', background: '#FDFCF9',
+  fontFamily: 'DM Sans, sans-serif', background: 'var(--clay-surface)',
   boxSizing: 'border-box',
+  boxShadow: 'inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6)',
 }
 
 export default function WalkInClient({
@@ -178,11 +179,11 @@ export default function WalkInClient({
 
       {/* Toast */}
       {toast && (
-        <div style={{
+        <div className="clay-raised" style={{
           position: 'fixed', bottom: 80, left: '50%', transform: 'translateX(-50%)',
           zIndex: 100, background: '#0A0D12', color: '#fff',
-          padding: '10px 20px', borderRadius: 10, fontSize: 13, fontWeight: 600,
-          boxShadow: '0 4px 20px rgba(0,0,0,.2)', whiteSpace: 'nowrap',
+          padding: '10px 20px', fontSize: 13, fontWeight: 600,
+          whiteSpace: 'nowrap',
         }}>
           {toast}
         </div>
@@ -202,10 +203,8 @@ export default function WalkInClient({
       </div>
 
       {/* Seat grid */}
-      <div style={{
-        background: '#FDFCF9', border: '1px solid #E2DDD4',
-        borderRadius: 14, padding: '14px', marginBottom: 14,
-        boxShadow: '0 2px 6px rgba(10,13,18,.04)',
+      <div className="clay-raised" style={{
+        padding: '14px', marginBottom: 14,
       }}>
         <div style={{ fontSize: 12, fontWeight: 700, color: '#0A0D12', marginBottom: 12 }}>
           Floor Layout — tap a free seat
@@ -221,9 +220,9 @@ export default function WalkInClient({
               const rowSeats = seats.filter(s => s.rowLabel === row).sort((a, b) => a.colNumber - b.colNumber)
               return (
                 <div key={row} style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 6 }}>
-                  <div style={{
+                  <div className="clay-icon-badge" style={{
                     width: 20, height: 20, borderRadius: 5,
-                    background: '#F4F7FB', display: 'flex',
+                    display: 'flex',
                     alignItems: 'center', justifyContent: 'center',
                     fontSize: 10, fontWeight: 700, color: '#6B7689', flexShrink: 0,
                   }}>
@@ -237,7 +236,7 @@ export default function WalkInClient({
                       return (
                         <div key={seat.id} style={{ display: 'flex', alignItems: 'center' }}>
                           {idx === 4 && <div style={{ width: 6 }} />}
-                          <button className="press"
+                          <button className={isFree ? 'clay-interactive' : undefined}
                             onClick={() => {
                               if (!isFree) return
                               setSelected(seat.id === selected?.id ? null : seat)
@@ -246,18 +245,19 @@ export default function WalkInClient({
                             style={{
                               width:      34,
                               height:     34,
-                              borderRadius: 6,
+                              borderRadius: 9,
                               background: sc.bg,
-                              border:     `2px solid ${isSelected ? '#0A0D12' : sc.border}`,
+                              border:     'none',
                               color:      sc.color,
                               fontSize:   9,
                               fontWeight: 700,
                               cursor:     isFree ? 'pointer' : 'default',
-                              boxShadow:  isSelected ? '0 0 0 3px rgba(10,13,18,.15)' : 'none',
+                              boxShadow:  isSelected
+                                ? 'inset 2px 2px 5px rgba(0,0,0,.18), inset -1px -1px 4px rgba(255,255,255,.4)'
+                                : `2px 2px 6px ${sc.border}66, -2px -2px 5px rgba(255,255,255,.6)`,
                               display:    'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              transition: 'all .1s',
                             }}
                           >
                             {seat.rowLabel}{seat.colNumber}
@@ -274,7 +274,7 @@ export default function WalkInClient({
             <div style={{ display: 'flex', gap: 12, marginTop: 12, flexWrap: 'wrap' }}>
               {Object.entries(SEAT_COLORS).map(([key, sc]) => (
                 <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <div style={{ width: 10, height: 10, borderRadius: 2, background: sc.bg, border: `1.5px solid ${sc.border}` }} />
+                  <div className="clay-raised-sm" style={{ width: 10, height: 10, borderRadius: 3, background: sc.bg, border: 'none' }} />
                   <span style={{ fontSize: 10, color: '#6B7689' }}>{sc.label}</span>
                 </div>
               ))}
@@ -285,11 +285,9 @@ export default function WalkInClient({
 
       {/* Booking form — shown when a free seat is selected */}
       {selected && (
-        <div style={{
-          background: '#FDFCF9', border: `1.5px solid ${ACCENT}`,
-          borderRadius: 14, padding: '16px',
-          boxShadow: `0 0 0 3px ${ACCENT_LIGHT}`,
-          animation: 'slideUp .2s ease',
+        <div className="clay-raised" style={{
+          padding: '16px',
+          background: 'var(--clay-surface)',
         }}>
           <div style={{
             display: 'flex', justifyContent: 'space-between',
@@ -298,7 +296,7 @@ export default function WalkInClient({
             <div style={{ fontSize: 14, fontWeight: 700, color: '#0A0D12', fontFamily: 'Syne, sans-serif' }}>
               Seat {selected.rowLabel}{selected.colNumber}
             </div>
-            <button className="press"
+            <button
               onClick={() => { setSelected(null); resetForm() }}
               style={{
                 border: 'none', background: 'none', fontSize: 18,
@@ -334,12 +332,12 @@ export default function WalkInClient({
             </div>
           </div>
 
-          <button className="press"
+          <button className="clay-raised-sm clay-interactive"
             onClick={handleCheckMembership}
             disabled={checkingPhone || form.guestPhone.length < 10}
             style={{
               width: '100%', padding: '8px 10px', marginBottom: 10,
-              borderRadius: 8, border: `1.5px solid ${GREEN}`, background: '#fff',
+              border: 'none', background: 'var(--clay-surface)',
               color: GREEN, fontSize: 12, fontWeight: 700,
               cursor: checkingPhone || form.guestPhone.length < 10 ? 'not-allowed' : 'pointer',
               opacity: checkingPhone || form.guestPhone.length < 10 ? 0.5 : 1,
@@ -359,8 +357,8 @@ export default function WalkInClient({
           )}
 
           {membership && membership.subscriptions.length > 0 && (
-            <div style={{
-              background: GREEN_LIGHT, border: `1px solid ${GREEN}`, borderRadius: 10,
+            <div className="clay-raised-sm" style={{
+              background: GREEN_LIGHT, border: 'none',
               padding: '10px 12px', marginBottom: 10,
             }}>
               <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, cursor: 'pointer' }}>
@@ -438,9 +436,8 @@ export default function WalkInClient({
 
           {/* Payment — hidden when booking free against a membership */}
           {!useSubId && (
-            <div style={{
-              background: '#F9F8F5', border: '1px solid #E2DDD4',
-              borderRadius: 10, padding: '10px 12px', marginBottom: 10,
+            <div className="clay-pressed" style={{
+              padding: '10px 12px', marginBottom: 10,
             }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: '#3A4A5C', marginBottom: 8 }}>
                 💵 Payment <span style={{ color: '#9AAAB8', fontWeight: 400 }}>(optional)</span>
@@ -472,9 +469,9 @@ export default function WalkInClient({
 
           {/* Preview */}
           {form.guestName && form.start && form.end && (
-            <div style={{
-              background: GREEN_LIGHT, border: '1px solid rgba(13,124,84,.2)',
-              borderRadius: 8, padding: '8px 12px', marginBottom: 10,
+            <div className="clay-raised-sm" style={{
+              background: GREEN_LIGHT, border: 'none',
+              padding: '8px 12px', marginBottom: 10,
               fontSize: 11, color: '#0A5E3F', lineHeight: 1.7,
             }}>
               <strong>{form.guestName}</strong> · Seat {selected.rowLabel}{selected.colNumber}<br />
@@ -487,21 +484,22 @@ export default function WalkInClient({
             </div>
           )}
 
-          <button className="press"
+          <button
             onClick={useSubId ? handleBookWithSubscription : handleBook}
             disabled={isPending || !form.guestName || !form.guestPhone}
             style={{
               width:      '100%',
               padding:    '12px 0',
-              borderRadius: 10,
+              borderRadius: 14,
               border:     'none',
-              background: !form.guestName || !form.guestPhone ? '#C8D4C8' : useSubId ? GREEN : ACCENT,
+              background: !form.guestName || !form.guestPhone ? '#C8D4C8' : useSubId ? `linear-gradient(155deg, #22B37C, ${GREEN}, #0A5E3F)` : `linear-gradient(155deg, #22D9EA, ${ACCENT}, #05707D)`,
               color:      '#fff',
               fontSize:   14,
               fontWeight: 700,
               fontFamily: 'Syne, sans-serif',
               cursor:     form.guestName && form.guestPhone ? 'pointer' : 'not-allowed',
               opacity:    isPending ? 0.7 : 1,
+              boxShadow:  (!form.guestName || !form.guestPhone) ? 'none' : '3px 3px 8px rgba(5,151,167,.3), -2px -2px 6px rgba(255,255,255,.4)',
             }}
           >
             {isPending

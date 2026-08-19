@@ -73,7 +73,7 @@ function LocalToast({ msg, ok }: { msg: string; ok: boolean }) {
 
 function InfoBox({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mt-[14px] p-3 bg-[var(--blue-lt)] rounded-[9px] border border-[#1E5CFF]/15 text-[12px] text-[#1447D4] leading-relaxed">
+    <div className="clay-raised-sm mt-[14px] p-3 text-[12px] text-[#1447D4] leading-relaxed" style={{ background: 'var(--blue-lt)' }}>
       {children}
     </div>
   )
@@ -81,7 +81,7 @@ function InfoBox({ children }: { children: React.ReactNode }) {
 
 function ErrorBox({ message }: { message: string }) {
   return (
-    <div className="flex gap-1.5 items-start bg-[var(--red-lt)] border border-[var(--red)]/20 rounded-[9px] px-3 py-[9px] mb-3 text-[12px] text-[#9B1C1C] leading-relaxed">
+    <div className="clay-raised-sm flex gap-1.5 items-start px-3 py-[9px] mb-3 text-[12px] text-[#9B1C1C] leading-relaxed" style={{ background: 'var(--red-lt)' }}>
       <span className="shrink-0">⚠️</span>
       {message}
     </div>
@@ -90,7 +90,7 @@ function ErrorBox({ message }: { message: string }) {
 
 function SectionCard({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`bg-[var(--surface)] border border-[var(--divider)] rounded-[14px] shadow-[var(--sh)] overflow-hidden ${className}`}>
+    <div className={`clay-raised overflow-hidden ${className}`}>
       {children}
     </div>
   )
@@ -113,14 +113,14 @@ function ConfirmRow({
         <button
           onClick={onCancel}
           disabled={isPending}
-          className="press flex-1 py-2 rounded-lg border border-[var(--divider)] bg-white text-[var(--ink3)] text-[12px] font-semibold cursor-pointer"
+          className="clay-raised-sm clay-interactive flex-1 py-2 border-none text-[var(--ink3)] text-[12px] font-semibold cursor-pointer"
         >
           Cancel
         </button>
         <button
           onClick={onConfirm}
           disabled={isPending}
-          className={`press flex-[2] py-2 rounded-lg border-none text-white text-[13px] font-bold cursor-pointer transition-opacity
+          className={`clay-raised-sm clay-interactive flex-[2] py-2 border-none text-white text-[13px] font-bold cursor-pointer transition-opacity
             ${danger ? 'bg-[var(--red)]' : 'bg-[var(--green)]'}
             ${isPending ? 'opacity-70' : 'opacity-100'}`}
         >
@@ -169,7 +169,7 @@ function StaffRow({
             value={roleKey}
             onChange={e => onRoleChange(e.target.value)}
             disabled={isPending}
-            className={`px-2 py-1 rounded-[7px] border-[1.5px] text-[11px] font-bold cursor-pointer outline-none ${rc.select}`}
+            className={`dash-badge px-2 py-1 text-[11px] font-bold cursor-pointer outline-none border-none ${rc.badge}`}
           >
             {ROLE_OPTIONS.map(r => (
               <option key={r} value={r}>{ROLE_LABELS[r]}</option>
@@ -179,11 +179,10 @@ function StaffRow({
             onClick={onConfirmRemove}
             disabled={isPending}
             title="Remove staff"
-            className="press 
-              w-[30px] h-[30px] rounded-[7px] border border-[var(--divider)] bg-[var(--surface)]
+            className="clay-raised-sm clay-interactive
+              w-[30px] h-[30px] border-none
               text-[var(--pale)] text-[14px] cursor-pointer shrink-0 flex items-center justify-center
-              transition-all duration-100
-              hover:bg-[var(--red-lt)] hover:border-[var(--red)] hover:text-[var(--red)]
+              hover:text-[var(--red)]
             "
           >
             ✕
@@ -213,12 +212,8 @@ function RequestCard({
     : ''
 
   return (
-    <div className={`
-      border-[1.5px] rounded-[14px] p-[16px_18px] shadow-[var(--sh)] transition-all duration-150
-      ${isConfirming
-        ? 'bg-[var(--red-lt)] border-[var(--red)]'
-        : 'bg-[var(--surface)] border-[#D97706]/30'}
-    `}>
+    <div className={`clay-raised p-[16px_18px] transition-all duration-150
+      ${isConfirming ? 'bg-[var(--red-lt)]' : ''}`}>
       {isConfirming ? (
         <ConfirmRow
           message={`Decline ${req.fullName}'s request?`}
@@ -241,7 +236,7 @@ function RequestCard({
           </div>
 
           {req.message && (
-            <div className="bg-[#FEF3E2] border border-[#D97706]/20 rounded-lg px-3 py-2 mb-3 text-[12px] text-[#78350F] italic leading-relaxed">
+            <div className="clay-pressed px-3 py-2 mb-3 text-[12px] text-[#78350F] italic leading-relaxed" style={{ background: '#FEF3E2' }}>
               "{req.message}"
             </div>
           )}
@@ -250,7 +245,7 @@ function RequestCard({
             <button
               onClick={onConfirmReject}
               disabled={isPending}
-              className={`press flex-1 py-[9px] rounded-[9px] border border-[var(--divider)] bg-[var(--surface)]
+              className={`clay-raised-sm clay-interactive flex-1 py-[9px] border-none
                 text-[var(--muted)] text-[13px] font-semibold cursor-pointer transition-opacity
                 ${isPending ? 'opacity-70' : ''}`}
             >
@@ -259,8 +254,8 @@ function RequestCard({
             <button
               onClick={onAccept}
               disabled={isPending}
-              className={`press flex-[2] py-[9px] rounded-[9px] border-none bg-[var(--green)] text-white text-[13px]
-                font-bold cursor-pointer shadow-[0_2px_10px_rgba(13,124,84,.25)] transition-opacity
+              className={`clay-btn-primary flex-[2] py-[9px] border-none bg-[var(--green)] text-white text-[13px]
+                font-bold cursor-pointer transition-opacity
                 ${isPending ? 'opacity-70' : ''}`}
             >
               {isPending ? 'Accepting…' : '✓ Accept & Add to Staff'}
@@ -426,12 +421,11 @@ export default function StaffManagementClient({
               <button
                 key={lib.id}
                 onClick={() => { setActiveLibId(lib.id); resetLibState() }}
-                className={`press 
-                  px-4 py-1.5 rounded-full text-[12px] font-semibold border-[1.5px] cursor-pointer
-                  transition-all duration-100
+                className={`clay-interactive
+                  px-4 py-1.5 text-[12px] font-semibold border-none cursor-pointer
                   ${isActive
-                    ? 'border-[var(--green)] bg-[#D1FAE5] text-[var(--green)]'
-                    : 'border-[var(--divider)] bg-[var(--surface)] text-[var(--muted)]'}
+                    ? 'clay-pressed bg-[#D1FAE5] text-[var(--green)]'
+                    : 'clay-raised-sm text-[var(--muted)]'}
                 `}
               >
                 {lib.name}
@@ -448,7 +442,7 @@ export default function StaffManagementClient({
       )}
 
       {/* Tab bar */}
-      <div className="flex mb-5 border border-[var(--divider)] rounded-[10px] overflow-hidden w-fit">
+      <div className="clay-raised-sm flex mb-5 overflow-hidden w-fit" style={{ padding: 3, gap: 3 }}>
         {([
           { key: 'staff',    label: 'Active Staff',     count: libStaff.length    },
           { key: 'requests', label: 'Pending Requests', count: libRequests.length },
@@ -459,19 +453,17 @@ export default function StaffManagementClient({
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`press 
-                px-[18px] py-2 text-[13px] font-semibold border-none cursor-pointer
-                flex items-center gap-1.5 transition-colors duration-100
-                ${i === 0 ? 'border-r border-[var(--divider)]' : ''}
+              className={`clay-interactive
+                px-[15px] py-2 rounded-[8px] text-[13px] font-semibold border-none cursor-pointer
+                flex items-center gap-1.5
                 ${isActive
-                  ? isAmber ? 'bg-[#FEF3E2] text-[#D97706]' : 'bg-[#D1FAE5] text-[var(--green)]'
-                  : 'bg-[var(--surface)] text-[var(--muted)]'}
+                  ? `clay-pressed ${isAmber ? 'bg-[#FEF3E2] text-[#D97706]' : 'bg-[#D1FAE5] text-[var(--green)]'}`
+                  : 'text-[var(--muted)]'}
               `}
             >
               {tab.label}
               {tab.count > 0 && (
-                <span className={`
-                  text-[11px] font-bold px-[7px] py-px rounded-full
+                <span className={`dash-badge
                   ${isActive
                     ? isAmber ? 'bg-[#D97706] text-white' : 'bg-[var(--green)] text-white'
                     : 'bg-[var(--divider)] text-[var(--pale)]'}
@@ -490,7 +482,7 @@ export default function StaffManagementClient({
 
           {/* Staff list */}
           <SectionCard>
-            <div className="px-[18px] py-[14px] border-b border-[var(--divider)] flex items-center justify-between">
+            <div className="px-[18px] py-[14px] flex items-center justify-between" style={{ boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.25)' }}>
               <span className="text-[14px] font-bold text-[var(--ink)]">
                 {activeLib?.name} — Staff
               </span>
@@ -509,7 +501,7 @@ export default function StaffManagementClient({
               </div>
             ) : (
               libStaff.map((member, idx) => (
-                <div key={member.staffId} className={idx < libStaff.length - 1 ? 'border-b border-[#F0EDE8]' : ''}>
+                <div key={member.staffId} style={idx < libStaff.length - 1 ? { boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.18)' } : undefined}>
                   <StaffRow
                     member={member}
                     isConfirming={confirmStaffId === member.staffId}
@@ -537,8 +529,8 @@ export default function StaffManagementClient({
               <label className="text-[11px] font-semibold text-[var(--muted)] block mb-[5px]">
                 Phone number
               </label>
-              <div className="flex">
-                <div className="px-2.5 py-[9px] bg-[var(--bg)] border border-[var(--divider)] border-r-0 rounded-l-[9px] text-[13px] text-[var(--muted)] font-semibold shrink-0">
+              <div className="clay-input flex items-center pr-0" style={{ padding: 0 }}>
+                <div className="px-2.5 py-[9px] text-[13px] text-[var(--muted)] font-semibold shrink-0">
                   +91
                 </div>
                 <input
@@ -547,7 +539,7 @@ export default function StaffManagementClient({
                   onKeyDown={e => e.key === 'Enter' && handleAdd()}
                   placeholder="98765 43210"
                   inputMode="numeric"
-                  className="inp rounded-l-none border-l-0 flex-1 !rounded-r-[9px]"
+                  className="flex-1 bg-transparent outline-none py-[9px] pr-3 text-[13px]"
                 />
               </div>
             </div>
@@ -558,17 +550,16 @@ export default function StaffManagementClient({
               <div className="flex gap-1.5">
                 {ROLE_OPTIONS.map(r => {
                   const rc = ROLE_CLASSES[r]
-                  const borderClass = rc.select.split(' ').find(c => c.startsWith('border-'))
                   return (
                     <button 
                       key={r}
                       onClick={() => setRoleInput(r)}
-                      className={` press 
-                        flex-1 py-[7px] px-1 rounded-lg border-[1.5px] text-[11px] font-bold
-                        cursor-pointer font-[var(--font-dm)] transition-all duration-100
+                      className={`clay-interactive
+                        flex-1 py-[7px] px-1 text-[11px] font-bold
+                        cursor-pointer font-[var(--font-dm)]
                         ${roleInput === r
-                          ? `${rc.badge} ${borderClass}`
-                          : 'border-[var(--divider)] bg-[var(--surface)] text-[var(--pale)]'}
+                          ? `clay-pressed ${rc.badge}`
+                          : 'clay-raised-sm text-[var(--pale)]'}
                       `}
                     >
                       {ROLE_LABELS[r]}
@@ -583,14 +574,15 @@ export default function StaffManagementClient({
             <button
               onClick={handleAdd}
               disabled={phone.length < 10 || isPending}
-              className={`press 
-                w-full py-[11px] rounded-[9px] border-none text-white text-[14px] font-bold
-                font-[var(--font-syne)] transition-all duration-100
+              className={`clay-btn-primary
+                w-full py-[11px] border-none text-white text-[14px] font-bold
+                font-[var(--font-syne)]
                 ${phone.length === 10
-                  ? 'bg-[var(--green)] cursor-pointer shadow-[0_2px_10px_rgba(13,124,84,.25)]'
-                  : 'bg-[#C8D4C8] cursor-not-allowed'}
+                  ? 'cursor-pointer'
+                  : 'cursor-not-allowed opacity-50'}
                 ${isPending ? 'opacity-70' : ''}
               `}
+              style={phone.length === 10 ? { background: `linear-gradient(155deg, #22B37C, var(--green), #0A5E3F)` } : { background: '#C8D4C8', boxShadow: 'none' }}
             >
               {isPending ? 'Adding…' : '+ Add Staff Member'}
             </button>

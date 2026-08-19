@@ -17,10 +17,10 @@ function AuthErrorContent() {
   const message = friendly[error] ?? decodeURIComponent(error)
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F4F7FB', fontFamily: 'DM Sans, sans-serif', padding: '24px' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--clay-bg)', fontFamily: 'DM Sans, sans-serif', padding: '24px' }}>
       <div style={{ maxWidth: 420, width: '100%', textAlign: 'center' }}>
         <Link href="/" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 40 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: '#1246FF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="clay-raised" style={{ width: 36, height: 36, background: '#1246FF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <rect x="2" y="2" width="5" height="7" rx="1.5" fill="white" fillOpacity="0.9"/>
               <rect x="9" y="2" width="5" height="5" rx="1.5" fill="white" fillOpacity="0.6"/>
@@ -32,8 +32,8 @@ function AuthErrorContent() {
           </span>
         </Link>
 
-        <div style={{ background: '#FDFCF9', border: '1px solid #E2DDD4', borderRadius: 20, padding: '40px 32px', boxShadow: '0 4px 24px rgba(10,13,18,.08)' }}>
-          <div style={{ width: 56, height: 56, borderRadius: 16, background: '#FDEAEA', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 24 }}>
+        <div className="clay-raised" style={{ background: 'var(--clay-surface)', padding: '40px 32px' }}>
+          <div className="clay-raised" style={{ width: 56, height: 56, background: '#FDEAEA', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 24 }}>
             ⚠️
           </div>
           <h1 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 22, color: '#0A0D12', letterSpacing: '-0.04em', marginBottom: 10 }}>
@@ -44,7 +44,8 @@ function AuthErrorContent() {
           </p>
           <Link
             href="/login"
-            style={{ display: 'block', padding: '13px 0', borderRadius: 10, fontSize: 14, fontWeight: 700, background: '#1246FF', color: '#fff', fontFamily: 'Syne, sans-serif', textDecoration: 'none', boxShadow: '0 4px 16px rgba(18,70,255,.25)' }}
+            className="clay-btn-primary"
+            style={{ display: 'block', padding: '13px 0', fontSize: 14, fontWeight: 700, background: `linear-gradient(155deg, #4D78FF, #1246FF, #0D3AE0)`, color: '#fff', fontFamily: 'Syne, sans-serif', textDecoration: 'none' }}
           >
             Try again →
           </Link>

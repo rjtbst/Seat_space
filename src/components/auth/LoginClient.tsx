@@ -40,7 +40,7 @@ function Spinner({ color = '#fff' }: { color?: string }) {
 
 function ErrorBanner({ msg }: { msg: string }) {
   return (
-    <div style={{ background: '#FDEAEA', border: '1px solid rgba(212,43,43,.2)', borderRadius: 10, padding: '10px 14px', marginBottom: 16, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+    <div className="clay-raised-sm" style={{ background: '#FDEAEA', border: 'none', padding: '10px 14px', marginBottom: 16, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
       <span style={{ flexShrink: 0 }}>⚠️</span>
       <p style={{ fontSize: 13, color: '#9B1C1C', margin: 0, lineHeight: 1.4 }}>{msg}</p>
     </div>
@@ -49,7 +49,7 @@ function ErrorBanner({ msg }: { msg: string }) {
 
 function InfoBanner({ msg }: { msg: string }) {
   return (
-    <div style={{ background: '#E8F8EF', border: '1px solid rgba(13,124,84,.2)', borderRadius: 10, padding: '10px 14px', marginBottom: 16, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+    <div className="clay-raised-sm" style={{ background: '#E8F8EF', border: 'none', padding: '10px 14px', marginBottom: 16, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
       <span style={{ flexShrink: 0 }}>✓</span>
       <p style={{ fontSize: 13, color: '#0D7C54', margin: 0, lineHeight: 1.4 }}>{msg}</p>
     </div>
@@ -149,32 +149,28 @@ function LoginContent() {
   }
 
   const primaryBtn: React.CSSProperties = {
-    width: '100%', padding: '14px 0', borderRadius: 10, fontSize: 15, fontWeight: 700,
+    width: '100%', padding: '14px 0', borderRadius: 14, fontSize: 15, fontWeight: 700,
     fontFamily: 'Syne, sans-serif', border: 'none', cursor: 'pointer',
-    background: '#1246FF', color: '#fff', boxShadow: '0 4px 16px rgba(18,70,255,.3)',
-    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all .15s',
+    background: `linear-gradient(155deg, #4D78FF, #1246FF, #0D3AE0)`, color: '#fff',
+    boxShadow: '4px 4px 12px rgba(18,70,255,.32), -3px -3px 8px rgba(255,255,255,.4), inset 0 1px 1px rgba(255,255,255,.3)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'transform .15s, box-shadow .15s',
   }
 
   const inputStyle: React.CSSProperties = {
-    width: '100%', padding: '12px 14px', border: '1.5px solid #E2DDD4', borderRadius: 10,
+    width: '100%', padding: '12px 14px', border: 'none', borderRadius: 12,
     fontSize: 15, color: '#0A0D12', outline: 'none', fontFamily: 'DM Sans, sans-serif',
-    background: '#FDFCF9', boxSizing: 'border-box', marginBottom: 14,
+    background: 'var(--clay-surface)', boxSizing: 'border-box', marginBottom: 14,
+    boxShadow: 'inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6)',
   }
 
   const canSubmitEmail = email.includes('@') && password.length >= 8
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg,#F4F7FB 0%,#EDE8DC 100%)', fontFamily: 'DM Sans, sans-serif', padding: '24px 16px', position: 'relative' }}>
-      {/* Decorative blobs */}
-      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
-        <div style={{ position: 'absolute', width: 500, height: 500, top: -150, right: -100, borderRadius: '50%', background: 'radial-gradient(circle,rgba(18,70,255,.07),transparent 70%)' }} />
-        <div style={{ position: 'absolute', width: 400, height: 400, bottom: -100, left: -80, borderRadius: '50%', background: 'radial-gradient(circle,rgba(13,124,84,.05),transparent 70%)' }} />
-      </div>
-
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--clay-bg)', fontFamily: 'DM Sans, sans-serif', padding: '24px 16px', position: 'relative' }}>
       <div style={{ width: '100%', maxWidth: 420, position: 'relative', zIndex: 1 }}>
         {/* <Logo /> */}
 
-        <div style={{ background: '#FDFCF9', border: '1px solid #E2DDD4', borderRadius: 20, padding: '36px 32px', boxShadow: '0 4px 32px rgba(10,13,18,.08)' }}>
+        <div className="clay-raised" style={{ background: 'var(--clay-surface)', padding: '36px 32px' }}>
           {/* Heading */}
           <div style={{ textAlign: 'center', marginBottom: 24 }}>
             <h1 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 26, color: '#0A0D12', letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: 8 }}>
@@ -188,10 +184,10 @@ function LoginContent() {
           </div>
 
           {/* Tabs */}
-          <div style={{ display: 'flex', gap: 4, background: '#F4F7FB', borderRadius: 12, padding: 4, marginBottom: 24 }}>
+          <div className="clay-pressed" style={{ display: 'flex', gap: 4, borderRadius: 14, padding: 4, marginBottom: 24 }}>
             {(['google', 'email'] as const).map(t => (
-              <button key={t} onClick={() => switchTab(t)}
-                style={{ flex: 1, padding: '9px 0', borderRadius: 9, fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer', transition: 'all .15s', background: tab === t ? '#FDFCF9' : 'transparent', color: tab === t ? '#0A0D12' : '#9AAAB8', boxShadow: tab === t ? '0 1px 6px rgba(10,13,18,.09)' : 'none', fontFamily: 'DM Sans, sans-serif' }}>
+              <button className="clay-interactive" key={t} onClick={() => switchTab(t)}
+                style={{ flex: 1, padding: '9px 0', borderRadius: 10, fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer', background: tab === t ? 'var(--clay-surface)' : 'transparent', color: tab === t ? '#0A0D12' : '#9AAAB8', boxShadow: tab === t ? '2px 2px 6px rgba(163,177,198,.28), -2px -2px 5px rgba(255,255,255,.6)' : 'none', fontFamily: 'DM Sans, sans-serif' }}>
                 {t === 'google' ? '🌐  Google' : '✉️  Email'}
               </button>
             ))}
@@ -203,10 +199,8 @@ function LoginContent() {
           {/* ── Google ── */}
           {tab === 'google' && (
             <div>
-              <button onClick={handleGoogle} disabled={isPending}
-                style={{ ...primaryBtn, background: isPending ? '#F4F7FB' : '#fff', color: '#0A0D12', boxShadow: 'none', border: '1.5px solid #E2DDD4', cursor: isPending ? 'wait' : 'pointer' }}
-                onMouseEnter={e => { if (!isPending) e.currentTarget.style.background = '#F4F7FB' }}
-                onMouseLeave={e => { if (!isPending) e.currentTarget.style.background = '#fff' }}
+              <button className="clay-raised clay-interactive" onClick={handleGoogle} disabled={isPending}
+                style={{ ...primaryBtn, background: 'var(--clay-surface)', color: '#0A0D12', boxShadow: undefined, border: 'none', cursor: isPending ? 'wait' : 'pointer' }}
               >
                 {isPending ? <Spinner color="#1246FF" /> : (
                   <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -219,14 +213,12 @@ function LoginContent() {
                 {isPending ? 'Redirecting...' : 'Continue with Google'}
               </button>
               <div style={{ margin: '18px 0', display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ flex: 1, height: 1, background: '#E2DDD4' }} />
+                <div style={{ flex: 1, height: 1, boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.3)' }} />
                 <span style={{ fontSize: 12, color: '#9AAAB8', whiteSpace: 'nowrap' }}>or use email</span>
-                <div style={{ flex: 1, height: 1, background: '#E2DDD4' }} />
+                <div style={{ flex: 1, height: 1, boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.3)' }} />
               </div>
-              <button onClick={() => switchTab('email')}
-                style={{ width: '100%', padding: '12px 0', borderRadius: 10, fontSize: 14, fontWeight: 600, background: 'transparent', color: '#1246FF', border: '1.5px solid rgba(18,70,255,.25)', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif', transition: 'background .15s' }}
-                onMouseEnter={e => (e.currentTarget.style.background = '#E8EFFE')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+              <button className="clay-raised-sm clay-interactive" onClick={() => switchTab('email')}
+                style={{ width: '100%', padding: '12px 0', fontSize: 14, fontWeight: 600, background: 'transparent', color: '#1246FF', border: 'none', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif' }}
               >
                 Use email instead →
               </button>
@@ -323,7 +315,7 @@ function LoginContent() {
 export default function LoginClient() {
   return (
     <Suspense fallback={
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F4F7FB' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--clay-bg)' }}>
         <div style={{ width: 32, height: 32, border: '3px solid #E2DDD4', borderTopColor: '#1246FF', borderRadius: '50%', animation: 'spin .7s linear infinite' }} />
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>

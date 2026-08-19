@@ -16,7 +16,7 @@ import { toast } from 'sonner'
 import { fmtIST, fmtISTTime } from '@/lib/ist'
 import { BookingQRModal } from './BookingQRCode'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
-import { ClayCard, ClayChip, ClayButton, ClayToggleChip, ClayIconBadge } from '@/components/ui/Clay'
+import { ClayCard, ClayChip, ClayButton, ClayToggleChip, ClayIconBadge } from '@/components/ui/clay'
 
 const STATUS: Record<string, { label: string; tone: 'success' | 'info' | 'warning' | 'neutral' | 'danger'; Icon: typeof CheckCircle2 }> = {
   confirmed:  { label: 'Confirmed',   tone: 'success', Icon: CheckCircle2 },

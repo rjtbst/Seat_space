@@ -27,7 +27,7 @@ function OccupancyBar({ occupied, total }: { occupied: number; total: number }) 
         <span style={{ color: '#6B7689' }}>Live occupancy</span>
         <span style={{ fontWeight: 700, color }}>{pct}%</span>
       </div>
-      <div style={{ height: 8, borderRadius: 4, background: '#E2DDD4', overflow: 'hidden' }}>
+      <div style={{ height: 8, borderRadius: 4, overflow: 'hidden', boxShadow: 'inset 2px 2px 5px rgba(163,177,198,.35), inset -1px -1px 3px rgba(255,255,255,.5)' }}>
         <div style={{
           height: '100%', width: `${pct}%`,
           background: color, borderRadius: 4,
@@ -110,8 +110,8 @@ export default function StaffDashboardClient({
       {/* Header */}
       <div style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-          <div style={{
-            width: 36, height: 36, borderRadius: 10,
+          <div className="clay-icon-badge" style={{
+            width: 36, height: 36,
             background: ACCENT, display: 'flex', alignItems: 'center',
             justifyContent: 'center', fontSize: 18,
           }}>
@@ -133,9 +133,9 @@ export default function StaffDashboardClient({
 
       {/* Senior staff badge */}
       {isSenior && (
-        <div style={{
-          background: '#EFF6FF', border: '1px solid rgba(30,92,255,.2)',
-          borderRadius: 10, padding: '8px 12px', marginBottom: 14,
+        <div className="clay-raised-sm" style={{
+          background: '#EFF6FF', border: 'none',
+          padding: '8px 12px', marginBottom: 14,
           display: 'flex', alignItems: 'center', gap: 8,
           fontSize: 12, color: '#1E5CFF', fontWeight: 600,
         }}>
@@ -144,17 +144,15 @@ export default function StaffDashboardClient({
       )}
 
       {/* Occupancy card */}
-      <div style={{
-        background: '#FDFCF9', border: '1px solid #E2DDD4',
-        borderRadius: 16, padding: '16px 18px', marginBottom: 16,
-        boxShadow: '0 2px 8px rgba(10,13,18,.04)',
+      <div className="clay-raised" style={{
+        padding: '16px 18px', marginBottom: 16,
       }}>
         <OccupancyBar occupied={stats.currentlyOccupied} total={stats.totalActiveSeats} />
 
         {stats.heldSeats > 0 && (
-          <div style={{
+          <div className="clay-raised-sm" style={{
             marginTop: 10, padding: '6px 10px',
-            background: AMBER_LIGHT, borderRadius: 8,
+            background: AMBER_LIGHT,
             fontSize: 12, color: AMBER, fontWeight: 600,
             display: 'flex', alignItems: 'center', gap: 6,
           }}>
@@ -166,13 +164,13 @@ export default function StaffDashboardClient({
       {/* Stat cards */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 20 }}>
         {[
-          { value: stats.todayBookings,   label: 'Today',      bg: '#F9F8F5',   color: '#0A0D12' },
+          { value: stats.todayBookings,   label: 'Today',      bg: 'var(--clay-surface)', color: '#0A0D12' },
           { value: stats.checkedIn,       label: 'Checked-in', bg: GREEN_LIGHT, color: GREEN     },
           { value: stats.pendingCheckIns, label: 'Pending',    bg: AMBER_LIGHT, color: AMBER     },
         ].map(({ value, label, bg, color }) => (
-          <div key={label} style={{
-            background: bg, borderRadius: 12, padding: '12px 10px',
-            textAlign: 'center', border: '1px solid #E2DDD4',
+          <div key={label} className="clay-raised" style={{
+            background: bg, padding: '12px 10px',
+            textAlign: 'center',
           }}>
             <div style={{ fontSize: 26, fontWeight: 800, fontFamily: 'Syne, sans-serif', color }}>
               {value}
@@ -193,23 +191,17 @@ export default function StaffDashboardClient({
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
         {quickActions.map(a => (
-          <button className="press"
+          <button className="clay-raised clay-interactive"
             key={a.href}
             onClick={() => router.push(a.href)}
             style={{
               background:   a.bg,
-              border:       `1.5px solid ${a.border}`,
-              borderRadius: 14,
+              border:       'none',
               padding:      '16px 14px',
               textAlign:    'left',
               cursor:       'pointer',
-              transition:   'transform .1s',
               fontFamily:   'DM Sans, sans-serif',
             }}
-            onMouseDown={e => (e.currentTarget.style.transform = 'scale(.97)')}
-            onMouseUp={e   => (e.currentTarget.style.transform = 'scale(1)')}
-            onTouchStart={e => (e.currentTarget.style.transform = 'scale(.97)')}
-            onTouchEnd={e   => (e.currentTarget.style.transform = 'scale(1)')}
           >
             <div style={{ fontSize: 26, marginBottom: 8 }}>{a.emoji}</div>
             <div style={{
@@ -225,15 +217,14 @@ export default function StaffDashboardClient({
 
       {/* Pending check-ins CTA */}
       {stats.pendingCheckIns > 0 && (
-        <button className="press"
+        <button className="clay-btn-primary"
           onClick={() => router.push('/staff/bookings')}
           style={{
             marginTop:      16,
             width:          '100%',
             padding:        '13px 16px',
-            borderRadius:   12,
             border:         'none',
-            background:     ACCENT,
+            background:     `linear-gradient(155deg, #22D9EA, ${ACCENT}, #05707D)`,
             color:          '#fff',
             fontSize:       14,
             fontWeight:     700,
@@ -243,7 +234,6 @@ export default function StaffDashboardClient({
             alignItems:     'center',
             justifyContent: 'center',
             gap:            8,
-            boxShadow:      '0 4px 16px rgba(5,151,167,.3)',
           }}
         >
           ✓ {stats.pendingCheckIns} pending check-in{stats.pendingCheckIns > 1 ? 's' : ''} — tap to review

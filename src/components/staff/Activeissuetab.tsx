@@ -44,7 +44,7 @@ export default function ActiveIssuesTab({ libraryId, issues, onReturned }: Props
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       {error && (
-        <div style={{ fontSize: 12, color: '#DC2626', background: '#FEF2F2', padding: '8px 12px', borderRadius: 8, fontFamily: 'DM Sans, sans-serif' }}>
+        <div className="clay-raised-sm" style={{ fontSize: 12, color: '#DC2626', background: '#FEF2F2', padding: '8px 12px', fontFamily: 'DM Sans, sans-serif' }}>
           {error}
         </div>
       )}
@@ -54,7 +54,7 @@ export default function ActiveIssuesTab({ libraryId, issues, onReturned }: Props
         <div>
           <div style={sectionHeader}>
             <span style={{ color: '#DC2626' }}>⚠ Overdue</span>
-            <span style={{ fontSize: 11, fontWeight: 600, color: '#DC2626', background: '#FEF2F2', padding: '2px 8px', borderRadius: 20 }}>
+            <span className="dash-badge" style={{ color: '#DC2626', background: '#FEF2F2' }}>
               {overdue.length}
             </span>
           </div>
@@ -78,7 +78,7 @@ export default function ActiveIssuesTab({ libraryId, issues, onReturned }: Props
           {overdue.length > 0 && (
             <div style={sectionHeader}>
               <span>Active</span>
-              <span style={{ fontSize: 11, fontWeight: 600, color: ACCENT, background: '#F4F7FB', padding: '2px 8px', borderRadius: 20 }}>
+              <span className="dash-badge" style={{ color: ACCENT, background: 'var(--clay-surface)' }}>
                 {onTime.length}
               </span>
             </div>
@@ -112,10 +112,8 @@ function IssueCard({
     new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: '2-digit' })
 
   return (
-    <div style={{
-      background: done ? '#ECFDF5' : issue.isOverdue ? '#FFF5F5' : '#FDFCF9',
-      border:     `1px solid ${done ? '#A7F3D0' : issue.isOverdue ? '#FECACA' : '#E2DDD4'}`,
-      borderRadius: 10,
+    <div className="clay-raised" style={{
+      background: done ? '#ECFDF5' : issue.isOverdue ? '#FFF5F5' : 'var(--clay-surface)',
       padding:    '12px 14px',
       transition: 'background .3s',
     }}>
@@ -128,14 +126,13 @@ function IssueCard({
             <div style={{ fontSize: 11, color: '#9AAAB8', marginTop: 1, fontFamily: 'DM Sans, sans-serif' }}>{issue.author}</div>
           )}
         </div>
-        <button className="press"
+        <button className="clay-raised-sm clay-interactive"
           onClick={onReturn}
           disabled={returning || done}
           style={{
             background:   done ? '#059669' : returning ? '#9AAAB8' : ACCENT,
             color:        '#fff',
             border:       'none',
-            borderRadius: 7,
             padding:      '6px 12px',
             fontSize:     11,
             fontWeight:   700,

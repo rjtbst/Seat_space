@@ -98,7 +98,7 @@ export default function RequestsTab({ libraryId, requests, catalog, onApproved, 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       {error && (
-        <div style={{ fontSize: 12, color: '#DC2626', background: '#FEF2F2', padding: '8px 12px', borderRadius: 8, fontFamily: 'DM Sans, sans-serif' }}>
+        <div className="clay-raised-sm" style={{ fontSize: 12, color: '#DC2626', background: '#FEF2F2', padding: '8px 12px', fontFamily: 'DM Sans, sans-serif' }}>
           {error}
         </div>
       )}
@@ -107,7 +107,7 @@ export default function RequestsTab({ libraryId, requests, catalog, onApproved, 
         <div>
           <div style={sectionHeader}>
             Pending
-            <span style={{ fontSize: 11, fontWeight: 700, color: ACCENT, background: '#F4F7FB', padding: '2px 8px', borderRadius: 20 }}>
+            <span className="dash-badge" style={{ color: ACCENT, background: 'var(--clay-surface)' }}>
               {pending.length}
             </span>
           </div>
@@ -120,14 +120,11 @@ export default function RequestsTab({ libraryId, requests, catalog, onApproved, 
               const isOpen     = expanded === req.requestId
 
               return (
-                <div key={req.requestId} style={{
-                  background:   '#FDFCF9',
-                  border:       '1px solid #E2DDD4',
-                  borderRadius: 10,
+                <div key={req.requestId} className="clay-raised" style={{
                   overflow:     'hidden',
                 }}>
                   {/* Header row */}
-                  <button className="press"
+                  <button className="clay-interactive"
                     onClick={() => setExpanded(isOpen ? null : req.requestId)}
                     style={{
                       width:       '100%',
@@ -151,11 +148,9 @@ export default function RequestsTab({ libraryId, requests, catalog, onApproved, 
                       </div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                      <span style={{
-                        fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 20,
+                      <span className="dash-badge" style={{
                         background: hasAvail ? '#ECFDF5' : '#FEF2F2',
                         color:      hasAvail ? '#059669' : '#DC2626',
-                        fontFamily: 'DM Sans, sans-serif',
                       }}>
                         {hasAvail ? `${book!.availableCopies} avail` : 'none avail'}
                       </span>
@@ -165,7 +160,7 @@ export default function RequestsTab({ libraryId, requests, catalog, onApproved, 
 
                   {/* Expanded: due date + actions */}
                   {isOpen && (
-                    <div style={{ padding: '0 14px 14px', borderTop: '1px solid #F4F7FB' }}>
+                    <div style={{ padding: '0 14px 14px', boxShadow: 'inset 0 1px 0 rgba(163,177,198,.2)' }}>
                       {req.message && (
                         <div style={{ fontSize: 12, color: '#6B7689', fontFamily: 'DM Sans, sans-serif', marginBottom: 10, marginTop: 10, fontStyle: 'italic' }}>
                           "{req.message}"
@@ -181,15 +176,13 @@ export default function RequestsTab({ libraryId, requests, catalog, onApproved, 
                         />
                       </div>
                       <div style={{ display: 'flex', gap: 8 }}>
-                        <button className="press"
+                        <button className="clay-btn-primary"
                           onClick={() => handleApprove(req)}
                           disabled={isLoading || isRejecting || !hasAvail}
                           style={{
                             flex:         1,
-                            background:   ACCENT,
-                            color:        '#fff',
+                            background:   `linear-gradient(155deg, #22D9EA, ${ACCENT}, #05707D)`,
                             border:       'none',
-                            borderRadius: 8,
                             padding:      '9px 0',
                             fontSize:     12,
                             fontWeight:   700,
@@ -200,15 +193,14 @@ export default function RequestsTab({ libraryId, requests, catalog, onApproved, 
                         >
                           {isLoading ? '…' : '✓ Approve'}
                         </button>
-                        <button className="press"
+                        <button className="clay-raised-sm clay-interactive"
                           onClick={() => handleReject(req)}
                           disabled={isLoading || isRejecting}
                           style={{
                             flex:         1,
                             background:   'transparent',
                             color:        '#DC2626',
-                            border:       '1px solid #FECACA',
-                            borderRadius: 8,
+                            border:       'none',
                             padding:      '9px 0',
                             fontSize:     12,
                             fontWeight:   700,
@@ -234,10 +226,8 @@ export default function RequestsTab({ libraryId, requests, catalog, onApproved, 
           <div style={{ ...sectionHeader, marginTop: pending.length > 0 ? 8 : 0 }}>History</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {reviewed.map(req => (
-              <div key={req.requestId} style={{
-                background:   '#F4F7FB',
-                border:       '1px solid #E2DDD4',
-                borderRadius: 10,
+              <div key={req.requestId} className="clay-raised-sm" style={{
+                background:   'var(--clay-surface)',
                 padding:      '10px 14px',
                 display:      'flex',
                 justifyContent: 'space-between',
@@ -250,11 +240,10 @@ export default function RequestsTab({ libraryId, requests, catalog, onApproved, 
                   </div>
                   <div style={{ fontSize: 11, color: '#9AAAB8', marginTop: 1, fontFamily: 'DM Sans, sans-serif' }}>{req.userName}</div>
                 </div>
-                <span style={{
-                  fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20, flexShrink: 0,
-                  background: req.status === 'approved' ? '#ECFDF5' : '#F4F7FB',
+                <span className="dash-badge" style={{
+                  flexShrink: 0,
+                  background: req.status === 'approved' ? '#ECFDF5' : 'var(--clay-surface)',
                   color:      req.status === 'approved' ? '#059669' : req.status === 'rejected' ? '#DC2626' : '#9AAAB8',
-                  fontFamily: 'DM Sans, sans-serif',
                   textTransform: 'capitalize',
                 }}>
                   {req.status}
@@ -296,9 +285,10 @@ const inputStyle: React.CSSProperties = {
   width:        '100%',
   boxSizing:    'border-box',
   padding:      '9px 12px',
-  borderRadius: 8,
-  border:       '1px solid #E2DDD4',
-  background:   '#fff',
+  borderRadius: 12,
+  border:       'none',
+  background:   'var(--clay-surface)',
+  boxShadow:    'inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6)',
   fontSize:     13,
   color:        '#0A0D12',
   fontFamily:   'DM Sans, sans-serif',

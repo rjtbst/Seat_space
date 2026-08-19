@@ -168,7 +168,7 @@ export function ClayIconBadge({
 ───────────────────────────────────────────────────────────────────────── */
 export function ClayToggleChip({
   active = false, className, children, ...rest
-}: { active?: boolean; className?: string } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
+}: { active?: boolean; className?: string } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'className'>) {
   return (
     <button
       className={cn(

@@ -52,10 +52,10 @@ export default function StaffBooksClient({ data }: { data: StaffBooksPageData })
       </div>
 
       {/* Tab bar */}
-      <div style={{
+      <div className="clay-pressed" style={{
         display: 'flex', gap: 4,
-        background: '#F4F7FB', borderRadius: 12, padding: 4,
-        marginBottom: 20, border: '1px solid #E2DDD4',
+        borderRadius: 12, padding: 4,
+        marginBottom: 20,
       }}>
         {TABS.map(tab => {
           const active  = activeTab === tab.id
@@ -63,7 +63,7 @@ export default function StaffBooksClient({ data }: { data: StaffBooksPageData })
                         : tab.id === 'active'   ? overdueCount
                         : 0
           return (
-            <button className="press"
+            <button className="clay-interactive"
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               style={{
@@ -75,14 +75,13 @@ export default function StaffBooksClient({ data }: { data: StaffBooksPageData })
                 padding:      '8px 4px',
                 borderRadius: 9,
                 border:       'none',
-                background:   active ? '#FDFCF9' : 'transparent',
+                background:   active ? 'var(--clay-surface)' : 'transparent',
                 color:        active ? ACCENT : '#6B7689',
                 fontSize:     12,
                 fontWeight:   active ? 700 : 500,
                 cursor:       'pointer',
                 fontFamily:   'DM Sans, sans-serif',
-                boxShadow:    active ? '0 1px 4px rgba(10,13,18,.08)' : 'none',
-                transition:   'all .15s',
+                boxShadow:    active ? '2px 2px 6px rgba(163,177,198,.28), -2px -2px 5px rgba(255,255,255,.6)' : 'none',
                 position:     'relative',
               }}
             >

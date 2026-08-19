@@ -23,7 +23,7 @@ export default function BooksLoading() {
         <SkeletonCard key={gi} className="mb-4 p-0 overflow-hidden">
 
           {/* Library header bar */}
-          <div className="flex items-center justify-between px-4 py-3 bg-[#F8FAFC] border-b border-[#E4EAF2]">
+          <div className="flex items-center justify-between px-4 py-3" style={{ boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.25)' }}>
             <div>
               <Bone width={180} height={14} className="mb-1.5" />
               <Bone width={100} height={11} />
@@ -35,7 +35,8 @@ export default function BooksLoading() {
           {Array.from({ length: 3 }).map((_, ri) => (
             <div
               key={ri}
-              className="flex items-center gap-3 px-4 py-3 border-b border-[#F4F7FB] last:border-0"
+              className="flex items-center gap-3 px-4 py-3 last:shadow-none"
+              style={{ boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.18)' }}
             >
               <div className="flex-1 space-y-1.5">
                 <Bone width="55%" height={13} />

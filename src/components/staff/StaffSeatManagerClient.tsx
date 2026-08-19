@@ -221,10 +221,11 @@ export default function StaffSeatManagerClient({
 
   /* ── Shared input style ──────────────────────────────────────────────── */
   const inp: React.CSSProperties = {
-    padding: '9px 12px', border: '1.5px solid #E2DDD4', borderRadius: 9,
+    padding: '9px 12px', border: 'none', borderRadius: 12,
     fontSize: 13, color: '#0A0D12', outline: 'none', width: '100%',
-    fontFamily: 'DM Sans, sans-serif', background: '#FDFCF9',
+    fontFamily: 'DM Sans, sans-serif', background: 'var(--clay-surface)',
     boxSizing: 'border-box',
+    boxShadow: 'inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6)',
   }
   const sel: React.CSSProperties = { ...inp, cursor: 'pointer' }
 
@@ -234,12 +235,11 @@ export default function StaffSeatManagerClient({
 
       {/* Toast */}
       {toast && (
-        <div style={{
+        <div className="clay-raised" style={{
           position: 'fixed', bottom: 80, left: '50%', transform: 'translateX(-50%)',
           zIndex: 100, background: '#0A0D12', color: '#fff',
-          padding: '10px 20px', borderRadius: 10, fontSize: 13, fontWeight: 600,
-          boxShadow: '0 4px 20px rgba(0,0,0,.2)', whiteSpace: 'nowrap',
-          animation: 'fadeUp .2s ease',
+          padding: '10px 20px', fontSize: 13, fontWeight: 600,
+          whiteSpace: 'nowrap',
         }}>
           {toast}
         </div>
@@ -262,13 +262,13 @@ export default function StaffSeatManagerClient({
           </div>
         </div>
         <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-          <button className="press"
+          <button
             onClick={handleManualRefresh}
             disabled={isRefreshing}
             title="Refresh seat status"
+            className="clay-icon-badge clay-interactive"
             style={{
-              width: 38, height: 38, borderRadius: 9,
-              border: '1.5px solid #E2DDD4', background: '#FDFCF9',
+              width: 38, height: 38, border: 'none',
               cursor: isRefreshing ? 'default' : 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 16, color: '#3A4A5C',
@@ -282,11 +282,11 @@ export default function StaffSeatManagerClient({
               ↻
             </span>
           </button>
-          <button className="press"
+          <button className="clay-raised-sm clay-interactive"
             onClick={() => setShowAddRow(v => !v)}
             style={{
-              padding: '8px 14px', borderRadius: 9, fontSize: 13, fontWeight: 600,
-              border: '1.5px solid #E2DDD4', background: '#FDFCF9', color: '#3A4A5C',
+              padding: '8px 14px', fontSize: 13, fontWeight: 600,
+              border: 'none', background: 'var(--clay-surface)', color: '#3A4A5C',
               cursor: 'pointer', fontFamily: 'DM Sans, sans-serif', flexShrink: 0,
             }}
           >
@@ -297,9 +297,9 @@ export default function StaffSeatManagerClient({
       <style dangerouslySetInnerHTML={{ __html: `@keyframes spin { to { transform: rotate(360deg); } }` }} />
 
       {/* Info banner */}
-      <div style={{
-        background: ACCENT_LIGHT, border: `1px solid rgba(5,151,167,.25)`,
-        borderRadius: 12, padding: '10px 14px', marginBottom: 14,
+      <div className="clay-raised-sm" style={{
+        background: ACCENT_LIGHT, border: 'none',
+        padding: '10px 14px', marginBottom: 14,
         display: 'flex', gap: 8, alignItems: 'center',
       }}>
         <span>💡</span>
@@ -309,27 +309,22 @@ export default function StaffSeatManagerClient({
       </div>
 
       {/* Floor grid */}
-      <div style={{
-        background: '#FDFCF9', border: '1px solid #E2DDD4',
-        borderRadius: 14, overflow: 'hidden', marginBottom: 14,
-        boxShadow: '0 2px 8px rgba(10,13,18,.04)',
+      <div className="clay-raised" style={{
+        overflow: 'hidden', marginBottom: 14,
       }}>
         {/* Grid header */}
         <div style={{
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          padding: '12px 16px', borderBottom: '1px solid #E2DDD4',
+          padding: '12px 16px', boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.25)',
         }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: '#0A0D12' }}>Floor Layout</div>
           <div style={{ display: 'flex', gap: 6 }}>
             {[
               { label: `${active} active`,  bg: ACCENT_LIGHT, color: ACCENT    },
               { label: `${booked} booked`,  bg: BLUE_LIGHT,   color: BLUE      },
-              { label: `${inactive} off`,   bg: '#F4F7FB',    color: '#9AAAB8' },
+              { label: `${inactive} off`,   bg: 'var(--clay-surface)', color: '#9AAAB8' },
             ].map(({ label, bg, color }) => (
-              <span key={label} style={{
-                padding: '3px 8px', borderRadius: 20, fontSize: 10,
-                fontWeight: 600, background: bg, color,
-              }}>
+              <span key={label} className="dash-badge" style={{ background: bg, color }}>
                 {label}
               </span>
             ))}
@@ -348,8 +343,8 @@ export default function StaffSeatManagerClient({
               .sort((a, b) => a.column_number - b.column_number)
             return (
               <div key={row} style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 6 }}>
-                <div style={{
-                  width: 22, height: 22, borderRadius: 5, background: '#F4F7FB',
+                <div className="clay-icon-badge" style={{
+                  width: 22, height: 22, borderRadius: 5,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 10, fontWeight: 700, color: '#6B7689', flexShrink: 0,
                 }}>
@@ -362,19 +357,21 @@ export default function StaffSeatManagerClient({
                     return (
                       <div key={seat.id} style={{ display: 'flex', alignItems: 'center' }}>
                         {idx === 4 && <div style={{ width: 8 }} />}
-                        <button className="press"
+                        <button className="clay-interactive"
                           onClick={() => {
                             setSelected(seat.id === selected?.id ? null : seat)
                             setConfirmForceFree(false)
                             resetForm()
                           }}
                           style={{
-                            width: 36, height: 36, borderRadius: 7,
+                            width: 36, height: 36, borderRadius: 10,
                             background: sc.bg,
-                            border: `2px solid ${isSelected ? '#0A0D12' : sc.border}`,
+                            border: 'none',
                             color: sc.color, fontSize: 9, fontWeight: 700,
-                            cursor: 'pointer', transition: 'all .12s',
-                            boxShadow: isSelected ? '0 0 0 3px rgba(5,151,167,.2)' : 'none',
+                            cursor: 'pointer',
+                            boxShadow: isSelected
+                              ? 'inset 2px 2px 5px rgba(0,0,0,.18), inset -1px -1px 4px rgba(255,255,255,.4)'
+                              : `2px 2px 6px ${sc.border}66, -2px -2px 5px rgba(255,255,255,.6)`,
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                           }}
                         >
@@ -392,9 +389,9 @@ export default function StaffSeatManagerClient({
           <div style={{ display: 'flex', gap: 12, marginTop: 14, flexWrap: 'wrap' }}>
             {Object.entries(SEAT_COLORS).map(([key, sc]) => (
               <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <div style={{
+                <div className="clay-raised-sm" style={{
                   width: 11, height: 11, borderRadius: 3,
-                  background: sc.bg, border: `1.5px solid ${sc.border}`,
+                  background: sc.bg, border: 'none',
                 }} />
                 <span style={{ fontSize: 10, color: '#6B7689' }}>{sc.label}</span>
               </div>
@@ -405,11 +402,8 @@ export default function StaffSeatManagerClient({
 
       {/* ── Seat editor ─────────────────────────────────────────────────── */}
       {selected && (
-        <div style={{
-          background: '#FDFCF9', border: '1px solid #E2DDD4',
-          borderRadius: 14, padding: '16px', marginBottom: 14,
-          boxShadow: '0 2px 8px rgba(10,13,18,.04)',
-          animation: 'slideUp .18s ease',
+        <div className="clay-raised" style={{
+          padding: '16px', marginBottom: 14,
         }}>
           {/* Panel header */}
           <div style={{
@@ -419,10 +413,7 @@ export default function StaffSeatManagerClient({
             <div style={{ fontSize: 15, fontWeight: 700, color: '#0A0D12', fontFamily: 'Syne, sans-serif' }}>
               Seat {selected.row_label}{selected.column_number}
             </div>
-            <span style={{
-              padding: '3px 10px', borderRadius: 20, fontSize: 11,
-              fontWeight: 600, background: ACCENT_LIGHT, color: ACCENT,
-            }}>
+            <span className="dash-badge" style={{ background: ACCENT_LIGHT, color: ACCENT }}>
               Selected
             </span>
           </div>
@@ -430,7 +421,7 @@ export default function StaffSeatManagerClient({
           {/* Active toggle row */}
           <div style={{
             display: 'flex', alignItems: 'center', gap: 10,
-            padding: '10px 0', borderBottom: '1px solid #E2DDD4',
+            padding: '10px 0', boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.25)',
           }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: '#3A4A5C' }}>
               Status:{' '}
@@ -440,24 +431,17 @@ export default function StaffSeatManagerClient({
             </div>
 
             {/* Toggle switch */}
-            <button className="press"
+            <button className="dash-toggle"
               onClick={handleToggle}
               disabled={isPending}
               aria-label="Toggle seat active"
               style={{
-                width: 40, height: 22, borderRadius: 11, border: 'none',
                 background: selected.is_active ? ACCENT : '#C8D4C8',
-                cursor: 'pointer', position: 'relative',
-                transition: 'background .2s', marginLeft: 'auto',
+                marginLeft: 'auto',
                 flexShrink: 0,
               }}
             >
-              <div style={{
-                width: 16, height: 16, borderRadius: '50%', background: '#fff',
-                position: 'absolute', top: 3,
-                left: selected.is_active ? 21 : 3,
-                transition: 'left .2s', boxShadow: '0 1px 3px rgba(0,0,0,.15)',
-              }} />
+              <div className="dash-toggle__dot" style={{ ['--toggle-dot-left' as any]: selected.is_active ? '21px' : '3px' }} />
             </button>
             <span style={{
               fontSize: 12, fontWeight: 600,
@@ -465,11 +449,11 @@ export default function StaffSeatManagerClient({
             }}>
               {selected.is_active ? 'Active' : 'Inactive'}
             </span>
-            <button className="press"
+            <button className="clay-raised-sm clay-interactive"
               onClick={() => { setSelected(null); setConfirmForceFree(false) }}
               style={{
-                padding: '5px 12px', borderRadius: 8, fontSize: 11, fontWeight: 600,
-                border: '1.5px solid #E2DDD4', background: '#FDFCF9', color: '#6B7689',
+                padding: '5px 12px', fontSize: 11, fontWeight: 600,
+                border: 'none', color: '#6B7689',
                 cursor: 'pointer', fontFamily: 'DM Sans, sans-serif', flexShrink: 0,
               }}
             >
@@ -479,10 +463,8 @@ export default function StaffSeatManagerClient({
 
           {/* Current booking info */}
           {selected.current_booking && (
-            <div style={{
+            <div className="clay-pressed" style={{
               marginTop: 12, padding: '10px 14px',
-              background: '#F9F8F5', borderRadius: 10,
-              border: '1px solid #E2DDD4',
               fontSize: 12, color: '#3A4A5C', lineHeight: 1.8,
             }}>
               <strong>{selected.current_booking.guest_name ?? 'Member'}</strong>
@@ -511,26 +493,24 @@ export default function StaffSeatManagerClient({
                 <div style={{ fontSize: 11, fontWeight: 600, color: '#6B7689', marginBottom: 6 }}>
                   Booking Channel
                 </div>
-                <div style={{
-                  display: 'flex', borderRadius: 9,
-                  border: '1.5px solid #E2DDD4', overflow: 'hidden', width: 'fit-content',
+                <div className="clay-raised-sm" style={{
+                  display: 'flex', overflow: 'hidden', width: 'fit-content', padding: 3, gap: 3,
                 }}>
                   {(['offline', 'online'] as const).map(mode => (
-                    <button className="press"
+                    <button className="clay-interactive"
                       key={mode}
                       onClick={() => setBookForm(f => ({ ...f, bookingMode: mode }))}
                       style={{
-                        padding: '7px 16px', fontSize: 12, fontWeight: 700,
+                        padding: '7px 16px', borderRadius: 8, fontSize: 12, fontWeight: 700,
                         border: 'none', cursor: 'pointer',
                         background: bookForm.bookingMode === mode
                           ? (mode === 'offline' ? '#FEF3E2' : BLUE_LIGHT)
-                          : '#FDFCF9',
+                          : 'transparent',
                         color: bookForm.bookingMode === mode
                           ? (mode === 'offline' ? '#92400E' : BLUE)
                           : '#9AAAB8',
                         fontFamily: 'DM Sans, sans-serif',
-                        borderRight: mode === 'offline' ? '1.5px solid #E2DDD4' : 'none',
-                        transition: 'all .15s',
+                        boxShadow: bookForm.bookingMode === mode ? 'inset 1px 1px 4px rgba(0,0,0,.1)' : 'none',
                       }}
                     >
                       {mode === 'offline' ? '🏪 Offline' : '🌐 Online'}
@@ -601,9 +581,8 @@ export default function StaffSeatManagerClient({
 
               {/* Payment (offline only) */}
               {bookForm.bookingMode === 'offline' && (
-                <div style={{
-                  background: '#F9F8F5', border: '1px solid #E2DDD4',
-                  borderRadius: 10, padding: '10px 12px', marginBottom: 8,
+                <div className="clay-pressed" style={{
+                  padding: '10px 12px', marginBottom: 8,
                 }}>
                   <div style={{
                     fontSize: 12, fontWeight: 700, color: '#3A4A5C',
@@ -650,9 +629,9 @@ export default function StaffSeatManagerClient({
 
               {/* Preview */}
               {bookForm.userName && bookForm.start && bookForm.end && (
-                <div style={{
-                  background: ACCENT_LIGHT, border: `1px solid rgba(5,151,167,.25)`,
-                  borderRadius: 9, padding: '10px 12px', marginBottom: 10,
+                <div className="clay-raised-sm" style={{
+                  background: ACCENT_LIGHT, border: 'none',
+                  padding: '10px 12px', marginBottom: 10,
                   fontSize: 12, color: '#0A6B78', lineHeight: 1.7,
                 }}>
                   <strong>{bookForm.userName}</strong> · Seat {selected.row_label}{selected.column_number}<br />
@@ -667,14 +646,13 @@ export default function StaffSeatManagerClient({
                 </div>
               )}
 
-              <button className="press"
+              <button className="clay-btn-primary"
                 onClick={handleManualBook}
                 disabled={isPending || !bookForm.userName || !bookForm.userPhone}
                 style={{
-                  width: '100%', padding: '11px 0', borderRadius: 10,
+                  width: '100%', padding: '11px 0',
                   fontSize: 13, fontWeight: 700, border: 'none',
-                  background: bookForm.userName && bookForm.userPhone ? ACCENT : '#C8D4C8',
-                  color: '#fff',
+                  background: bookForm.userName && bookForm.userPhone ? `linear-gradient(155deg, #22D9EA, ${ACCENT}, #05707D)` : '#C8D4C8',
                   cursor: bookForm.userName && bookForm.userPhone ? 'pointer' : 'not-allowed',
                   fontFamily: 'Syne, sans-serif',
                   opacity: isPending ? 0.7 : 1,
@@ -687,7 +665,7 @@ export default function StaffSeatManagerClient({
 
           {/* ── Force Free (booked seats) ────────────────────────────────── */}
           {selected.live_status === 'booked' && (
-            <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #E2DDD4' }}>
+            <div style={{ marginTop: 14, paddingTop: 14, boxShadow: 'inset 0 1px 0 rgba(163,177,198,.25)' }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#0A0D12', marginBottom: 6 }}>
                 🔓 Clear This Seat
               </div>
@@ -695,43 +673,43 @@ export default function StaffSeatManagerClient({
                 Cancels the active booking and marks the seat as free. Payment record is kept for audit.
               </div>
               {!confirmForceFree ? (
-                <button className="press"
+                <button className="clay-raised-sm clay-interactive"
                   onClick={() => setConfirmForceFree(true)}
                   style={{
-                    width: '100%', padding: '10px 0', borderRadius: 9,
+                    width: '100%', padding: '10px 0',
                     fontSize: 13, fontWeight: 700,
-                    border: `1.5px solid ${RED}`, background: RED_LIGHT,
+                    border: 'none', background: RED_LIGHT,
                     color: RED, cursor: 'pointer', fontFamily: 'DM Sans, sans-serif',
                   }}
                 >
                   Force Free Seat {selected.row_label}{selected.column_number}
                 </button>
               ) : (
-                <div style={{
-                  background: RED_LIGHT, border: `1.5px solid ${RED}`,
-                  borderRadius: 10, padding: '12px',
+                <div className="clay-raised-sm" style={{
+                  background: RED_LIGHT, border: 'none',
+                  padding: '12px',
                 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: RED, marginBottom: 10 }}>
                     Are you sure? This will cancel the booking.
                   </div>
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <button className="press"
+                    <button className="clay-raised-sm clay-interactive"
                       onClick={() => setConfirmForceFree(false)}
                       disabled={isPending}
                       style={{
-                        flex: 1, padding: '8px 0', borderRadius: 8, fontSize: 12,
-                        fontWeight: 600, border: '1.5px solid #E2DDD4',
-                        background: '#fff', color: '#3A4A5C',
+                        flex: 1, padding: '8px 0', fontSize: 12,
+                        fontWeight: 600, border: 'none',
+                        color: '#3A4A5C',
                         cursor: 'pointer', fontFamily: 'DM Sans, sans-serif',
                       }}
                     >
                       Cancel
                     </button>
-                    <button className="press"
+                    <button className="clay-raised-sm clay-interactive"
                       onClick={handleForceFree}
                       disabled={isPending}
                       style={{
-                        flex: 2, padding: '8px 0', borderRadius: 8,
+                        flex: 2, padding: '8px 0',
                         fontSize: 13, fontWeight: 700, border: 'none',
                         background: RED, color: '#fff',
                         cursor: 'pointer', fontFamily: 'Syne, sans-serif',
@@ -748,10 +726,10 @@ export default function StaffSeatManagerClient({
 
           {/* ── Held notice ──────────────────────────────────────────────── */}
           {selected.live_status === 'held' && (
-            <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #E2DDD4' }}>
-              <div style={{
-                background: '#FEF3E2', border: '1px solid #FCD34D',
-                borderRadius: 10, padding: '12px 14px',
+            <div style={{ marginTop: 14, paddingTop: 14, boxShadow: 'inset 0 1px 0 rgba(163,177,198,.25)' }}>
+              <div className="clay-raised-sm" style={{
+                background: '#FEF3E2', border: 'none',
+                padding: '12px 14px',
                 display: 'flex', gap: 10, alignItems: 'flex-start',
               }}>
                 <span style={{ fontSize: 16, flexShrink: 0 }}>⏳</span>
@@ -769,10 +747,10 @@ export default function StaffSeatManagerClient({
 
           {/* ── Inactive notice ───────────────────────────────────────────── */}
           {selected.live_status === 'inactive' && (
-            <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #E2DDD4' }}>
-              <div style={{
-                background: '#F4F7FB', border: '1px solid #E2DDD4',
-                borderRadius: 10, padding: '12px 14px',
+            <div style={{ marginTop: 14, paddingTop: 14, boxShadow: 'inset 0 1px 0 rgba(163,177,198,.25)' }}>
+              <div className="clay-raised-sm" style={{
+                background: 'var(--clay-surface)', border: 'none',
+                padding: '12px 14px',
                 display: 'flex', gap: 10, alignItems: 'flex-start',
               }}>
                 <span style={{ fontSize: 16, flexShrink: 0 }}>🚫</span>
@@ -792,11 +770,8 @@ export default function StaffSeatManagerClient({
 
       {/* ── Add row panel ──────────────────────────────────────────────────── */}
       {showAddRow && (
-        <div style={{
-          background: '#FDFCF9', border: '1px solid #E2DDD4',
-          borderRadius: 14, padding: '16px',
-          boxShadow: '0 2px 8px rgba(10,13,18,.04)',
-          animation: 'slideUp .18s ease',
+        <div className="clay-raised" style={{
+          padding: '16px',
         }}>
           <div style={{ fontSize: 14, fontWeight: 700, color: '#0A0D12', marginBottom: 12 }}>
             Add New Row
@@ -829,25 +804,24 @@ export default function StaffSeatManagerClient({
             </div>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button className="press"
+            <button className="clay-raised-sm clay-interactive"
               onClick={() => { setShowAddRow(false); setNewRowLabel('') }}
               style={{
-                flex: 1, padding: '10px 0', borderRadius: 9, fontSize: 13,
-                fontWeight: 600, border: '1.5px solid #E2DDD4',
-                background: '#FDFCF9', color: '#3A4A5C',
+                flex: 1, padding: '10px 0', fontSize: 13,
+                fontWeight: 600, border: 'none',
+                color: '#3A4A5C',
                 cursor: 'pointer', fontFamily: 'DM Sans, sans-serif',
               }}
             >
               Cancel
             </button>
-            <button className="press"
+            <button className="clay-btn-primary"
               onClick={handleAddRow}
               disabled={!newRowLabel || isPending}
               style={{
-                flex: 2, padding: '10px 0', borderRadius: 9, fontSize: 13,
+                flex: 2, padding: '10px 0', fontSize: 13,
                 fontWeight: 700, border: 'none',
-                background: newRowLabel ? ACCENT : '#C8D4C8',
-                color: '#fff',
+                background: newRowLabel ? `linear-gradient(155deg, #22D9EA, ${ACCENT}, #05707D)` : '#C8D4C8',
                 cursor: newRowLabel ? 'pointer' : 'not-allowed',
                 fontFamily: 'Syne, sans-serif',
                 opacity: isPending ? 0.7 : 1,
@@ -863,10 +837,6 @@ export default function StaffSeatManagerClient({
         @keyframes fadeUp {
           from { opacity:0; transform:translateX(-50%) translateY(8px) }
           to   { opacity:1; transform:translateX(-50%) translateY(0) }
-        }
-        @keyframes slideUp {
-          from { opacity:0; transform:translateY(8px) }
-          to   { opacity:1; transform:none }
         }
         input[type="datetime-local"]::-webkit-calendar-picker-indicator { cursor:pointer; }
       `}} />

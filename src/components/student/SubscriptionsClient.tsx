@@ -7,7 +7,7 @@ import { CreditCard, MapPin, Armchair, AlertCircle, Plus, QrCode } from 'lucide-
 import { cn } from '@/lib/utils'
 import { fmtIST } from '@/lib/ist'
 import { describeDaysOfWeek } from '@/lib/booking/subscriptionEntitlement'
-import { ClayCard, ClayChip, ClayIconBadge, ClayButton } from '@/components/ui/Clay'
+import { ClayCard, ClayChip, ClayIconBadge, ClayButton } from '@/components/ui/clay'
 
 const STATUS_CFG: Record<string, { label: string; tone: 'success' | 'warning' | 'neutral' | 'danger' }> = {
   active:    { label: 'Active',    tone: 'success' },

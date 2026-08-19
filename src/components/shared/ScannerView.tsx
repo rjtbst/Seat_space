@@ -271,13 +271,12 @@ export default function ScannerView({
       {scanState === 'idle' && (
         <div>
           {hasCam && (
-            <button
+            <button className="clay-raised clay-interactive"
               onClick={startCamera}
               style={{
                 width:      '100%',
                 padding:    '20px',
-                borderRadius: 16,
-                border:     `2px dashed ${ACCENT}`,
+                border:     'none',
                 background: ACCENT_LIGHT,
                 color:      ACCENT,
                 fontSize:   15,
@@ -300,8 +299,8 @@ export default function ScannerView({
           )}
 
           {errorMsg && (
-            <div style={{
-              background: '#FEE2E2', borderRadius: 10, padding: '10px 14px',
+            <div className="clay-raised-sm" style={{
+              background: '#FEE2E2', padding: '10px 14px',
               fontSize: 13, color: '#9B1C1C', marginBottom: 14,
               display: 'flex', gap: 8,
             }}>
@@ -310,7 +309,7 @@ export default function ScannerView({
           )}
 
           {/* Manual ID fallback */}
-          <div style={{ borderTop: '1px solid #E2DDD4', paddingTop: 16 }}>
+          <div style={{ boxShadow: 'inset 0 1px 0 rgba(163,177,198,.3)', paddingTop: 16 }}>
             <div style={{ fontSize: 12, fontWeight: 600, color: '#6B7689', marginBottom: 8 }}>
               Or enter Booking / Membership ID manually
             </div>
@@ -321,21 +320,21 @@ export default function ScannerView({
                 placeholder="Paste booking or membership UUID…"
                 style={{
                   flex: 1, padding: '10px 12px',
-                  border: '1.5px solid #E2DDD4', borderRadius: 9,
+                  border: 'none', borderRadius: 12,
                   fontSize: 13, color: '#0A0D12', outline: 'none',
-                  fontFamily: 'DM Sans, sans-serif', background: '#FDFCF9',
+                  fontFamily: 'DM Sans, sans-serif', background: 'var(--clay-surface)',
+                  boxShadow: 'inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6)',
                 }}
                 onKeyDown={e => e.key === 'Enter' && handleManualLookup()}
               />
-              <button
+              <button className="clay-raised-sm clay-interactive"
                 onClick={handleManualLookup}
                 disabled={!manualId.trim()}
                 style={{
                   padding:    '10px 16px',
-                  borderRadius: 9,
                   border:     'none',
-                  background: manualId.trim() ? ACCENT : '#C8D4C8',
-                  color:      '#fff',
+                  background: manualId.trim() ? `linear-gradient(155deg, #22D9EA, ${ACCENT}, #05707D)` : 'var(--clay-surface)',
+                  color:      manualId.trim() ? '#fff' : '#9AAAB8',
                   fontSize:   13,
                   fontWeight: 700,
                   cursor:     manualId.trim() ? 'pointer' : 'not-allowed',
@@ -352,9 +351,8 @@ export default function ScannerView({
       {/* ── SCANNING (camera live) ── */}
       {scanState === 'scanning' && (
         <div>
-          <div style={{
+          <div className="clay-raised" style={{
             position:     'relative',
-            borderRadius: 16,
             overflow:     'hidden',
             background:   '#0A0D12',
             aspectRatio:  '1 / 1',
@@ -397,12 +395,11 @@ export default function ScannerView({
 
           <button
             onClick={handleReset}
+className="clay-raised-sm clay-interactive"
             style={{
               width:      '100%',
               padding:    '11px 0',
-              borderRadius: 10,
-              border:     '1.5px solid #E2DDD4',
-              background: '#FDFCF9',
+              border:     'none',
               color:      '#6B7689',
               fontSize:   13,
               fontWeight: 600,
@@ -429,10 +426,8 @@ export default function ScannerView({
       {/* ── FOUND + booking loaded → confirm check-in ── */}
       {scanState === 'found' && booking && (
         <div>
-          <div style={{
+          <div className="clay-raised" style={{
             background:   GREEN_LIGHT,
-            border:       `1.5px solid rgba(13,124,84,.3)`,
-            borderRadius: 16,
             padding:      '18px',
             marginBottom: 14,
           }}>
@@ -440,8 +435,8 @@ export default function ScannerView({
               Booking Found
             </div>
             <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
-              <div style={{
-                width: 48, height: 48, borderRadius: 12,
+              <div className="clay-icon-badge" style={{
+                width: 48, height: 48,
                 background: ACCENT_LIGHT, display: 'flex',
                 alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0,
               }}>
@@ -456,8 +451,8 @@ export default function ScannerView({
                 </div>
               </div>
             </div>
-            <div style={{
-              background: '#fff', borderRadius: 10, padding: '10px 14px',
+            <div className="clay-pressed" style={{
+              padding: '10px 14px',
               fontSize: 12, color: '#3A4A5C', lineHeight: 1.8,
             }}>
               📅 {fmtIST(booking.startTime)}<br />
@@ -470,12 +465,12 @@ export default function ScannerView({
             <button
               onClick={handleCheckIn}
               disabled={isPending}
+className="clay-btn-primary"
               style={{
                 width:        '100%',
                 padding:      '14px 0',
-                borderRadius: 12,
                 border:       'none',
-                background:   GREEN,
+                background:   `linear-gradient(155deg, #22B37C, ${GREEN}, #0A5E3F)`,
                 color:        '#fff',
                 fontSize:     15,
                 fontWeight:   700,
@@ -483,7 +478,6 @@ export default function ScannerView({
                 cursor:       'pointer',
                 marginBottom: 10,
                 opacity:      isPending ? 0.7 : 1,
-                boxShadow:    '0 4px 16px rgba(13,124,84,.3)',
               }}
             >
               {isPending ? 'Processing…' : '✓ Confirm Check-In'}
@@ -492,12 +486,11 @@ export default function ScannerView({
             <div style={{
               padding:      '12px 14px',
               background:   '#FEF3E2',
-              borderRadius: 12,
               fontSize:     13,
               color:        '#92400E',
               marginBottom: 10,
               fontWeight:   600,
-            }}>
+            }} className="clay-raised-sm">
               ⚠️ Cannot check in — booking is already <strong>{booking.status.replace('_', ' ')}</strong>
             </div>
           )}
@@ -524,10 +517,8 @@ export default function ScannerView({
       {/* ── FOUND + subscription loaded → confirm check-in/out ── */}
       {scanState === 'found' && subscription && (
         <div>
-          <div style={{
+          <div className="clay-raised" style={{
             background:   GREEN_LIGHT,
-            border:       `1.5px solid rgba(13,124,84,.3)`,
-            borderRadius: 16,
             padding:      '18px',
             marginBottom: 14,
           }}>
@@ -535,8 +526,8 @@ export default function ScannerView({
               Membership Pass
             </div>
             <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
-              <div style={{
-                width: 48, height: 48, borderRadius: 12,
+              <div className="clay-icon-badge" style={{
+                width: 48, height: 48,
                 background: ACCENT_LIGHT, display: 'flex',
                 alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0,
               }}>
@@ -551,8 +542,8 @@ export default function ScannerView({
                 </div>
               </div>
             </div>
-            <div style={{
-              background: '#fff', borderRadius: 10, padding: '10px 14px',
+            <div className="clay-pressed" style={{
+              padding: '10px 14px',
               fontSize: 12, color: '#3A4A5C', lineHeight: 1.8,
             }}>
               🏛️ {subscription.libraryName}<br />
@@ -565,12 +556,12 @@ export default function ScannerView({
             <button
               onClick={handleCheckIn}
               disabled={isPending}
+className="clay-btn-primary"
               style={{
                 width:        '100%',
                 padding:      '14px 0',
-                borderRadius: 12,
                 border:       'none',
-                background:   GREEN,
+                background:   `linear-gradient(155deg, #22B37C, ${GREEN}, #0A5E3F)`,
                 color:        '#fff',
                 fontSize:     15,
                 fontWeight:   700,
@@ -578,7 +569,6 @@ export default function ScannerView({
                 cursor:       'pointer',
                 marginBottom: 10,
                 opacity:      isPending ? 0.7 : 1,
-                boxShadow:    '0 4px 16px rgba(13,124,84,.3)',
               }}
             >
               {isPending ? 'Processing…' : '✓ Confirm Scan'}
@@ -587,12 +577,11 @@ export default function ScannerView({
             <div style={{
               padding:      '12px 14px',
               background:   '#FEF3E2',
-              borderRadius: 12,
               fontSize:     13,
               color:        '#92400E',
               marginBottom: 10,
               fontWeight:   600,
-            }}>
+            }} className="clay-raised-sm">
               ⚠️ Cannot scan — membership is <strong>{subscription.status}</strong>
             </div>
           )}
@@ -619,7 +608,7 @@ export default function ScannerView({
       {/* ── SUCCESS ── */}
       {scanState === 'success' && (
         <div style={{ textAlign: 'center', padding: '20px 0' }}>
-          <div style={{
+          <div className="clay-raised" style={{
             width:        72,
             height:       72,
             borderRadius: '50%',
@@ -629,7 +618,6 @@ export default function ScannerView({
             justifyContent: 'center',
             fontSize:     36,
             margin:       '0 auto 16px',
-            border:       `2px solid rgba(13,124,84,.2)`,
           }}>
             ✓
           </div>
@@ -652,13 +640,12 @@ export default function ScannerView({
           <div style={{ fontSize: 12, color: '#9AAAB8', marginBottom: 24 }}>
             {scanKind === 'subscription' ? 'Attendance recorded' : 'Entry recorded in system'}
           </div>
-          <button
+          <button className="clay-btn-primary"
             onClick={handleReset}
             style={{
               padding:      '12px 32px',
-              borderRadius: 10,
               border:       'none',
-              background:   ACCENT,
+              background:   `linear-gradient(155deg, #22D9EA, ${ACCENT}, #05707D)`,
               color:        '#fff',
               fontSize:     14,
               fontWeight:   700,
@@ -674,10 +661,8 @@ export default function ScannerView({
       {/* ── ERROR ── */}
       {scanState === 'error' && (
         <div style={{ textAlign: 'center' }}>
-          <div style={{
+          <div className="clay-raised-sm" style={{
             background:   '#FEE2E2',
-            border:       '1px solid rgba(220,38,38,.2)',
-            borderRadius: 14,
             padding:      '20px',
             marginBottom: 14,
           }}>
@@ -685,14 +670,13 @@ export default function ScannerView({
             <div style={{ fontSize: 14, fontWeight: 700, color: '#9B1C1C', marginBottom: 4 }}>Scan Failed</div>
             <div style={{ fontSize: 13, color: '#9B1C1C' }}>{errorMsg}</div>
           </div>
-          <button
+          <button className="clay-btn-primary"
             onClick={handleReset}
             style={{
               width:        '100%',
               padding:      '12px 0',
-              borderRadius: 10,
               border:       'none',
-              background:   ACCENT,
+              background:   `linear-gradient(155deg, #22D9EA, ${ACCENT}, #05707D)`,
               color:        '#fff',
               fontSize:     14,
               fontWeight:   700,

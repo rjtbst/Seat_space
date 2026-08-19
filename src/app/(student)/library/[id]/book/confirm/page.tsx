@@ -50,11 +50,11 @@ export default async function BookingConfirmPage({ searchParams }: PageProps) {
   if (!booking) redirect('/bookings')
 
   return (
-    <div className="min-h-screen bg-[#F4F7FB] flex items-start justify-center pt-10 px-4 pb-16">
+    <div className="min-h-screen flex items-start justify-center pt-10 px-4 pb-16" style={{ background: 'var(--clay-bg)' }}>
       <div className="w-full max-w-md">
 
         {/* Success card */}
-        <div className="bg-white rounded-2xl border border-[#E4EAF2] shadow-sm overflow-hidden">
+        <div className="clay-raised overflow-hidden">
 
           {/* Top accent */}
           <div className="h-1.5 bg-gradient-to-r from-[#12A87A] via-[#1E5CFF] to-[#7C3AED]" />
@@ -62,7 +62,7 @@ export default async function BookingConfirmPage({ searchParams }: PageProps) {
           <div className="p-6 text-center">
             {/* Icon */}
             <div className="flex items-center justify-center mb-4">
-              <div className="w-16 h-16 rounded-full bg-[#E2F5EE] flex items-center justify-center">
+              <div className="clay-raised w-16 h-16 !rounded-full flex items-center justify-center" style={{ background: '#E2F5EE' }}>
                 <CheckCircle className="w-8 h-8 text-[#12A87A]" />
               </div>
             </div>
@@ -73,7 +73,7 @@ export default async function BookingConfirmPage({ searchParams }: PageProps) {
             </p>
 
             {/* Booking ID badge */}
-            <div className="mt-4 inline-flex items-center gap-2 bg-[#F4F7FB] rounded-lg px-4 py-2">
+            <div className="clay-raised-sm mt-4 inline-flex items-center gap-2 px-4 py-2">
               <span className="text-[11px] text-[#9AACBE] font-medium">Booking ID</span>
               <span className="text-[12px] font-mono font-bold text-[#0D1117]">
                 {booking.id.slice(0, 8).toUpperCase()}
@@ -82,7 +82,7 @@ export default async function BookingConfirmPage({ searchParams }: PageProps) {
           </div>
 
           {/* Details */}
-          <div className="border-t border-[#E4EAF2] divide-y divide-[#E4EAF2]">
+          <div>
             {[
               {
                 icon: MapPin,
@@ -100,7 +100,7 @@ export default async function BookingConfirmPage({ searchParams }: PageProps) {
                 value: `${fmt12h(booking.start_time)} – ${fmt12h(booking.end_time)}`,
               },
             ].map(({ icon: Icon, label, value }) => (
-              <div key={label} className="flex items-start gap-3 px-6 py-4">
+              <div key={label} className="flex items-start gap-3 px-6 py-4" style={{ boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.2)' }}>
                 <Icon className="w-4 h-4 text-[#9AACBE] mt-0.5 flex-shrink-0" />
                 <div>
                   <div className="text-[11px] text-[#9AACBE] mb-0.5">{label}</div>
@@ -142,13 +142,13 @@ export default async function BookingConfirmPage({ searchParams }: PageProps) {
           <div className="p-5 space-y-3">
             <Link
               href="/bookings"
-              className="block w-full py-3 text-center rounded-xl bg-[#1E5CFF] text-white text-[14px] font-bold hover:bg-[#1447D4] transition-colors shadow-[0_4px_24px_rgba(30,92,255,.25)]"
+              className="clay-btn-primary block w-full py-3 text-center text-[14px] font-bold"
             >
               View My Bookings
             </Link>
             <Link
               href="/explore"
-              className="block w-full py-3 text-center rounded-xl bg-[#F4F7FB] text-[#3A4A5C] text-[13px] font-medium hover:bg-[#EDF1F7] transition-colors"
+              className="clay-raised-sm clay-interactive block w-full py-3 text-center text-[#3A4A5C] text-[13px] font-medium"
             >
               Explore More Libraries
             </Link>

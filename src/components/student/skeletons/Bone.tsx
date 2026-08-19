@@ -36,7 +36,7 @@ export function Bone({
  *  for wrapping groups of Bone elements in a loading.tsx. */
 export function SkeletonCard({ className, children }: { className?: string; children: React.ReactNode }) {
   return (
-    <div className={cn('bg-white border border-[#E4EAF2] rounded-2xl p-4', className)}>
+    <div className={cn('clay-raised p-4', className)}>
       {children}
     </div>
   )

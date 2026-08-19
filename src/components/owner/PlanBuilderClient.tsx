@@ -61,9 +61,8 @@ function PlanCard({
             {plan.duration_days} days
           </div>
           {(plan.time_window_start && plan.time_window_end) || dayDesc ? (
-            <div style={{
+            <div className="dash-badge" style={{
               display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 6,
-              padding: '2px 8px', borderRadius: 20, fontSize: 10.5, fontWeight: 600,
               background: '#FEF3E2', color: '#92400E',
             }}>
               🕐 {[
@@ -73,18 +72,17 @@ function PlanCard({
             </div>
           ) : null}
         </div>
-        <span style={{ padding: '3px 9px', borderRadius: 20, fontSize: 10, fontWeight: 700, background: ACCENT_LIGHT, color: ACCENT }}>
+        <span className="dash-badge" style={{ background: ACCENT_LIGHT, color: ACCENT }}>
           ● Active
         </span>
       </div>
 
-      <div style={{ height: 1, background: BORDER, marginBottom: 12 }} />
+      <div style={{ height: 1, boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.3)', marginBottom: 12 }} />
 
       {/* Scope */}
       <div style={{ marginBottom: 10 }}>
         <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: TEXT_MUTED, marginBottom: 5 }}>Scope</div>
-        <span style={{
-          padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600,
+        <span className="dash-badge" style={{
           background: plan.scope === 'cross' ? ACCENT_LIGHT : BLUE_LIGHT,
           color:      plan.scope === 'cross' ? ACCENT : BLUE,
         }}>
@@ -97,9 +95,9 @@ function PlanCard({
         <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: TEXT_MUTED, marginBottom: 5 }}>Active at</div>
         <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
           {plan.libraries.length > 0 ? plan.libraries.map(lib => (
-            <span key={lib.id} style={{
-              padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 500,
-              background: '#F4F7FB', color: '#3A4A5C', border: `1px solid ${BORDER}`,
+            <span key={lib.id} className="clay-raised-sm" style={{
+              padding: '2px 8px', fontSize: 10, fontWeight: 500,
+              color: '#3A4A5C', border: 'none',
             }}>
               {lib.name}
             </span>
@@ -110,7 +108,7 @@ function PlanCard({
       {/* Subscriber bar */}
       <div style={{ marginBottom: 14 }}>
         <span style={{ fontSize: 12, fontWeight: 600, color: '#3A4A5C' }}>{plan.subscriber_count} subscribers</span>
-        <div style={{ background: '#F4F7FB', borderRadius: 5, height: 5, overflow: 'hidden', marginTop: 5 }}>
+        <div style={{ borderRadius: 5, height: 5, overflow: 'hidden', marginTop: 5, boxShadow: 'inset 1px 1px 3px rgba(163,177,198,.35), inset -1px -1px 2px rgba(255,255,255,.5)' }}>
           <div style={{ width: `${barPct}%`, height: '100%', borderRadius: 5, background: color, transition: 'width .4s ease' }} />
         </div>
       </div>
@@ -120,12 +118,12 @@ function PlanCard({
         {confirmArchive ? (
           <>
             <span style={{ fontSize: 12, color: '#9B1C1C', alignSelf: 'center', flex: 1 }}>Archive this plan?</span>
-            <button className="press" onClick={() => setConfirmArchive(false)} style={{
-              padding: '6px 12px', borderRadius: 7, fontSize: 12, fontWeight: 600,
-              border: `1.5px solid ${BORDER}`, background: BG_CARD, color: '#3A4A5C', cursor: 'pointer', fontFamily: FONT_BODY,
+            <button className="clay-raised-sm clay-interactive" onClick={() => setConfirmArchive(false)} style={{
+              padding: '6px 12px', fontSize: 12, fontWeight: 600,
+              border: 'none', color: '#3A4A5C', cursor: 'pointer', fontFamily: FONT_BODY,
             }}>Cancel</button>
-            <button className="press" disabled={archiving} onClick={() => onArchive(plan.id)} style={{
-              padding: '6px 12px', borderRadius: 7, fontSize: 12, fontWeight: 700,
+            <button className="clay-raised-sm clay-interactive" disabled={archiving} onClick={() => onArchive(plan.id)} style={{
+              padding: '6px 12px', fontSize: 12, fontWeight: 700,
               border: 'none', background: '#C5282C', color: '#fff', cursor: 'pointer',
               fontFamily: FONT_BODY, opacity: archiving ? 0.7 : 1,
             }}>
@@ -134,16 +132,16 @@ function PlanCard({
           </>
         ) : (
           <>
-            <button className="press" onClick={() => onEdit(plan)} style={{
-              flex: 1, padding: '7px 0', borderRadius: 8, fontSize: 12, fontWeight: 600,
-              border: `1.5px solid ${BORDER}`, background: BG_CARD, color: '#3A4A5C',
+            <button className="clay-raised-sm clay-interactive" onClick={() => onEdit(plan)} style={{
+              flex: 1, padding: '7px 0', fontSize: 12, fontWeight: 600,
+              border: 'none', color: '#3A4A5C',
               cursor: 'pointer', fontFamily: FONT_BODY,
             }}>
               ✏️ Edit
             </button>
-            <button className="press" onClick={() => setConfirmArchive(true)} style={{
-              flex: 1, padding: '7px 0', borderRadius: 8, fontSize: 12, fontWeight: 600,
-              border: '1.5px solid #FCA5A5', background: '#FEE2E2', color: '#9B1C1C',
+            <button className="clay-raised-sm clay-interactive" onClick={() => setConfirmArchive(true)} style={{
+              flex: 1, padding: '7px 0', fontSize: 12, fontWeight: 600,
+              border: 'none', background: '#FEE2E2', color: '#9B1C1C',
               cursor: 'pointer', fontFamily: FONT_BODY,
             }}>
               Archive
@@ -307,12 +305,12 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
         title="Plan Builder"
         subtitle="Create membership plans — assign per-library or share across all"
         action={
-          <button className="press"
+          <button className="clay-btn-primary"
             onClick={() => { if (showForm) { handleCancelForm() } else { setShowForm(true) } }}
             style={{
-              padding: '9px 16px', borderRadius: 9, fontSize: 13, fontWeight: 700,
-              background: ACCENT, color: '#fff', border: 'none', cursor: 'pointer',
-              fontFamily: FONT_DISPLAY, boxShadow: '0 2px 10px rgba(13,124,84,.25)',
+              padding: '9px 16px', fontSize: 13, fontWeight: 700,
+              border: 'none', cursor: 'pointer',
+              fontFamily: FONT_DISPLAY, background: `linear-gradient(155deg, #22B37C, ${ACCENT}, #0A5E3F)`,
             }}
           >
             {showForm ? '✕ Cancel' : '+ New Plan'}
@@ -321,9 +319,9 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
       />
 
       {/* Info banner */}
-      <div style={{
-        background: BLUE_LIGHT, border: `1px solid rgba(30,92,255,.2)`,
-        borderRadius: 12, padding: '11px 14px', marginBottom: 20,
+      <div className="clay-raised-sm" style={{
+        background: BLUE_LIGHT, border: 'none',
+        padding: '11px 14px', marginBottom: 20,
         display: 'flex', gap: 10, alignItems: 'flex-start',
       }}>
         <span style={{ fontSize: 16, flexShrink: 0 }}>💡</span>
@@ -356,11 +354,12 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
             title="No plans yet"
             subtitle="Create membership plans so students can subscribe to your library"
             action={
-              <button className="press"
+              <button className="clay-btn-primary"
                 onClick={() => setShowForm(true)}
                 style={{
-                  padding: '10px 22px', borderRadius: 9, fontSize: 13, fontWeight: 700,
-                  background: ACCENT, color: '#fff', border: 'none', cursor: 'pointer', fontFamily: FONT_DISPLAY,
+                  padding: '10px 22px', fontSize: 13, fontWeight: 700,
+                  border: 'none', cursor: 'pointer', fontFamily: FONT_DISPLAY,
+                  background: `linear-gradient(155deg, #22B37C, ${ACCENT}, #0A5E3F)`,
                 }}
               >
                 + Create First Plan
@@ -378,8 +377,8 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
           </div>
 
           {editingPlanId && (plans.find(p => p.id === editingPlanId)?.subscriber_count ?? 0) > 0 && (
-            <div style={{
-              background: '#FFF7ED', border: '1px solid #FDE3C5', borderRadius: 10,
+            <div className="clay-raised-sm" style={{
+              background: '#FFF7ED', border: 'none',
               padding: '10px 14px', marginBottom: 16, fontSize: 12, color: '#92400E', lineHeight: 1.5,
             }}>
               ⚠️ This plan has <strong>{plans.find(p => p.id === editingPlanId)?.subscriber_count} active subscriber(s)</strong>.
@@ -417,21 +416,25 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
 
           {/* Restricted hours — makes plans like "9 to 12" or "12 to 5" possible */}
           <div style={{ marginBottom: 16 }}>
-            <button className="press"
+            <button className="clay-interactive"
               type="button"
               onClick={() => setForm(f => ({ ...f, time_window_enabled: !f.time_window_enabled }))}
               style={{
                 display: 'flex', alignItems: 'center', gap: 10, width: '100%',
-                padding: '10px 14px', borderRadius: 9, textAlign: 'left', cursor: 'pointer',
-                border: `1.5px solid ${form.time_window_enabled ? '#F59E0B' : BORDER}`,
-                background: form.time_window_enabled ? '#FEF3E2' : '#F9F8F5',
-                fontFamily: FONT_BODY, transition: 'all .12s',
+                padding: '10px 14px', borderRadius: 12, textAlign: 'left', cursor: 'pointer',
+                border: 'none',
+                background: form.time_window_enabled ? '#FEF3E2' : 'var(--clay-surface)',
+                boxShadow: form.time_window_enabled
+                  ? 'inset 2px 2px 5px rgba(245,158,11,.2), inset -1px -1px 4px rgba(255,255,255,.5)'
+                  : '2px 2px 6px rgba(163,177,198,.3), -2px -2px 5px rgba(255,255,255,.6)',
+                fontFamily: FONT_BODY,
               }}
             >
               <div style={{
                 width: 18, height: 18, borderRadius: 4, flexShrink: 0,
-                border: `2px solid ${form.time_window_enabled ? '#F59E0B' : BORDER}`,
-                background: form.time_window_enabled ? '#F59E0B' : 'transparent',
+                border: 'none',
+                background: form.time_window_enabled ? '#F59E0B' : 'var(--clay-surface)',
+                boxShadow: form.time_window_enabled ? 'none' : 'inset 1px 1px 3px rgba(163,177,198,.4)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: '#fff',
               }}>
                 {form.time_window_enabled && '✓'}
@@ -467,21 +470,25 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
 
           {/* Restricted days — makes plans like "Weekday Pass" or "Weekend Pass" possible; composes with restricted hours above */}
           <div style={{ marginBottom: 16 }}>
-            <button className="press"
+            <button className="clay-interactive"
               type="button"
               onClick={() => setForm(f => ({ ...f, days_of_week_enabled: !f.days_of_week_enabled }))}
               style={{
                 display: 'flex', alignItems: 'center', gap: 10, width: '100%',
-                padding: '10px 14px', borderRadius: 9, textAlign: 'left', cursor: 'pointer',
-                border: `1.5px solid ${form.days_of_week_enabled ? PURPLE : BORDER}`,
-                background: form.days_of_week_enabled ? PURPLE + '1A' : '#F9F8F5',
-                fontFamily: FONT_BODY, transition: 'all .12s',
+                padding: '10px 14px', borderRadius: 12, textAlign: 'left', cursor: 'pointer',
+                border: 'none',
+                background: form.days_of_week_enabled ? PURPLE + '1A' : 'var(--clay-surface)',
+                boxShadow: form.days_of_week_enabled
+                  ? `inset 2px 2px 5px ${PURPLE}33, inset -1px -1px 4px rgba(255,255,255,.5)`
+                  : '2px 2px 6px rgba(163,177,198,.3), -2px -2px 5px rgba(255,255,255,.6)',
+                fontFamily: FONT_BODY,
               }}
             >
               <div style={{
                 width: 18, height: 18, borderRadius: 4, flexShrink: 0,
-                border: `2px solid ${form.days_of_week_enabled ? PURPLE : BORDER}`,
-                background: form.days_of_week_enabled ? PURPLE : 'transparent',
+                border: 'none',
+                background: form.days_of_week_enabled ? PURPLE : 'var(--clay-surface)',
+                boxShadow: form.days_of_week_enabled ? 'none' : 'inset 1px 1px 3px rgba(163,177,198,.4)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: '#fff',
               }}>
                 {form.days_of_week_enabled && '✓'}
@@ -502,12 +509,15 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
                   {DAY_OPTIONS.map(d => {
                     const checked = form.days_of_week.includes(d.value)
                     return (
-                      <button className="press" key={d.value} type="button" onClick={() => toggleDayOfWeek(d.value)} style={{
-                        width: 44, padding: '8px 0', borderRadius: 8, textAlign: 'center', cursor: 'pointer',
-                        border: `1.5px solid ${checked ? PURPLE : BORDER}`,
-                        background: checked ? PURPLE : '#F9F8F5',
+                      <button className="clay-interactive" key={d.value} type="button" onClick={() => toggleDayOfWeek(d.value)} style={{
+                        width: 44, padding: '8px 0', borderRadius: 10, textAlign: 'center', cursor: 'pointer',
+                        border: 'none',
+                        background: checked ? PURPLE : 'var(--clay-surface)',
+                        boxShadow: checked
+                          ? 'inset 2px 2px 5px rgba(0,0,0,.15)'
+                          : '2px 2px 6px rgba(163,177,198,.3), -2px -2px 5px rgba(255,255,255,.6)',
                         color: checked ? '#fff' : '#3A4A5C',
-                        fontSize: 12, fontWeight: 700, fontFamily: FONT_BODY, transition: 'all .12s',
+                        fontSize: 12, fontWeight: 700, fontFamily: FONT_BODY,
                       }}>
                         {d.label}
                       </button>
@@ -532,11 +542,14 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
               ] as const).map(opt => {
                 const active = libraryMode === opt.value
                 return (
-                  <button className="press" key={opt.value} type="button" onClick={() => applyLibraryMode(opt.value)} style={{
-                    padding: '12px 12px', borderRadius: 10, textAlign: 'left', cursor: 'pointer',
-                    border: `${active ? 2 : 1.5}px solid ${active ? BLUE : BORDER}`,
-                    background: active ? BLUE_LIGHT : '#F9F8F5',
-                    fontFamily: FONT_BODY, transition: 'all .12s',
+                  <button className="clay-interactive" key={opt.value} type="button" onClick={() => applyLibraryMode(opt.value)} style={{
+                    padding: '12px 12px', borderRadius: 12, textAlign: 'left', cursor: 'pointer',
+                    border: 'none',
+                    background: active ? BLUE_LIGHT : 'var(--clay-surface)',
+                    boxShadow: active
+                      ? 'inset 2px 2px 5px rgba(30,92,255,.2), inset -1px -1px 4px rgba(255,255,255,.5)'
+                      : '2px 2px 6px rgba(163,177,198,.3), -2px -2px 5px rgba(255,255,255,.6)',
+                    fontFamily: FONT_BODY,
                   }}>
                     <div style={{ fontSize: 12.5, fontWeight: 700, color: active ? BLUE_DARK : '#3A4A5C', marginBottom: 3 }}>
                       {opt.icon} {opt.title}
@@ -562,7 +575,7 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
               {libraries.map(lib => {
                 const checked = form.library_ids.includes(lib.id)
                 return (
-                  <button className="press" key={lib.id} type="button"
+                  <button className="clay-interactive" key={lib.id} type="button"
                     onClick={() => {
                       if (libraryMode === 'all') return
                       if (libraryMode === 'one') selectSingleLibrary(lib.id)
@@ -570,11 +583,14 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
                     }}
                     style={{
                       display: 'flex', alignItems: 'center', gap: 12,
-                      padding: '10px 14px', borderRadius: 9, textAlign: 'left',
+                      padding: '10px 14px', borderRadius: 12, textAlign: 'left',
                       cursor: libraryMode === 'all' ? 'default' : 'pointer',
-                      border: `1.5px solid ${checked ? BLUE : BORDER}`,
-                      background: checked ? BLUE_LIGHT : '#F9F8F5',
-                      fontFamily: FONT_BODY, transition: 'all .12s',
+                      border: 'none',
+                      background: checked ? BLUE_LIGHT : 'var(--clay-surface)',
+                      boxShadow: checked
+                        ? 'inset 2px 2px 5px rgba(30,92,255,.2), inset -1px -1px 4px rgba(255,255,255,.5)'
+                        : '2px 2px 6px rgba(163,177,198,.3), -2px -2px 5px rgba(255,255,255,.6)',
+                      fontFamily: FONT_BODY,
                     }}
                   >
                     <span style={{ fontSize: 18 }}>📚</span>
@@ -584,8 +600,9 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
                     <div style={{
                       width: 18, height: 18, flexShrink: 0,
                       borderRadius: libraryMode === 'one' ? 9 : 4,
-                      border: `2px solid ${checked ? BLUE : BORDER}`,
-                      background: checked ? BLUE : 'transparent',
+                      border: 'none',
+                      background: checked ? BLUE : 'var(--clay-surface)',
+                      boxShadow: checked ? 'none' : 'inset 1px 1px 3px rgba(163,177,198,.4)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontSize: 11, color: '#fff',
                     }}>
@@ -605,16 +622,16 @@ export default function PlanBuilderClient({ plans: initial }: { plans: PlanWithS
           <ErrorBanner error={error} />
 
           <div style={{ display: 'flex', gap: 10 }}>
-            <button className="press" onClick={handleCancelForm} style={{
-              flex: 1, padding: '11px 0', borderRadius: 9, fontSize: 13, fontWeight: 600,
-              border: `1.5px solid ${BORDER}`, background: BG_CARD, color: '#3A4A5C',
+            <button className="clay-raised-sm clay-interactive" onClick={handleCancelForm} style={{
+              flex: 1, padding: '11px 0', fontSize: 13, fontWeight: 600,
+              border: 'none', color: '#3A4A5C',
               cursor: 'pointer', fontFamily: FONT_BODY,
             }}>Cancel</button>
-            <button className="press" onClick={handleSubmit} disabled={isPending} style={{
-              flex: 2, padding: '11px 0', borderRadius: 9, fontSize: 14, fontWeight: 700,
-              border: 'none', background: ACCENT, color: '#fff',
+            <button className="clay-btn-primary" onClick={handleSubmit} disabled={isPending} style={{
+              flex: 2, padding: '11px 0', fontSize: 14, fontWeight: 700,
+              border: 'none', background: `linear-gradient(155deg, #22B37C, ${ACCENT}, #0A5E3F)`,
               cursor: isPending ? 'not-allowed' : 'pointer', fontFamily: FONT_DISPLAY,
-              boxShadow: '0 2px 10px rgba(13,124,84,.25)', opacity: isPending ? 0.7 : 1,
+              opacity: isPending ? 0.7 : 1,
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
             }}>
               {isPending && <Spinner />}

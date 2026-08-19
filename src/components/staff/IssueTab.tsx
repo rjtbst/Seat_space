@@ -210,19 +210,18 @@ export default function IssueTab({ libraryId, catalog, onIssued }: Props) {
         </div>
 
         {results.length > 0 && !selected && (
-          <div style={{
-            border: '1px solid #E2DDD4', borderRadius: 10, overflow: 'hidden',
-            marginTop: 4, background: '#fff',
-            boxShadow: '0 4px 16px rgba(10,13,18,.08)',
+          <div className="clay-raised" style={{
+            overflow: 'hidden',
+            marginTop: 4, background: 'var(--clay-surface)',
           }}>
             {results.map((book, i) => (
-              <button className="press"
+              <button
                 key={book.bookId}
                 onClick={() => handleSelect(book)}
                 style={{
                   width: '100%', textAlign: 'left', padding: '10px 14px',
                   background: 'transparent', border: 'none', cursor: 'pointer',
-                  borderTop: i > 0 ? '1px solid #F4F7FB' : 'none',
+                  boxShadow: i > 0 ? 'inset 0 1px 0 rgba(163,177,198,.2)' : undefined,
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                   fontFamily: 'DM Sans, sans-serif',
                 }}
@@ -231,8 +230,7 @@ export default function IssueTab({ libraryId, catalog, onIssued }: Props) {
                   <div style={{ fontSize: 13, fontWeight: 600, color: '#0A0D12' }}>{book.title}</div>
                   {book.author && <div style={{ fontSize: 11, color: '#9AAAB8', marginTop: 1 }}>{book.author}</div>}
                 </div>
-                <span style={{
-                  fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 20,
+                <span className="dash-badge" style={{
                   background: book.availableCopies > 0 ? '#ECFDF5' : '#FEF2F2',
                   color: book.availableCopies > 0 ? '#059669' : '#DC2626',
                 }}>
@@ -246,9 +244,8 @@ export default function IssueTab({ libraryId, catalog, onIssued }: Props) {
 
       {/* Selected book info */}
       {selected && (
-        <div style={{
-          background: '#F4F7FB', borderRadius: 10, padding: '12px 14px',
-          border: '1px solid #E2DDD4',
+        <div className="clay-pressed" style={{
+          padding: '12px 14px',
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
@@ -259,7 +256,7 @@ export default function IssueTab({ libraryId, catalog, onIssued }: Props) {
                 <div style={{ fontSize: 11, color: '#9AAAB8', marginTop: 2 }}>{selected.author}</div>
               )}
             </div>
-            <button className="press"
+            <button
               onClick={() => { setSelected(null); setQuery('') }}
               style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9AAAB8', fontSize: 16, padding: 0 }}
             >
@@ -293,7 +290,7 @@ export default function IssueTab({ libraryId, catalog, onIssued }: Props) {
         <label style={labelStyle}>Borrower Type</label>
         <div style={{ display: 'flex', gap: 8 }}>
           {(['guest', 'member'] as BorrowerMode[]).map(mode => (
-            <button className="press"
+            <button className="clay-interactive"
               key={mode}
               onClick={() => {
                 setBorrowerMode(mode)
@@ -305,10 +302,13 @@ export default function IssueTab({ libraryId, catalog, onIssued }: Props) {
               style={{
                 flex: 1,
                 padding: '9px 0',
-                borderRadius: 8,
-                border: `1.5px solid ${borrowerMode === mode ? ACCENT : '#E2DDD4'}`,
-                background: borrowerMode === mode ? '#ECFDF5' : '#FDFCF9',
+                borderRadius: 12,
+                border: 'none',
+                background: borrowerMode === mode ? '#ECFDF5' : 'var(--clay-surface)',
                 color: borrowerMode === mode ? '#059669' : '#6E7F94',
+                boxShadow: borrowerMode === mode
+                  ? 'inset 2px 2px 5px rgba(5,150,105,.2), inset -1px -1px 4px rgba(255,255,255,.5)'
+                  : '2px 2px 6px rgba(163,177,198,.28), -2px -2px 5px rgba(255,255,255,.55)',
                 fontWeight: 600,
                 fontSize: 12,
                 cursor: 'pointer',
@@ -364,9 +364,9 @@ export default function IssueTab({ libraryId, catalog, onIssued }: Props) {
           </div>
 
           {lookupStatus === 'found' && memberLookup && (
-            <div style={{
-              marginTop: 8, padding: '10px 12px', borderRadius: 8,
-              background: '#ECFDF5', border: '1px solid #86EFAC',
+            <div className="clay-raised-sm" style={{
+              marginTop: 8, padding: '10px 12px',
+              background: '#ECFDF5', border: 'none',
               display: 'flex', alignItems: 'center', gap: 8,
             }}>
               <span style={{ fontSize: 18 }}>✅</span>
@@ -378,9 +378,9 @@ export default function IssueTab({ libraryId, catalog, onIssued }: Props) {
           )}
 
           {lookupStatus === 'not_found' && (
-            <div style={{
-              marginTop: 8, padding: '10px 12px', borderRadius: 8,
-              background: '#FEF2F2', border: '1px solid #FCA5A5', fontSize: 12, color: '#DC2626',
+            <div className="clay-raised-sm" style={{
+              marginTop: 8, padding: '10px 12px',
+              background: '#FEF2F2', border: 'none', fontSize: 12, color: '#DC2626',
             }}>
               No registered member found with this number. Use Walk-in mode instead.
             </div>
@@ -400,25 +400,26 @@ export default function IssueTab({ libraryId, catalog, onIssued }: Props) {
       </div>
 
       {error && (
-        <div style={{ fontSize: 12, color: '#DC2626', background: '#FEF2F2', padding: '8px 12px', borderRadius: 8 }}>
+        <div className="clay-raised-sm" style={{ fontSize: 12, color: '#DC2626', background: '#FEF2F2', padding: '8px 12px' }}>
           {error}
         </div>
       )}
 
-      <button className="press"
+      <button
         onClick={handleSubmit}
         disabled={loading || success || !selected || availCopies.length === 0}
         style={{
-          background:    success ? '#059669' : ACCENT,
+          background:    success ? '#059669' : `linear-gradient(155deg, #22D9EA, ${ACCENT}, #05707D)`,
           color:         '#fff',
           border:        'none',
-          borderRadius:  10,
+          borderRadius:  14,
           padding:       '13px 0',
           fontSize:      14,
           fontWeight:    700,
           cursor:        loading || success ? 'default' : 'pointer',
           fontFamily:    'DM Sans, sans-serif',
           opacity:       (!selected || availCopies.length === 0) ? 0.5 : 1,
+          boxShadow:     '3px 3px 8px rgba(5,151,167,.3), -2px -2px 6px rgba(255,255,255,.4)',
           transition:    'background .2s',
         }}
       >
@@ -443,9 +444,10 @@ const inputStyle: React.CSSProperties = {
   width:        '100%',
   boxSizing:    'border-box',
   padding:      '10px 12px',
-  borderRadius: 8,
-  border:       '1px solid #E2DDD4',
-  background:   '#FDFCF9',
+  borderRadius: 12,
+  border:       'none',
+  background:   'var(--clay-surface)',
+  boxShadow:    'inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6)',
   fontSize:     13,
   color:        '#0A0D12',
   fontFamily:   'DM Sans, sans-serif',

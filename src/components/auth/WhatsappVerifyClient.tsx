@@ -70,10 +70,10 @@ export default function WhatsappVerifyClient() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg,#F4F7FB,#EDE8DC)', fontFamily: 'DM Sans, sans-serif', padding: '24px 16px' }}>
-      <div style={{ width: '100%', maxWidth: 440, background: '#FDFCF9', borderRadius: 20, padding: '36px 32px', boxShadow: '0 12px 40px rgba(10,13,18,.08)' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--clay-bg)', fontFamily: 'DM Sans, sans-serif', padding: '24px 16px' }}>
+      <div className="clay-raised" style={{ width: '100%', maxWidth: 440, background: 'var(--clay-surface)', padding: '36px 32px' }}>
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
-          <div style={{ width: 44, height: 44, borderRadius: 12, background: '#25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', boxShadow: '0 4px 16px rgba(37,211,102,.3)', fontSize: 22 }}>
+          <div className="clay-raised" style={{ width: 44, height: 44, borderRadius: 12, background: '#25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 22 }}>
             💬
           </div>
           <h1 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 24, color: '#0A0D12', letterSpacing: '-0.04em', marginBottom: 8 }}>
@@ -96,11 +96,11 @@ export default function WhatsappVerifyClient() {
               placeholder="+91 98765 43210"
               value={number}
               onChange={e => setNumber(e.target.value)}
-              style={{ width: '100%', padding: '13px 14px', borderRadius: 10, border: '1.5px solid #E2DDD4', fontSize: 15, fontFamily: 'DM Sans, sans-serif', marginBottom: 20, boxSizing: 'border-box' }}
+              style={{ width: '100%', padding: '13px 14px', borderRadius: 12, border: 'none', fontSize: 15, fontFamily: 'DM Sans, sans-serif', marginBottom: 20, boxSizing: 'border-box', background: 'var(--clay-surface)', outline: 'none', boxShadow: 'inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6)' }}
             />
 
             {errMsg && (
-              <div style={{ background: '#FDEAEA', border: '1px solid rgba(212,43,43,.2)', borderRadius: 10, padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#9B1C1C' }}>
+              <div className="clay-raised-sm" style={{ background: '#FDEAEA', border: 'none', padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#9B1C1C' }}>
                 ⚠️ {errMsg}
               </div>
             )}
@@ -108,7 +108,12 @@ export default function WhatsappVerifyClient() {
             <button
               onClick={handleSend}
               disabled={!numberValid || isPending}
-              style={{ width: '100%', padding: '15px 0', borderRadius: 12, fontSize: 16, fontWeight: 700, fontFamily: 'Syne, sans-serif', border: 'none', cursor: numberValid ? 'pointer' : 'not-allowed', background: numberValid ? ACCENT : '#9AAAB8', color: '#fff' }}
+              style={{
+                width: '100%', padding: '15px 0', borderRadius: 14, fontSize: 16, fontWeight: 700,
+                fontFamily: 'Syne, sans-serif', border: 'none', cursor: numberValid ? 'pointer' : 'not-allowed',
+                background: numberValid ? `linear-gradient(155deg, #4D78FF, ${ACCENT}, #0D3AE0)` : '#C8D4C8', color: '#fff',
+                boxShadow: numberValid ? '4px 4px 12px rgba(18,70,255,.32), -3px -3px 8px rgba(255,255,255,.4)' : 'none',
+              }}
             >
               {isPending ? 'Sending…' : 'Send verification code'}
             </button>
@@ -116,7 +121,7 @@ export default function WhatsappVerifyClient() {
         ) : (
           <>
             {infoMsg && (
-              <div style={{ background: '#E8F8EF', border: '1px solid rgba(13,124,84,.2)', borderRadius: 10, padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#0D7C54' }}>
+              <div className="clay-raised-sm" style={{ background: '#E8F8EF', border: 'none', padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#0D7C54' }}>
                 ✓ {infoMsg}
               </div>
             )}
@@ -131,7 +136,7 @@ export default function WhatsappVerifyClient() {
               placeholder="000000"
               value={otp}
               onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              style={{ width: '100%', padding: '13px 14px', borderRadius: 10, border: '1.5px solid #E2DDD4', fontSize: 20, letterSpacing: '0.3em', textAlign: 'center', fontFamily: 'DM Sans, sans-serif', marginBottom: 12, boxSizing: 'border-box' }}
+              style={{ width: '100%', padding: '13px 14px', borderRadius: 12, border: 'none', fontSize: 20, letterSpacing: '0.3em', textAlign: 'center', fontFamily: 'DM Sans, sans-serif', marginBottom: 12, boxSizing: 'border-box', background: 'var(--clay-surface)', outline: 'none', boxShadow: 'inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6)' }}
             />
 
             <button
@@ -143,7 +148,7 @@ export default function WhatsappVerifyClient() {
             </button>
 
             {errMsg && (
-              <div style={{ background: '#FDEAEA', border: '1px solid rgba(212,43,43,.2)', borderRadius: 10, padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#9B1C1C' }}>
+              <div className="clay-raised-sm" style={{ background: '#FDEAEA', border: 'none', padding: '10px 14px', marginBottom: 16, fontSize: 13, color: '#9B1C1C' }}>
                 ⚠️ {errMsg}
               </div>
             )}
@@ -151,7 +156,12 @@ export default function WhatsappVerifyClient() {
             <button
               onClick={handleVerify}
               disabled={!otpValid || isPending}
-              style={{ width: '100%', padding: '15px 0', borderRadius: 12, fontSize: 16, fontWeight: 700, fontFamily: 'Syne, sans-serif', border: 'none', cursor: otpValid ? 'pointer' : 'not-allowed', background: otpValid ? ACCENT : '#9AAAB8', color: '#fff' }}
+              style={{
+                width: '100%', padding: '15px 0', borderRadius: 14, fontSize: 16, fontWeight: 700,
+                fontFamily: 'Syne, sans-serif', border: 'none', cursor: otpValid ? 'pointer' : 'not-allowed',
+                background: otpValid ? `linear-gradient(155deg, #4D78FF, ${ACCENT}, #0D3AE0)` : '#C8D4C8', color: '#fff',
+                boxShadow: otpValid ? '4px 4px 12px rgba(18,70,255,.32), -3px -3px 8px rgba(255,255,255,.4)' : 'none',
+              }}
             >
               {isPending ? 'Verifying…' : 'Verify & continue →'}
             </button>

@@ -30,9 +30,11 @@ function Steps() {
             <div style={{
               width: 26, height: 26, borderRadius: '50%', display: 'flex',
               alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700,
-              background: s.done ? ACCENT : s.active ? ACCENT : '#E2DDD4',
+              background: s.done || s.active ? ACCENT : 'var(--clay-surface)',
               color: s.done || s.active ? '#fff' : '#9AAAB8',
-              boxShadow: s.active ? `0 0 0 3px ${ACCENT_LIGHT}` : 'none',
+              boxShadow: s.done || s.active
+                ? '2px 2px 6px rgba(13,124,84,.35), -1px -1px 4px rgba(255,255,255,.4)'
+                : 'inset 2px 2px 5px rgba(163,177,198,.35), inset -1px -1px 3px rgba(255,255,255,.6)',
             }}>
               {s.done ? '✓' : i + 1}
             </div>
@@ -45,7 +47,7 @@ function Steps() {
             </span>
           </div>
           {i < steps.length - 1 && (
-            <div style={{ width: 28, height: 2, background: s.done ? ACCENT : '#E2DDD4', margin: '0 3px', marginBottom: 18 }} />
+            <div style={{ width: 28, height: 2, background: s.done ? ACCENT : '#DDE3EC', margin: '0 3px', marginBottom: 18 }} />
           )}
         </div>
       ))}
@@ -64,9 +66,9 @@ function CheckRow({
     <div style={{
       display: 'flex', alignItems: 'center', gap: 12,
       padding: '12px 0',
-      borderBottom: '1px solid #F0EDE8',
+      boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.2)',
     }}>
-      <div style={{
+      <div className="clay-icon-badge" style={{
         width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         background: ok ? ACCENT_LIGHT : '#FEF3E2',
@@ -79,11 +81,11 @@ function CheckRow({
         <div style={{ fontSize: 12, color: '#6B7689', marginTop: 2 }}>{detail}</div>
       </div>
       {!ok && action && (
-        <button className="press"
+        <button className="clay-raised-sm clay-interactive"
           onClick={onAction}
           style={{
-            padding: '5px 12px', borderRadius: 7, fontSize: 12, fontWeight: 600,
-            border: '1.5px solid #E2DDD4', background: '#FDFCF9', color: '#3A4A5C',
+            padding: '5px 12px', fontSize: 12, fontWeight: 600,
+            border: 'none', color: '#3A4A5C',
             cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
           }}
         >
@@ -97,9 +99,8 @@ function CheckRow({
 /* ─── Library preview card ───────────────────────────────────────────────────── */
 function PreviewCard({ summary }: { summary: LibrarySummary }) {
   return (
-    <div style={{
-      border: '1.5px solid #E2DDD4', borderRadius: 14, overflow: 'hidden',
-      background: '#FDFCF9', marginBottom: 20,
+    <div className="clay-raised" style={{
+      overflow: 'hidden', marginBottom: 20,
     }}>
       {/* Cover photo / placeholder */}
       <div style={{
@@ -115,8 +116,7 @@ function PreviewCard({ summary }: { summary: LibrarySummary }) {
       <div style={{ padding: '14px 16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
           <span style={{ fontSize: 15, fontWeight: 700, color: '#0A0D12' }}>{summary.name}</span>
-          <span style={{
-            padding: '2px 8px', borderRadius: 20, fontSize: 10, fontWeight: 700,
+          <span className="dash-badge" style={{
             background: '#FEF3E2', color: '#92400E',
           }}>○ Draft</span>
         </div>
@@ -291,7 +291,7 @@ export default function GoLiveClient() {
     return (
       <div style={{
         minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: 'linear-gradient(135deg,#F4F7FB 0%,#EDE8DC 100%)',
+        background: 'var(--clay-bg)',
         fontFamily: 'DM Sans, sans-serif', padding: '24px 16px',
       }}>
         <div style={{ width: '100%', maxWidth: 440, textAlign: 'center' }}>
@@ -302,13 +302,12 @@ export default function GoLiveClient() {
           <p style={{ fontSize: 15, color: '#6B7689', lineHeight: 1.6, marginBottom: 28 }}>
             <strong>{summary?.name}</strong> has been submitted to the platform admin for approval. You'll be notified as soon as it's reviewed — this usually takes 1–2 business days.
           </p>
-          <button className="press"
+          <button className="clay-btn-primary"
             onClick={() => router.push('/dashboard')}
             style={{
-              width: '100%', padding: '14px 0', borderRadius: 10, fontSize: 15,
+              width: '100%', padding: '14px 0', fontSize: 15,
               fontWeight: 700, fontFamily: 'Syne, sans-serif', border: 'none',
-              background: ACCENT, color: '#fff',
-              boxShadow: '0 4px 16px rgba(13,124,84,.3)',
+              background: `linear-gradient(155deg, #22B37C, ${ACCENT}, #0A5E3F)`,
               cursor: 'pointer',
             }}
           >
@@ -324,7 +323,7 @@ export default function GoLiveClient() {
     return (
       <div style={{
         minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: 'linear-gradient(135deg,#F4F7FB 0%,#EDE8DC 100%)',
+        background: 'var(--clay-bg)',
         fontFamily: 'DM Sans, sans-serif', padding: '24px 16px',
       }}>
         <div style={{ width: '100%', maxWidth: 440, textAlign: 'center' }}>
@@ -336,9 +335,8 @@ export default function GoLiveClient() {
             <strong>{summary?.name}</strong> is now visible to students. Bookings will start coming in soon.
           </p>
 
-          <div style={{
-            background: '#FDFCF9', border: '1px solid #E2DDD4', borderRadius: 20,
-            padding: '24px', marginBottom: 20, boxShadow: '0 4px 28px rgba(10,13,18,.08)',
+          <div className="clay-raised" style={{
+            padding: '24px', marginBottom: 20,
           }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: '#3A4A5C', marginBottom: 14 }}>
               What's next
@@ -348,21 +346,20 @@ export default function GoLiveClient() {
               { icon: '🪑', text: 'Add more seats and configure pricing' },
               { icon: '💳', text: 'Create membership plans for students' },
               { icon: '📊', text: 'Track bookings & revenue in real time' },
-            ].map(({ icon, text }) => (
-              <div key={text} style={{ display: 'flex', gap: 10, alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #F0EDE8' }}>
+            ].map(({ icon, text }, i, arr) => (
+              <div key={text} style={{ display: 'flex', gap: 10, alignItems: 'center', padding: '8px 0', boxShadow: i < arr.length - 1 ? 'inset 0 -1px 0 rgba(163,177,198,.2)' : undefined }}>
                 <span style={{ fontSize: 18, flexShrink: 0 }}>{icon}</span>
                 <span style={{ fontSize: 13, color: '#3A4A5C' }}>{text}</span>
               </div>
             ))}
           </div>
 
-          <button className="press"
+          <button className="clay-btn-primary"
             onClick={() => router.push('/dashboard')}
             style={{
-              width: '100%', padding: '14px 0', borderRadius: 10, fontSize: 15,
+              width: '100%', padding: '14px 0', fontSize: 15,
               fontWeight: 700, fontFamily: 'Syne, sans-serif', border: 'none',
-              background: ACCENT, color: '#fff',
-              boxShadow: '0 4px 16px rgba(13,124,84,.3)',
+              background: `linear-gradient(155deg, #22B37C, ${ACCENT}, #0A5E3F)`,
               cursor: 'pointer',
             }}
           >
@@ -376,7 +373,7 @@ export default function GoLiveClient() {
   return (
     <div style={{
       minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'linear-gradient(135deg,#F4F7FB 0%,#EDE8DC 100%)',
+      background: 'var(--clay-bg)',
       fontFamily: 'DM Sans, sans-serif', padding: '24px 16px', position: 'relative',
     }}>
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
@@ -388,9 +385,9 @@ export default function GoLiveClient() {
 
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
           <div style={{
-            width: 52, height: 52, borderRadius: 14, background: ACCENT,
+            width: 52, height: 52, borderRadius: 16, background: ACCENT,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 16px', boxShadow: '0 4px 18px rgba(13,124,84,.32)', fontSize: 24,
+            margin: '0 auto 16px', boxShadow: '4px 4px 12px rgba(13,124,84,.35), -3px -3px 8px rgba(255,255,255,.5)', fontSize: 24,
           }}>
             🚀
           </div>
@@ -402,7 +399,11 @@ export default function GoLiveClient() {
           </p>
         </div>
 
-        <div style={{ background: '#FDFCF9', border: '1px solid #E2DDD4', borderRadius: 20, padding: '28px 28px 24px', boxShadow: '0 4px 28px rgba(10,13,18,.08)' }}>
+        <div style={{
+          background: 'var(--clay-surface)', border: 'none', borderRadius: 22,
+          padding: '28px 28px 24px',
+          boxShadow: '8px 8px 20px rgba(163,177,198,.35), -6px -6px 16px rgba(255,255,255,.7)',
+        }}>
 
           {loading ? (
             <div style={{ textAlign: 'center', padding: '40px 0' }}>
@@ -416,9 +417,9 @@ export default function GoLiveClient() {
 
               {goLiveStatus?.displayStatus && (
                 <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
-                  <span style={{
+                  <span className="dash-badge" style={{
                     display: 'inline-flex', alignItems: 'center', gap: 6,
-                    padding: '5px 14px', borderRadius: 20, fontSize: 12, fontWeight: 700,
+                    padding: '5px 14px',
                     fontFamily: 'DM Sans, sans-serif', letterSpacing: '.02em',
                     background: LIBRARY_STATUS_LABELS[goLiveStatus.displayStatus].bg,
                     color: LIBRARY_STATUS_LABELS[goLiveStatus.displayStatus].color,
@@ -429,7 +430,7 @@ export default function GoLiveClient() {
               )}
 
               {goLiveStatus?.displayStatus === 'expired' && (
-                <div style={{ background: '#FEE2E2', border: '1px solid rgba(155,28,28,.2)', borderRadius: 12, padding: '12px 14px', marginBottom: 16, display: 'flex', gap: 10 }}>
+                <div style={{ background: '#FEE2E2', border: 'none', borderRadius: 12, padding: '12px 14px', marginBottom: 16, display: 'flex', gap: 10, boxShadow: '3px 3px 8px rgba(163,177,198,.28), -2px -2px 6px rgba(255,255,255,.6)' }}>
                   <span>⏰</span>
                   <p style={{ fontSize: 13, color: '#9B1C1C', margin: 0, lineHeight: 1.5 }}>
                     <strong>Your subscription has expired</strong> and this library is no longer visible to students. Renew below to go live again.
@@ -438,7 +439,7 @@ export default function GoLiveClient() {
               )}
 
               {goLiveStatus?.approvalStatus === 'rejected' && (
-                <div style={{ background: '#FDEAEA', border: '1px solid rgba(212,43,43,.2)', borderRadius: 12, padding: '12px 14px', marginBottom: 16, display: 'flex', gap: 10 }}>
+                <div style={{ background: '#FDEAEA', border: 'none', borderRadius: 12, padding: '12px 14px', marginBottom: 16, display: 'flex', gap: 10, boxShadow: '3px 3px 8px rgba(163,177,198,.28), -2px -2px 6px rgba(255,255,255,.6)' }}>
                   <span>✕</span>
                   <p style={{ fontSize: 13, color: '#9B1C1C', margin: 0, lineHeight: 1.5 }}>
                     <strong>Your last submission was rejected:</strong> {goLiveStatus.approvalNotes ?? 'No reason given.'} Fix the issue and resubmit below.
@@ -447,7 +448,7 @@ export default function GoLiveClient() {
               )}
 
               {goLiveStatus?.approvalStatus === 'suspended' && (
-                <div style={{ background: '#F3E8FF', border: '1px solid rgba(107,33,168,.2)', borderRadius: 12, padding: '12px 14px', marginBottom: 16, display: 'flex', gap: 10 }}>
+                <div style={{ background: '#F3E8FF', border: 'none', borderRadius: 12, padding: '12px 14px', marginBottom: 16, display: 'flex', gap: 10, boxShadow: '3px 3px 8px rgba(163,177,198,.28), -2px -2px 6px rgba(255,255,255,.6)' }}>
                   <span>⏸</span>
                   <p style={{ fontSize: 13, color: '#6B21A8', margin: 0, lineHeight: 1.5 }}>
                     <strong>This library is suspended:</strong> {goLiveStatus.suspendedReason ?? 'Contact support for details.'} You cannot go live until the platform admin lifts this suspension.
@@ -467,21 +468,21 @@ export default function GoLiveClient() {
 
               {/* Overall status */}
               {allGood ? (
-                <div style={{ background: ACCENT_LIGHT, border: `1px solid rgba(13,124,84,.2)`, borderRadius: 12, padding: '12px 14px', marginBottom: 20, display: 'flex', gap: 10 }}>
+                <div style={{ background: ACCENT_LIGHT, border: 'none', borderRadius: 12, padding: '12px 14px', marginBottom: 20, display: 'flex', gap: 10, boxShadow: '3px 3px 8px rgba(163,177,198,.28), -2px -2px 6px rgba(255,255,255,.6)' }}>
                   <span>✅</span>
                   <p style={{ fontSize: 13, color: '#0A5E3F', margin: 0, lineHeight: 1.5 }}>
                     Everything looks great! Your library is ready to go live.
                   </p>
                 </div>
               ) : criticalOk ? (
-                <div style={{ background: '#FEF3E2', border: '1px solid rgba(201,106,0,.2)', borderRadius: 12, padding: '12px 14px', marginBottom: 20, display: 'flex', gap: 10 }}>
+                <div style={{ background: '#FEF3E2', border: 'none', borderRadius: 12, padding: '12px 14px', marginBottom: 20, display: 'flex', gap: 10, boxShadow: '3px 3px 8px rgba(163,177,198,.28), -2px -2px 6px rgba(255,255,255,.6)' }}>
                   <span>⚠️</span>
                   <p style={{ fontSize: 13, color: '#92400E', margin: 0, lineHeight: 1.5 }}>
                     Some items are incomplete but you can go live now and fix them from the dashboard.
                   </p>
                 </div>
               ) : (
-                <div style={{ background: '#FDEAEA', border: '1px solid rgba(212,43,43,.2)', borderRadius: 12, padding: '12px 14px', marginBottom: 20, display: 'flex', gap: 10 }}>
+                <div style={{ background: '#FDEAEA', border: 'none', borderRadius: 12, padding: '12px 14px', marginBottom: 20, display: 'flex', gap: 10, boxShadow: '3px 3px 8px rgba(163,177,198,.28), -2px -2px 6px rgba(255,255,255,.6)' }}>
                   <span>⛔</span>
                   <p style={{ fontSize: 13, color: '#9B1C1C', margin: 0, lineHeight: 1.5 }}>
                     Please fix the items marked above before going live.
@@ -490,47 +491,47 @@ export default function GoLiveClient() {
               )}
 
               {error && (
-                <div style={{ background: '#FDEAEA', border: '1px solid rgba(212,43,43,.2)', borderRadius: 10, padding: '10px 14px', marginBottom: 16, display: 'flex', gap: 8 }}>
+                <div style={{ background: '#FDEAEA', border: 'none', borderRadius: 12, padding: '10px 14px', marginBottom: 16, display: 'flex', gap: 8, boxShadow: '2px 2px 6px rgba(163,177,198,.25), -2px -2px 5px rgba(255,255,255,.55)' }}>
                   <span>⚠️</span>
                   <p style={{ fontSize: 13, color: '#9B1C1C', margin: 0 }}>{error}</p>
                 </div>
               )}
 
               {subMessage && (
-                <div style={{ background: ACCENT_LIGHT, border: '1px solid rgba(13,124,84,.2)', borderRadius: 10, padding: '10px 14px', marginBottom: 16, display: 'flex', gap: 8 }}>
+                <div style={{ background: ACCENT_LIGHT, border: 'none', borderRadius: 12, padding: '10px 14px', marginBottom: 16, display: 'flex', gap: 8, boxShadow: '2px 2px 6px rgba(163,177,198,.25), -2px -2px 5px rgba(255,255,255,.55)' }}>
                   <span>⏳</span>
                   <p style={{ fontSize: 13, color: '#0A5E3F', margin: 0 }}>{subMessage}</p>
                 </div>
               )}
 
-              <div style={{ height: 1, background: '#E2DDD4', margin: '4px 0 20px' }} />
+              <div style={{ height: 1, boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.3)', margin: '4px 0 20px' }} />
 
               <div style={{ display: 'flex', gap: 10 }}>
-                <button className="press"
+                <button className="clay-raised-sm clay-interactive"
                   type="button"
                   onClick={() => router.back()}
                   style={{
-                    flex: 1, padding: '13px 0', borderRadius: 10, fontSize: 14, fontWeight: 600,
-                    fontFamily: 'DM Sans, sans-serif', border: '1.5px solid #E2DDD4',
-                    background: '#FDFCF9', color: '#3A4A5C', cursor: 'pointer',
+                    flex: 1, padding: '13px 0', fontSize: 14, fontWeight: 600,
+                    fontFamily: 'DM Sans, sans-serif', border: 'none',
+                    color: '#3A4A5C', cursor: 'pointer',
                   }}
                 >
                   ← Back
                 </button>
-                <button className="press"
+                <button
                   onClick={handlePublish}
                   disabled={!criticalOk || isPending || subPending}
                   style={{
-                    flex: 2, padding: '13px 0', borderRadius: 10, fontSize: 15,
+                    flex: 2, padding: '13px 0', borderRadius: 14, fontSize: 15,
                     fontWeight: 700, fontFamily: 'Syne, sans-serif', border: 'none',
-                    background: criticalOk ? ACCENT : '#C8D4C8', color: '#fff',
+                    background: criticalOk ? `linear-gradient(155deg, #22B37C, ${ACCENT}, ${ACCENT_DARK})` : '#C8D4C8', color: '#fff',
                     cursor: criticalOk ? 'pointer' : 'not-allowed',
-                    boxShadow: criticalOk ? '0 4px 16px rgba(13,124,84,.3)' : 'none',
+                    boxShadow: criticalOk
+                      ? '4px 4px 12px rgba(13,124,84,.35), -3px -3px 8px rgba(255,255,255,.4), inset 0 1px 1px rgba(255,255,255,.3)'
+                      : 'none',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                    transition: 'all .2s',
+                    transition: 'transform .15s, box-shadow .15s',
                   }}
-                  onMouseEnter={e => { if (criticalOk) e.currentTarget.style.background = ACCENT_DARK }}
-                  onMouseLeave={e => { if (criticalOk) e.currentTarget.style.background = ACCENT }}
                 >
                   {isPending && <span style={{ width: 15, height: 15, border: '2px solid rgba(255,255,255,.35)', borderTopColor: '#fff', borderRadius: '50%', display: 'inline-block', animation: 'spin .65s linear infinite' }} />}
                   {isPending
@@ -570,9 +571,10 @@ export default function GoLiveClient() {
         >
           <div
             onClick={e => e.stopPropagation()}
+            className="clay-raised"
             style={{
-              width: '100%', maxWidth: 400, background: '#FDFCF9', borderRadius: 18,
-              padding: '28px 24px', textAlign: 'center', boxShadow: '0 20px 60px rgba(0,0,0,.3)',
+              width: '100%', maxWidth: 400, background: 'var(--clay-surface)',
+              padding: '28px 24px', textAlign: 'center',
             }}
           >
             <div style={{ fontSize: 44, marginBottom: 12 }}>💳</div>
@@ -582,21 +584,21 @@ export default function GoLiveClient() {
             <p style={{ fontSize: 13.5, color: '#6B7689', lineHeight: 1.6, marginBottom: 22 }}>
               Please complete payment to make this library active. Your library is saved as a draft and won't be lost — it just won't be visible to students until your ₹399/month subscription is set up.
             </p>
-            <button className="press"
+            <button className="clay-btn-primary"
               onClick={() => { setShowSubscriptionModal(false); handleStartSubscription() }}
               disabled={subPending}
               style={{
-                width: '100%', padding: '13px 0', borderRadius: 10, fontSize: 15,
+                width: '100%', padding: '13px 0', fontSize: 15,
                 fontWeight: 700, fontFamily: 'Syne, sans-serif', border: 'none',
-                background: ACCENT, color: '#fff', cursor: subPending ? 'default' : 'pointer',
-                boxShadow: '0 4px 16px rgba(13,124,84,.3)', marginBottom: 10,
+                background: `linear-gradient(155deg, #22B37C, ${ACCENT}, #0A5E3F)`, cursor: subPending ? 'default' : 'pointer',
+                marginBottom: 10,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
               }}
             >
               {subPending && <span style={{ width: 15, height: 15, border: '2px solid rgba(255,255,255,.35)', borderTopColor: '#fff', borderRadius: '50%', display: 'inline-block', animation: 'spin .65s linear infinite' }} />}
               {subPending ? 'Opening checkout…' : 'Subscribe — ₹399/month'}
             </button>
-            <button className="press"
+            <button
               onClick={() => setShowSubscriptionModal(false)}
               style={{
                 width: '100%', padding: '10px 0', borderRadius: 10, fontSize: 13.5,

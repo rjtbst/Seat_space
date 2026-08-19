@@ -29,7 +29,7 @@ import {
   getAvailableSeatsForPlan,
 } from '@/lib/actions/students/student-subscriptions'
 import { describeDaysOfWeek } from '@/lib/booking/subscriptionEntitlement'
-import { ClayButton, ClayInput } from '@/components/ui/Clay'
+import { ClayButton, ClayInput } from '@/components/ui/clay'
 
 export type SubscribeModalPlan = {
   id:            string

@@ -1,146 +1,83 @@
 // components/student/ExploreClient.tsx
-"use client";
+'use client'
 
 import {
-  useState,
-  useCallback,
-  useTransition,
-  useRef,
-  useEffect,
-  lazy,
-  Suspense,
-} from "react";
-import { createPortal } from "react-dom";
-import { useRouter, usePathname } from "next/navigation";
-import type { LibraryCard } from "@/lib/actions/students/student-discovery";
-import LibraryCardTile from "./LibraryCard";
+  useState, useCallback, useTransition, useRef, useEffect, lazy, Suspense,
+} from 'react'
+import { createPortal } from 'react-dom'
+import { useRouter, usePathname } from 'next/navigation'
+import type { LibraryCard } from '@/lib/actions/students/student-discovery'
+import LibraryCardTile from './LibraryCard'
 import {
-  Search,
-  SlidersHorizontal,
-  X,
-  Clock,
-  ChevronLeft,
-  ChevronRight,
-  Loader2,
-  Navigation,
-  AlertCircle,
-  Map,
-  List,
-  MapPin,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useGeolocation } from "@/hooks/useGeolocation";
-import {
-  ClayButton,
-  ClayChip,
-  ClayIconBadge,
-  ClayInput,
-  ClaySelect,
-  ClayToggleChip,
-} from "@/components/ui/Clay";
+  Search, SlidersHorizontal, X, Clock,
+  ChevronLeft, ChevronRight, Loader2, Navigation,
+  AlertCircle, Map, List, MapPin,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { useGeolocation } from '@/hooks/useGeolocation'
+import { ClayButton, ClayChip, ClayIconBadge, ClayInput, ClaySelect, ClayToggleChip } from '@/components/ui/clay'
 
-const MapView = lazy(() => import("./MapView"));
+const MapView = lazy(() => import('./MapView'))
 
 interface Props {
-  initialLibraries: LibraryCard[];
-  total: number;
-  cities: string[];
-  allAmenities: string[];
-  profileCity: string | null;
-  profileState: string | null;
-  locationMode: "gps" | "profile_city" | "profile_state" | "all";
+  initialLibraries: LibraryCard[]
+  total:            number
+  cities:           string[]
+  allAmenities:     string[]
+  profileCity:      string | null
+  profileState:     string | null
+  locationMode:     'gps' | 'profile_city' | 'profile_state' | 'all'
   initialFilters: {
-    q: string;
-    city: string;
-    open_now: boolean;
-    amenities: string[];
-    lat?: number;
-    lng?: number;
-  };
-  page: number;
+    q:         string
+    city:      string
+    open_now:  boolean
+    amenities: string[]
+    lat?:      number
+    lng?:      number
+  }
+  page: number
 }
 
-const LIMIT = 12;
-const LOC_PREF_KEY = "ls_loc_pref";
-const LOC_COOKIE_KEY = "ls_loc"; // "lat,lng" — read server-side too
-const LOC_COOKIE_MAX_AGE = 15 * 60; // 15 min — location goes stale, then re-resolved
+const LIMIT = 12
+const LOC_PREF_KEY = 'ls_loc_pref'
 
 function readLocPref(): boolean | null {
   try {
-    const stored = window.localStorage.getItem(LOC_PREF_KEY);
+    const stored = window.localStorage.getItem(LOC_PREF_KEY)
     // null = no stored preference yet (first-ever visit) — caller decides
     // the default in that case.
-    return stored === null ? null : stored === "on";
+    return stored === null ? null : stored === 'on'
   } catch {
-    return null;
+    return null
   }
 }
 
 function writeLocPref(enabled: boolean) {
   try {
-    window.localStorage.setItem(LOC_PREF_KEY, enabled ? "on" : "off");
-  } catch {
-    /* ignore quota/availability errors */
-  }
-}
-
-// The localStorage flag above is client-only and invisible to the server
-// component that decides `location_mode` on first paint. These cookie
-// helpers mirror the same "user wants Near Me + last known coords" state
-// into a cookie the server CAN read (see app/(student)/explore/page.tsx),
-// so a fresh visit to /explore can render GPS results immediately instead
-// of painting city/state results first and then re-fetching once geo
-// resolves client-side.
-function writeLocCookie(lat: number, lng: number) {
-  try {
-    document.cookie = `${LOC_COOKIE_KEY}=${lat},${lng}; path=/; max-age=${LOC_COOKIE_MAX_AGE}; samesite=lax`;
-  } catch {
-    /* ignore */
-  }
-}
-
-function clearLocCookie() {
-  try {
-    document.cookie = `${LOC_COOKIE_KEY}=; path=/; max-age=0`;
-  } catch {
-    /* ignore */
-  }
-}
-
-function writeLocPrefCookie(enabled: boolean) {
-  try {
-    // 1 year — mirrors the intent of localStorage's ls_loc_pref, just
-    // readable by the server. Explicit "off" should stick until the user
-    // turns it back on, regardless of how stale any cached coords get.
-    document.cookie = `${LOC_PREF_KEY}=${enabled ? "on" : "off"}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
-  } catch {
-    /* ignore */
-  }
+    window.localStorage.setItem(LOC_PREF_KEY, enabled ? 'on' : 'off')
+  } catch { /* ignore quota/availability errors */ }
 }
 
 /* ─── Location mode banner ───────────────────────────────────── */
 function LocationBanner({
-  mode,
-  profileCity,
-  profileState,
-  onEnableLocation,
+  mode, profileCity, profileState, onEnableLocation,
 }: {
-  mode: "gps" | "profile_city" | "profile_state" | "all";
-  profileCity: string | null;
-  profileState: string | null;
-  onEnableLocation: () => void;
+  mode:             'gps' | 'profile_city' | 'profile_state' | 'all'
+  profileCity:      string | null
+  profileState:     string | null
+  onEnableLocation: () => void
 }) {
-  if (mode === "gps") {
+  if (mode === 'gps') {
     return (
-      <div className="flex items-center gap-2 px-3 py-2 bg-[#E8EFFE] rounded-xl border border-[#C7D7FD] text-[11px] text-[#1246FF] font-medium">
+      <div className="clay-raised-sm flex items-center gap-2 px-3 py-2 text-[11px] text-[#1246FF] font-medium" style={{ background: '#E8EFFE' }}>
         <Navigation className="w-3 h-3 flex-shrink-0" />
         Showing libraries nearest to you
       </div>
-    );
+    )
   }
-  if (mode === "profile_city") {
+  if (mode === 'profile_city') {
     return (
-      <div className="flex items-center justify-between gap-2 px-3 py-2 bg-[#D1FAE5] rounded-xl border border-[#6EE7B7] text-[11px]">
+      <div className="clay-raised-sm flex items-center justify-between gap-2 px-3 py-2 text-[11px]" style={{ background: '#D1FAE5' }}>
         <span className="flex items-center gap-1.5 text-[#0A5E3F] font-medium">
           <MapPin className="w-3 h-3 flex-shrink-0" />
           Showing libraries in <strong>{profileCity}</strong>
@@ -152,11 +89,11 @@ function LocationBanner({
           Enable location for better results
         </button> */}
       </div>
-    );
+    )
   }
-  if (mode === "profile_state") {
+  if (mode === 'profile_state') {
     return (
-      <div className="flex items-center justify-between gap-2 px-3 py-2 bg-[#FEF3C7] rounded-xl border border-[#FCD34D] text-[11px]">
+      <div className="clay-raised-sm flex items-center justify-between gap-2 px-3 py-2 text-[11px]" style={{ background: '#FEF3C7' }}>
         <span className="flex items-center gap-1.5 text-[#92400E] font-medium">
           <MapPin className="w-3 h-3 flex-shrink-0" />
           Showing libraries in <strong>{profileState}</strong>
@@ -168,172 +105,108 @@ function LocationBanner({
           Enable location for better results
         </button>
       </div>
-    );
+    )
   }
   // mode === 'all' — nudge to enable location
   return (
     <button
       onClick={onEnableLocation}
-      className="w-full flex items-center gap-2 px-3 py-2 bg-[#F4F7FB] hover:bg-[#E8EFFE] rounded-xl border border-[#E4EAF2] hover:border-[#C7D7FD] text-[11px] text-[#6E7F94] hover:text-[#1246FF] transition-all text-left"
+      className="clay-raised-sm clay-interactive w-full flex items-center gap-2 px-3 py-2 text-[11px] text-[#6E7F94] hover:text-[#1246FF] text-left"
     >
       <Navigation className="w-3 h-3 flex-shrink-0" />
       Enable location to find nearest libraries
     </button>
-  );
+  )
 }
 
 /* ─── Main component ─────────────────────────────────────────── */
 export default function ExploreClient({
-  initialLibraries,
-  total,
-  cities,
-  allAmenities,
-  profileCity,
-  profileState,
-  locationMode,
-  initialFilters,
-  page,
+  initialLibraries, total, cities, allAmenities,
+  profileCity, profileState, locationMode, initialFilters, page,
 }: Props) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const [isPending, startTransition] = useTransition();
-  const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { geo, request: requestGeo } = useGeolocation();
+  const router   = useRouter()
+  const pathname = usePathname()
+  const [isPending, startTransition] = useTransition()
+  const debounce  = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const { geo, request: requestGeo } = useGeolocation()
 
-  const [viewMode, setViewMode] = useState<"list" | "map">("list");
-  const [q, setQ] = useState(initialFilters.q);
-  const [city, setCity] = useState(initialFilters.city);
-  const [openNow, setOpenNow] = useState(initialFilters.open_now);
-  const [selAmenities, setSelAmenities] = useState<string[]>(
-    initialFilters.amenities,
-  );
-  const [showFilters, setShowFilters] = useState(false);
+  const [viewMode,     setViewMode]     = useState<'list' | 'map'>('list')
+  const [q,            setQ]            = useState(initialFilters.q)
+  const [city,         setCity]         = useState(initialFilters.city)
+  const [openNow,      setOpenNow]      = useState(initialFilters.open_now)
+  const [selAmenities, setSelAmenities] = useState<string[]>(initialFilters.amenities)
+  const [showFilters,  setShowFilters]  = useState(false)
   // Guards the createPortal() call below — document doesn't exist during
   // SSR, so the portal target is only resolved once mounted client-side.
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
 
   // ── Location state ──────────────────────────────────────────
   // locEnabled tracks whether the user WANTS near-me sorting. It starts
   // `true` to match server-rendered output exactly (avoids a hydration
   // mismatch) -- if the user previously turned Near Me off, that's
   // corrected a moment later from localStorage, in the effect below.
-  //
-  // NOTE: as of the cookie fix, the server (page.tsx) now ALSO knows the
-  // user's Near Me preference and last-known coords via cookies, so in
-  // the common case (returning user, cookie present) the server has
-  // already rendered GPS results and `locationMode === 'gps'` on first
-  // paint — this client-side state just needs to stay consistent with
-  // that, not re-derive it from scratch.
-  const [locEnabled, setLocEnabled] = useState(true);
+  const [locEnabled, setLocEnabled] = useState(true)
 
   // On mount: apply any saved Near Me preference (localStorage isn't
   // available during SSR, so this necessarily happens client-side, after
   // the server-rendered fallback has already painted once) and, unless
-  // the user explicitly turned it off last time, refresh geo. Previously
+  // the user explicitly turned it off last time, request geo. Previously
   // this fired unconditionally on every mount -- turning Near Me off and
   // then reloading the page silently turned it back on and re-navigated
   // to nearby results, overriding what the user had just chosen.
-  //
-  // If the server already rendered us in GPS mode (locationMode === 'gps',
-  // meaning it had a fresh-enough cookie), we still refresh geo in the
-  // background to keep coords current, but there's no more "flip from
-  // city to nearby" flicker for the user to see — they already see nearby
-  // results, this just re-syncs the cookie so it doesn't go stale as fast.
   useEffect(() => {
-    const pref = readLocPref();
+    const pref = readLocPref()
     if (pref === false) {
-      setLocEnabled(false);
-      return;
+      setLocEnabled(false)
+      return
     }
-    requestGeo();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    requestGeo()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
-  const totalPages = Math.ceil(total / LIMIT);
+  const totalPages = Math.ceil(total / LIMIT)
 
-  const navigate = useCallback(
-    (params: Record<string, string>, mode: "push" | "replace" = "push") => {
-      const sp = new URLSearchParams();
-      Object.entries(params).forEach(([k, v]) => {
-        if (v) sp.set(k, v);
-      });
-      const url = `${pathname}?${sp.toString()}`;
-      startTransition(() => {
-        if (mode === "replace") router.replace(url);
-        else router.push(url);
-      });
-    },
-    [router, pathname],
-  );
+  const navigate = useCallback((params: Record<string, string>, mode: 'push' | 'replace' = 'push') => {
+    const sp = new URLSearchParams()
+    Object.entries(params).forEach(([k, v]) => { if (v) sp.set(k, v) })
+    const url = `${pathname}?${sp.toString()}`
+    startTransition(() => {
+      if (mode === 'replace') router.replace(url)
+      else router.push(url)
+    })
+  }, [router, pathname])
 
   // ── Reads live geo coords so callers don't need to pass them explicitly ──
-  const buildAndNavigate = useCallback(
-    (
-      overrides: {
-        q?: string;
-        city?: string;
-        open_now?: boolean;
-        amenities?: string[];
-        page?: number;
-        lat?: number | null;
-        lng?: number | null;
-        locEnabled?: boolean;
-        mode?: "push" | "replace";
-      } = {},
-    ) => {
-      // Decide whether location should be active for this navigation
-      const wantLoc =
-        overrides.locEnabled !== undefined ? overrides.locEnabled : locEnabled;
-      const curLat = wantLoc && geo.status === "granted" ? geo.lat : null;
-      const curLng = wantLoc && geo.status === "granted" ? geo.lng : null;
-      navigate(
-        {
-          q: overrides.q !== undefined ? overrides.q : q,
-          city: overrides.city !== undefined ? overrides.city : city,
-          open_now: (
-            overrides.open_now !== undefined ? overrides.open_now : openNow
-          )
-            ? "1"
-            : "",
-          amenities: (overrides.amenities !== undefined
-            ? overrides.amenities
-            : selAmenities
-          ).join(","),
-          page: String(overrides.page ?? 1),
-          lat:
-            overrides.lat !== undefined
-              ? overrides.lat != null
-                ? String(overrides.lat)
-                : ""
-              : curLat != null
-                ? String(curLat)
-                : "",
-          lng:
-            overrides.lng !== undefined
-              ? overrides.lng != null
-                ? String(overrides.lng)
-                : ""
-              : curLng != null
-                ? String(curLng)
-                : "",
-        },
-        overrides.mode ?? "push",
-      );
-    },
-    [q, city, openNow, selAmenities, locEnabled, geo, navigate],
-  );
+  const buildAndNavigate = useCallback((overrides: {
+    q?: string; city?: string; open_now?: boolean; amenities?: string[]
+    page?: number; lat?: number | null; lng?: number | null
+    locEnabled?: boolean; mode?: 'push' | 'replace'
+  } = {}) => {
+    // Decide whether location should be active for this navigation
+    const wantLoc = overrides.locEnabled !== undefined ? overrides.locEnabled : locEnabled
+    const curLat  = wantLoc && geo.status === 'granted' ? geo.lat : null
+    const curLng  = wantLoc && geo.status === 'granted' ? geo.lng : null
+    navigate({
+      q:        overrides.q         !== undefined ? overrides.q         : q,
+      city:     overrides.city      !== undefined ? overrides.city      : city,
+      open_now: (overrides.open_now !== undefined ? overrides.open_now  : openNow) ? '1' : '',
+      amenities: (overrides.amenities !== undefined ? overrides.amenities : selAmenities).join(','),
+      page:     String(overrides.page ?? 1),
+      lat:      overrides.lat !== undefined
+        ? (overrides.lat != null ? String(overrides.lat) : '')
+        : (curLat != null ? String(curLat) : ''),
+      lng:      overrides.lng !== undefined
+        ? (overrides.lng != null ? String(overrides.lng) : '')
+        : (curLng != null ? String(curLng) : ''),
+    }, overrides.mode ?? 'push')
+  }, [q, city, openNow, selAmenities, locEnabled, geo, navigate])
 
-  const handleSearch = useCallback(
-    (val: string) => {
-      setQ(val);
-      if (debounce.current) clearTimeout(debounce.current);
-      debounce.current = setTimeout(() => buildAndNavigate({ q: val }), 420);
-    },
-    [buildAndNavigate],
-  );
+  const handleSearch = useCallback((val: string) => {
+    setQ(val)
+    if (debounce.current) clearTimeout(debounce.current)
+    debounce.current = setTimeout(() => buildAndNavigate({ q: val }), 420)
+  }, [buildAndNavigate])
 
   // Tracks whether the *next* geo grant was kicked off by an explicit
   // click (handleEnableLocation) rather than the silent automatic request
@@ -342,149 +215,110 @@ export default function ExploreClient({
   // effect can't tell "user just clicked this" from "this happened
   // quietly in the background", and would use `replace` for both,
   // erasing the history entry from a deliberate click.
-  const explicitEnableRef = useRef(false);
+  const explicitEnableRef = useRef(false)
 
   // ── Location toggle ─────────────────────────────────────────
   // Turning OFF  → keep coords cached in geo, just stop sending them
   // Turning ON   → if already granted use immediately; otherwise request once
   // Either way this is a direct, deliberate user action, so it pushes a
   // normal history entry (unlike the automatic on-mount apply below) and
-  // persists the choice — both to localStorage (existing) and the cookie
-  // (new, so the SERVER also knows next time) — so it's remembered on
-  // the next visit and doesn't silently flip back on.
+  // persists the choice so it's remembered on the next visit.
   const handleEnableLocation = useCallback(() => {
     if (locEnabled) {
       // User is turning Near Me OFF — fall back to city/state, don't clear geo cache
-      explicitEnableRef.current = false;
-      setLocEnabled(false);
-      writeLocPref(false);
-      writeLocPrefCookie(false);
-      clearLocCookie();
-      buildAndNavigate({ locEnabled: false, lat: null, lng: null });
-      return;
+      explicitEnableRef.current = false
+      setLocEnabled(false)
+      writeLocPref(false)
+      buildAndNavigate({ locEnabled: false, lat: null, lng: null })
+      return
     }
     // User is turning Near Me ON
-    setLocEnabled(true);
-    writeLocPref(true);
-    writeLocPrefCookie(true);
-    if (geo.status === "granted") {
+    setLocEnabled(true)
+    writeLocPref(true)
+    if (geo.status === 'granted') {
       // Coords already available — apply synchronously, no prompt
-      writeLocCookie(geo.lat, geo.lng);
-      buildAndNavigate({ locEnabled: true, lat: geo.lat, lng: geo.lng });
+      buildAndNavigate({ locEnabled: true, lat: geo.lat, lng: geo.lng })
     } else {
       // Haven't asked yet (or was denied and user retries) — request
       // permission. Mark this as explicit so the effect below pushes
       // (not replaces) once it resolves.
-      explicitEnableRef.current = true;
-      requestGeo();
+      explicitEnableRef.current = true
+      requestGeo()
     }
-  }, [locEnabled, geo, buildAndNavigate, requestGeo]);
+  }, [locEnabled, geo, buildAndNavigate, requestGeo])
 
-  // ── When geo resolves (first grant, or a background refresh) ─────────
+  // ── When geo resolves (first grant) push coords immediately ──
   // This only fires on the transition to 'granted', not on every render.
   // locEnabled is intentionally not a dep — we read it via the closure
   // captured at grant-time, which is always true (we only call requestGeo
-  // when locEnabled is being set to true, or in the background-refresh
-  // effect above which already checked locPref !== false before calling).
+  // when locEnabled is being set to true).
   //
   // Mode depends on how this grant was triggered: the silent automatic
-  // request on mount refines the page the user is already on and uses
-  // `replace` so it doesn't add a back-button entry that just re-triggers
-  // the same transition on its way "back". An explicit click on the Near
-  // Me toggle is a deliberate action, though, and should behave like one
-  // -- `push`, so Back actually undoes it.
-  //
-  // writeLocPref/writeLocCookie now fire on BOTH paths (previously only
-  // the explicit-click path wrote the localStorage flag) — this was the
-  // root cause of the "searches city, then nearby, every single time"
-  // bug: on a normal first-grant via the automatic mount effect, neither
-  // the localStorage pref nor any server-visible signal was ever
-  // persisted, so every fresh mount of this component repeated the full
-  // city→gps cycle instead of the server just rendering GPS results
-  // straight away next time.
+  // request on mount refines the page the user is already on (city
+  // results → nearby results) and uses `replace` so it doesn't add a
+  // back-button entry that just re-triggers the same transition on its
+  // way "back". An explicit click on the Near Me toggle is a deliberate
+  // action, though, and should behave like one -- `push`, so Back
+  // actually undoes it -- even though the permission grant itself is
+  // just as asynchronous either way.
   useEffect(() => {
-    if (geo.status === "granted" && locEnabled) {
-      const mode = explicitEnableRef.current ? "push" : "replace";
-      explicitEnableRef.current = false;
-      writeLocPref(true);
-      writeLocPrefCookie(true);
-      writeLocCookie(geo.lat, geo.lng);
-      buildAndNavigate({ locEnabled: true, lat: geo.lat, lng: geo.lng, mode });
+    if (geo.status === 'granted' && locEnabled) {
+      const mode = explicitEnableRef.current ? 'push' : 'replace'
+      explicitEnableRef.current = false
+      buildAndNavigate({ locEnabled: true, lat: geo.lat, lng: geo.lng, mode })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [geo.status]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [geo.status])
 
   const toggleAmenity = (a: string) => {
-    const next = selAmenities.includes(a)
-      ? selAmenities.filter((x) => x !== a)
-      : [...selAmenities, a];
-    setSelAmenities(next);
-    buildAndNavigate({ amenities: next });
-  };
+    const next = selAmenities.includes(a) ? selAmenities.filter((x) => x !== a) : [...selAmenities, a]
+    setSelAmenities(next)
+    buildAndNavigate({ amenities: next })
+  }
 
   // ── Clear all filters — NEVER wipes location ─────────────────
   const clearAll = () => {
-    setQ("");
-    setCity("");
-    setOpenNow(false);
-    setSelAmenities([]);
+    setQ(''); setCity(''); setOpenNow(false); setSelAmenities([])
     // Preserve locEnabled and any live coords — location is not a "filter"
-    const lat = locEnabled && geo.status === "granted" ? geo.lat : null;
-    const lng = locEnabled && geo.status === "granted" ? geo.lng : null;
+    const lat = locEnabled && geo.status === 'granted' ? geo.lat : null
+    const lng = locEnabled && geo.status === 'granted' ? geo.lng : null
     navigate({
-      lat: lat != null ? String(lat) : "",
-      lng: lng != null ? String(lng) : "",
-    });
-  };
+      lat: lat != null ? String(lat) : '',
+      lng: lng != null ? String(lng) : '',
+    })
+  }
 
-  const hasFilters = !!q || !!city || openNow || selAmenities.length > 0;
-  const userLat = geo.status === "granted" && locEnabled ? geo.lat : null;
-  const userLng = geo.status === "granted" && locEnabled ? geo.lng : null;
+  const hasFilters = !!q || !!city || openNow || selAmenities.length > 0
+  const userLat    = geo.status === 'granted' && locEnabled ? geo.lat : null
+  const userLng    = geo.status === 'granted' && locEnabled ? geo.lng : null
 
   // Subtitle text
   const subtitle =
-    locationMode === "gps"
-      ? `${total} spot${total !== 1 ? "s" : ""} · sorted by distance`
-      : locationMode === "profile_city"
-        ? `${total} spot${total !== 1 ? "s" : ""} in ${profileCity}`
-        : locationMode === "profile_state"
-          ? `${total} spot${total !== 1 ? "s" : ""} in ${profileState}`
-          : `${total} spot${total !== 1 ? "s" : ""}`;
+    locationMode === 'gps'           ? `${total} spot${total !== 1 ? 's' : ''} · sorted by distance`
+    : locationMode === 'profile_city'  ? `${total} spot${total !== 1 ? 's' : ''} in ${profileCity}`
+    : locationMode === 'profile_state' ? `${total} spot${total !== 1 ? 's' : ''} in ${profileState}`
+    : `${total} spot${total !== 1 ? 's' : ''}`
 
   return (
-    <div className="flex flex-col" style={{ height: "calc(100vh - 58px)" }}>
+    <div className="flex flex-col" style={{ height: 'calc(100vh - 58px)' }}>
       {/* ── Header ──────────────────────────────────────────── */}
-      <div
-        className="flex-shrink-0 px-4 md:px-6 py-3 space-y-2.5"
-        style={{
-          background: "var(--clay-surface)",
-          boxShadow: "0 4px 14px rgba(163,177,198,.25)",
-        }}
-      >
+      <div className="flex-shrink-0 px-4 md:px-6 py-3 space-y-2.5" style={{ background: 'var(--clay-surface)', boxShadow: '0 4px 14px rgba(163,177,198,.25)' }}>
         <div className="flex items-center justify-between gap-3">
           <div>
-            <h1 className="text-[17px] font-bold text-[#0D1117]">
-              Find a Library
-            </h1>
+            <h1 className="text-[17px] font-bold text-[#0D1117]">Find a Library</h1>
             <p className="text-[11px] text-[#9AACBE]">{subtitle}</p>
           </div>
           <div className="clay-pressed flex items-center rounded-[11px] p-0.5">
-            {(["list", "map"] as const).map((m) => (
+            {(['list', 'map'] as const).map((m) => (
               <button
                 key={m}
                 onClick={() => setViewMode(m)}
                 className={cn(
-                  "flex items-center gap-1.5 px-2.5 py-1.5 rounded-[9px] text-[12px] font-semibold transition-all capitalize",
-                  viewMode === m
-                    ? "clay-raised-sm text-[#0D1117]"
-                    : "text-[#9AACBE] hover:text-[#6E7F94]",
+                  'flex items-center gap-1.5 px-2.5 py-1.5 rounded-[9px] text-[12px] font-semibold transition-all capitalize',
+                  viewMode === m ? 'clay-raised-sm text-[#0D1117]' : 'text-[#9AACBE] hover:text-[#6E7F94]',
                 )}
               >
-                {m === "list" ? (
-                  <List className="w-3.5 h-3.5" />
-                ) : (
-                  <Map className="w-3.5 h-3.5" />
-                )}
+                {m === 'list' ? <List className="w-3.5 h-3.5" /> : <Map className="w-3.5 h-3.5" />}
                 {m}
               </button>
             ))}
@@ -503,100 +337,55 @@ export default function ExploreClient({
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9AACBE] pointer-events-none" />
           <ClayInput
-            type="text"
-            value={q}
-            onChange={(e) => handleSearch(e.target.value)}
+            type="text" value={q} onChange={(e) => handleSearch(e.target.value)}
             placeholder="Search by name, city, area…"
             className="h-10 pl-9 pr-9"
           />
-          {q && (
-            <button
-              onClick={() => handleSearch("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2"
-            >
-              <X className="w-3.5 h-3.5 text-[#9AACBE]" />
-            </button>
-          )}
+          {q && <button onClick={() => handleSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2"><X className="w-3.5 h-3.5 text-[#9AACBE]" /></button>}
         </div>
 
         {/* Filter pills */}
-        <div className="flex flex-col gap-1.5">
-          {/* Row 1 — controls, wraps to next line if it doesn't fit */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <ClayToggleChip
-              onClick={handleEnableLocation}
-              active={locEnabled}
-              className={
-                locEnabled && geo.status === "granted"
-                  ? "text-[#0D7C54]"
-                  : undefined
-              }
-            >
-              {geo.status === "loading" ? (
-                <Loader2 className="w-3 h-3 animate-spin" />
-              ) : (
-                <Navigation className="w-3 h-3" />
-              )}
-              {locEnabled && geo.status === "granted" ? "Near Me ✓" : "Near Me"}
-            </ClayToggleChip>
+        <div className="flex items-center gap-2 overflow-x-auto pb-0.5 scrollbar-none">
+          {/* Near Me pill — active by default, shows spinner while geo resolves */}
+          <ClayToggleChip
+            onClick={handleEnableLocation}
+            active={locEnabled}
+            className={locEnabled && geo.status === 'granted' ? 'text-[#0D7C54]' : undefined}
+          >
+            {geo.status === 'loading'
+              ? <Loader2 className="w-3 h-3 animate-spin" />
+              : <Navigation className="w-3 h-3" />
+            }
+            {locEnabled && geo.status === 'granted' ? 'Near Me ✓' : 'Near Me'}
+          </ClayToggleChip>
 
-            <ClayToggleChip
-              onClick={() => {
-                setOpenNow((v) => !v);
-                buildAndNavigate({ open_now: !openNow });
-              }}
-              active={openNow}
-              className={openNow ? "text-[#0D7C54]" : undefined}
-            >
-              <Clock className="w-3 h-3" />
-              Open Now
-            </ClayToggleChip>
+          <ClayToggleChip
+            onClick={() => { setOpenNow(v => !v); buildAndNavigate({ open_now: !openNow }) }}
+            active={openNow}
+            className={openNow ? 'text-[#0D7C54]' : undefined}
+          >
+            <Clock className="w-3 h-3" />Open Now
+          </ClayToggleChip>
 
-            <ClayToggleChip
-              onClick={() => setShowFilters((v) => !v)}
-              active={showFilters}
-            >
-              <SlidersHorizontal className="w-3 h-3" />
-              More
-              {hasFilters && (
-                <span className="w-4 h-4 rounded-full bg-[#1246FF] text-white text-[9px] font-bold flex items-center justify-center">
-                  {
-                    [!!q, !!city, openNow, selAmenities.length > 0].filter(
-                      Boolean,
-                    ).length
-                  }
-                </span>
-              )}
-            </ClayToggleChip>
+          {selAmenities.map((a) => (
+            <ClayChip key={a} tone="info" className="cursor-pointer" onClick={() => toggleAmenity(a)}>
+              {a}<X className="w-2.5 h-2.5 ml-1" />
+            </ClayChip>
+          ))}
 
+          <ClayToggleChip onClick={() => setShowFilters(v => !v)} active={showFilters}>
+            <SlidersHorizontal className="w-3 h-3" />More
             {hasFilters && (
-              <ClayButton
-                variant="ghost"
-                size="sm"
-                onClick={clearAll}
-                className="text-[#C5282C] hover:text-[#C5282C]"
-              >
-                Clear all
-              </ClayButton>
+              <span className="w-4 h-4 rounded-full bg-[#1246FF] text-white text-[9px] font-bold flex items-center justify-center">
+                {[!!q, !!city, openNow, selAmenities.length > 0].filter(Boolean).length}
+              </span>
             )}
-          </div>
+          </ClayToggleChip>
 
-          {/* Row 2 — active amenity chips, wraps to as many lines as needed.
-      No horizontal scroll/clipping — every chip is always fully visible. */}
-          {selAmenities.length > 0 && (
-            <div className="flex items-center gap-2 flex-wrap">
-              {selAmenities.map((a) => (
-                <ClayChip
-                  key={a}
-                  tone="info"
-                  className="cursor-pointer flex-shrink-0"
-                  onClick={() => toggleAmenity(a)}
-                >
-                  {a}
-                  <X className="w-2.5 h-2.5 ml-1" />
-                </ClayChip>
-              ))}
-            </div>
+          {hasFilters && (
+            <ClayButton variant="ghost" size="sm" onClick={clearAll} className="text-[#C5282C] hover:text-[#C5282C]">
+              Clear all
+            </ClayButton>
           )}
         </div>
 
@@ -608,28 +397,23 @@ export default function ExploreClient({
             competing with the list for space, and it's no longer
             clipped/misplaced by any transformed ancestor (e.g. the page
             transition wrapper) since it renders directly under <body>. */}
-        {mounted &&
-          showFilters &&
-          createPortal(
-            <FilterSheet
-              onClose={() => setShowFilters(false)}
-              city={city}
-              setCity={(v) => {
-                setCity(v);
-                buildAndNavigate({ city: v });
-              }}
-              cities={cities}
-              profileCity={profileCity}
-              allAmenities={allAmenities}
-              selAmenities={selAmenities}
-              toggleAmenity={toggleAmenity}
-              resultCount={total}
-            />,
-            document.body,
-          )}
+        {mounted && showFilters && createPortal(
+          <FilterSheet
+            onClose={() => setShowFilters(false)}
+            city={city}
+            setCity={(v) => { setCity(v); buildAndNavigate({ city: v }) }}
+            cities={cities}
+            profileCity={profileCity}
+            allAmenities={allAmenities}
+            selAmenities={selAmenities}
+            toggleAmenity={toggleAmenity}
+            resultCount={total}
+          />,
+          document.body,
+        )}
 
         {/* Only show denied error — never show "enable location" nagging here */}
-        {geo.status === "denied" && (
+        {geo.status === 'denied' && (
           <div className="flex items-start gap-2 bg-[#FEF3C7] rounded-xl px-3 py-2">
             <AlertCircle className="w-3.5 h-3.5 text-[#B45309] flex-shrink-0 mt-0.5" />
             <p className="text-[11px] text-[#92400E]">{geo.reason}</p>
@@ -638,7 +422,7 @@ export default function ExploreClient({
       </div>
 
       {/* ── Content ──────────────────────────────────────────── */}
-      {viewMode === "list" ? (
+      {viewMode === 'list' ? (
         <div className="flex-1 overflow-y-auto">
           <div className="max-w-5xl mx-auto px-4 md:px-6 py-4">
             {isPending ? (
@@ -651,29 +435,25 @@ export default function ExploreClient({
                 <ClayIconBadge size="lg" className="mb-4">
                   <Search className="w-6 h-6 text-[#C4CDD8]" />
                 </ClayIconBadge>
-                <h3 className="text-[14px] font-semibold text-[#0D1117] mb-1">
-                  No libraries found
-                </h3>
+                <h3 className="text-[14px] font-semibold text-[#0D1117] mb-1">No libraries found</h3>
                 <p className="text-[12px] text-[#9AACBE] max-w-xs">
-                  {locationMode === "profile_city"
+                  {locationMode === 'profile_city'
                     ? `No libraries in ${profileCity} yet. Try searching another city.`
-                    : locationMode === "profile_state"
+                    : locationMode === 'profile_state'
                       ? `No libraries in ${profileState} yet. Try searching another state.`
                       : hasFilters
-                        ? "Try adjusting your filters."
-                        : "No libraries available right now."}
+                        ? 'Try adjusting your filters.'
+                        : 'No libraries available right now.'}
                 </p>
-                {(hasFilters || locationMode !== "all") && (
+                {(hasFilters || locationMode !== 'all') && (
                   <ClayButton onClick={clearAll} className="mt-4">
-                    {locationMode !== "all"
-                      ? "Show All Libraries"
-                      : "Clear Filters"}
+                    {locationMode !== 'all' ? 'Show All Libraries' : 'Clear Filters'}
                   </ClayButton>
                 )}
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {initialLibraries.map((lib) => (
                     <LibraryCardTile key={lib.id} library={lib} />
                   ))}
@@ -709,26 +489,17 @@ export default function ExploreClient({
         </div>
       ) : (
         <div className="flex-1 min-h-0">
-          <Suspense
-            fallback={
-              <div
-                className="flex items-center justify-center h-full"
-                style={{ background: "var(--clay-bg)" }}
-              >
-                <Loader2 className="w-6 h-6 animate-spin text-[#1246FF]" />
-              </div>
-            }
-          >
-            <MapView
-              libraries={initialLibraries}
-              userLat={userLat}
-              userLng={userLng}
-            />
+          <Suspense fallback={
+            <div className="flex items-center justify-center h-full" style={{ background: 'var(--clay-bg)' }}>
+              <Loader2 className="w-6 h-6 animate-spin text-[#1246FF]" />
+            </div>
+          }>
+            <MapView libraries={initialLibraries} userLat={userLat} userLng={userLng} />
           </Suspense>
         </div>
       )}
-    </div>
-  );
+    </div> 
+  )
 }
 
 /* ── Filter bottom-sheet ──────────────────────────────────────────────
@@ -740,35 +511,25 @@ export default function ExploreClient({
    buildAndNavigate/toggleAmenity directly), so there's no separate
    "Apply" step to get wrong. */
 function FilterSheet({
-  onClose,
-  city,
-  setCity,
-  cities,
-  profileCity,
-  allAmenities,
-  selAmenities,
-  toggleAmenity,
-  resultCount,
+  onClose, city, setCity, cities, profileCity, allAmenities, selAmenities, toggleAmenity, resultCount,
 }: {
-  onClose: () => void;
-  city: string;
-  setCity: (v: string) => void;
-  cities: string[];
-  profileCity: string | null;
-  allAmenities: string[];
-  selAmenities: string[];
-  toggleAmenity: (a: string) => void;
-  resultCount: number;
+  onClose: () => void
+  city: string
+  setCity: (v: string) => void
+  cities: string[]
+  profileCity: string | null
+  allAmenities: string[]
+  selAmenities: string[]
+  toggleAmenity: (a: string) => void
+  resultCount: number
 }) {
   // Lock background scroll while the sheet is open — otherwise the list
   // underneath can scroll behind the backdrop, which feels broken on touch.
   useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, []);
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
+  }, [])
 
   return (
     <div className="fixed inset-0 z-[200] flex flex-col justify-end">
@@ -782,12 +543,9 @@ function FilterSheet({
         aria-modal="true"
         aria-label="Filters"
         className="relative rounded-t-[22px] safe-bottom max-h-[80vh] flex flex-col animate-in slide-in-from-bottom duration-200"
-        style={{ background: "var(--clay-surface)" }}
+        style={{ background: 'var(--clay-surface)' }}
       >
-        <div
-          className="flex items-center justify-between px-4 py-3 flex-shrink-0"
-          style={{ boxShadow: "inset 0 -1px 0 rgba(163,177,198,.25)" }}
-        >
+        <div className="flex items-center justify-between px-4 py-3 flex-shrink-0" style={{ boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.25)' }}>
           <span className="w-8" />
           <div className="w-9 h-1 rounded-full bg-[#E4EAF2] absolute left-1/2 -translate-x-1/2 top-2" />
           <h2 className="text-[15px] font-bold text-[#0D1117]">Filters</h2>
@@ -800,28 +558,21 @@ function FilterSheet({
 
         <div className="overflow-y-auto px-4 py-4 space-y-4">
           <div>
-            <p className="text-[10px] font-bold text-[#9AACBE] uppercase tracking-wider mb-1.5">
-              City
-            </p>
+            <p className="text-[10px] font-bold text-[#9AACBE] uppercase tracking-wider mb-1.5">City</p>
             <ClaySelect value={city} onChange={(e) => setCity(e.target.value)}>
               <option value="">All Cities</option>
               {profileCity && (
                 <option value={profileCity}>{profileCity} (My City)</option>
               )}
               {cities
-                .filter((c) => c !== profileCity)
-                .map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
+                .filter(c => c !== profileCity)
+                .map(c => <option key={c} value={c}>{c}</option>)
+              }
             </ClaySelect>
           </div>
           {allAmenities.length > 0 && (
             <div>
-              <p className="text-[10px] font-bold text-[#9AACBE] uppercase tracking-wider mb-1.5">
-                Amenities
-              </p>
+              <p className="text-[10px] font-bold text-[#9AACBE] uppercase tracking-wider mb-1.5">Amenities</p>
               <div className="flex flex-wrap gap-1.5">
                 {allAmenities.map((a) => (
                   <ClayToggleChip
@@ -838,15 +589,12 @@ function FilterSheet({
           )}
         </div>
 
-        <div
-          className="flex-shrink-0 p-4"
-          style={{ boxShadow: "inset 0 1px 0 rgba(163,177,198,.25)" }}
-        >
+        <div className="flex-shrink-0 p-4" style={{ boxShadow: 'inset 0 1px 0 rgba(163,177,198,.25)' }}>
           <ClayButton onClick={onClose} size="lg" className="w-full">
-            Show {resultCount} {resultCount === 1 ? "library" : "libraries"}
+            Show {resultCount} {resultCount === 1 ? 'library' : 'libraries'}
           </ClayButton>
         </div>
       </div>
     </div>
-  );
+  )
 }

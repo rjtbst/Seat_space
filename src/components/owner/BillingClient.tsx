@@ -29,7 +29,7 @@ const STATUS_LABEL: Record<string, { label: string; color: string; bg: string }>
 
 function Card({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ background: '#fff', border: '1.5px solid #E2DDD4', borderRadius: 16, padding: 24, marginBottom: 20 }}>
+    <div className="clay-raised" style={{ padding: 24, marginBottom: 20 }}>
       {children}
     </div>
   )
@@ -130,17 +130,17 @@ function SubscriptionPanel({ library }: { library: OwnerLibrary }) {
           <p style={{ fontSize: 12.5, color: '#8B95A5', margin: '3px 0 0' }}>₹399/month platform subscription</p>
         </div>
         {statusInfo && (
-          <span style={{ background: statusInfo.bg, color: statusInfo.color, fontSize: 12, fontWeight: 700, padding: '4px 12px', borderRadius: 999 }}>
+          <span className="dash-badge" style={{ background: statusInfo.bg, color: statusInfo.color, padding: '4px 12px' }}>
             {statusInfo.label}
           </span>
         )}
       </div>
 
-      {error && <div style={{ background: '#FDEAEA', color: '#9B1C1C', padding: '8px 12px', borderRadius: 8, fontSize: 12.5, marginBottom: 12 }}>{error}</div>}
-      {subMessage && <div style={{ background: ACCENT_LIGHT, color: '#0A5E3F', padding: '8px 12px', borderRadius: 8, fontSize: 12.5, marginBottom: 12 }}>⏳ {subMessage}</div>}
+      {error && <div className="clay-raised-sm" style={{ background: '#FDEAEA', color: '#9B1C1C', padding: '8px 12px', fontSize: 12.5, marginBottom: 12 }}>{error}</div>}
+      {subMessage && <div className="clay-raised-sm" style={{ background: ACCENT_LIGHT, color: '#0A5E3F', padding: '8px 12px', fontSize: 12.5, marginBottom: 12 }}>⏳ {subMessage}</div>}
 
       {library.is_in_trial && (!sub?.status || ['cancelled', 'expired', 'halted'].includes(sub.status)) && (
-        <div style={{ background: '#EDE9FE', border: '1px solid rgba(124,58,237,.2)', borderRadius: 10, padding: '10px 14px', marginBottom: 14, fontSize: 12.5, color: '#5B21B6' }}>
+        <div className="clay-raised-sm" style={{ background: '#EDE9FE', border: 'none', padding: '10px 14px', marginBottom: 14, fontSize: 12.5, color: '#5B21B6' }}>
           🎉 You're on your free trial —{' '}
           <strong>{library.trial_days_remaining} day{library.trial_days_remaining === 1 ? '' : 's'} left</strong>.
           Your library stays live at no cost until then; set up billing any time before it ends to avoid a gap.
@@ -148,8 +148,8 @@ function SubscriptionPanel({ library }: { library: OwnerLibrary }) {
       )}
 
       {!sub?.status || ['cancelled', 'expired', 'halted'].includes(sub.status) ? (
-        <button disabled={isPending} onClick={handleSubscribe} style={{
-          padding: '10px 20px', borderRadius: 10, border: 'none', background: ACCENT, color: '#fff',
+        <button className="clay-btn-primary" disabled={isPending} onClick={handleSubscribe} style={{
+          padding: '10px 20px', border: 'none', background: `linear-gradient(155deg, #22B37C, ${ACCENT}, #0A5E3F)`,
           fontWeight: 700, fontSize: 13.5, cursor: 'pointer',
         }}>
           {isPending ? 'Setting up…' : sub?.status ? 'Re-subscribe' : library.is_in_trial ? 'Set up billing early' : 'Set up subscription'}
@@ -174,13 +174,13 @@ function SubscriptionPanel({ library }: { library: OwnerLibrary }) {
           </div>
 
           {sub.status === 'past_due' && (
-            <div style={{ background: '#FEF3E2', border: '1px solid rgba(201,106,0,.2)', borderRadius: 10, padding: '10px 14px', marginBottom: 14, fontSize: 12.5, color: '#92400E' }}>
+            <div className="clay-raised-sm" style={{ background: '#FEF3E2', border: 'none', padding: '10px 14px', marginBottom: 14, fontSize: 12.5, color: '#92400E' }}>
               ⚠️ Your last payment failed. Please ensure your UPI AutoPay mandate is funded — your library will go offline if this isn't resolved before the grace period ends.
             </div>
           )}
 
           {sub.cancelAtPeriodEnd && (
-            <div style={{ background: '#F3E8FF', border: '1px solid rgba(107,33,168,.2)', borderRadius: 10, padding: '10px 14px', marginBottom: 14, fontSize: 12.5, color: '#6B21A8' }}>
+            <div className="clay-raised-sm" style={{ background: '#F3E8FF', border: 'none', padding: '10px 14px', marginBottom: 14, fontSize: 12.5, color: '#6B21A8' }}>
               This subscription is set to cancel at the end of the current billing period.
             </div>
           )}
@@ -198,14 +198,15 @@ function SubscriptionPanel({ library }: { library: OwnerLibrary }) {
               <textarea
                 placeholder="Why are you cancelling?"
                 value={cancelReason} onChange={e => setCancelReason(e.target.value)}
-                style={{ width: '100%', minHeight: 50, padding: 8, borderRadius: 8, border: '1px solid #E2DDD4', fontSize: 12.5, marginBottom: 8, fontFamily: 'inherit' }}
+                className="clay-input"
+                style={{ width: '100%', minHeight: 50, padding: 8, fontSize: 12.5, marginBottom: 8, fontFamily: 'inherit' }}
               />
               <div style={{ display: 'flex', gap: 8 }}>
-                <button disabled={isPending} onClick={handleCancel} style={{
-                  padding: '7px 14px', borderRadius: 8, border: 'none', background: '#9B1C1C', color: '#fff', fontWeight: 700, fontSize: 12.5, cursor: 'pointer',
+                <button className="clay-raised-sm clay-interactive" disabled={isPending} onClick={handleCancel} style={{
+                  padding: '7px 14px', border: 'none', background: '#9B1C1C', color: '#fff', fontWeight: 700, fontSize: 12.5, cursor: 'pointer',
                 }}>Confirm cancel</button>
-                <button onClick={() => setShowCancelForm(false)} style={{
-                  padding: '7px 14px', borderRadius: 8, border: '1px solid #E2DDD4', background: '#fff', color: '#6B7689', fontWeight: 600, fontSize: 12.5, cursor: 'pointer',
+                <button className="clay-raised-sm clay-interactive" onClick={() => setShowCancelForm(false)} style={{
+                  padding: '7px 14px', border: 'none', color: '#6B7689', fontWeight: 600, fontSize: 12.5, cursor: 'pointer',
                 }}>Keep subscription</button>
               </div>
             </div>
@@ -216,9 +217,9 @@ function SubscriptionPanel({ library }: { library: OwnerLibrary }) {
       {history.length > 0 && (
         <div style={{ marginTop: 18 }}>
           <p style={{ fontSize: 12, fontWeight: 700, color: '#3A4A5C', textTransform: 'uppercase', letterSpacing: '.05em', margin: '0 0 8px' }}>Payment history</p>
-          <div style={{ borderTop: '1px solid #F0EDE8' }}>
+          <div>
             {history.slice(0, 6).map(h => (
-              <div key={h.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #F0EDE8', fontSize: 12.5 }}>
+              <div key={h.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', boxShadow: 'inset 0 -1px 0 rgba(163,177,198,.2)', fontSize: 12.5 }}>
                 <span style={{ color: h.status === 'captured' ? '#0A5E3F' : h.status === 'failed' ? '#9B1C1C' : '#6B7689' }}>
                   {h.status === 'captured' ? '✓ Paid' : h.status === 'failed' ? '✕ Failed' : h.status}
                   {h.isRetry && ' (retry)'}
@@ -271,7 +272,10 @@ function PayoutSetupPanel({ initial }: { initial: PayoutSetupView | null }) {
   }
 
   const inputStyle: React.CSSProperties = {
-    width: '100%', padding: '10px 12px', borderRadius: 8, border: '1.5px solid #E2DDD4', fontSize: 13.5, marginBottom: 10,
+    width: '100%', padding: '10px 12px', borderRadius: 12, border: 'none',
+    background: 'var(--clay-surface)',
+    boxShadow: 'inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6)',
+    fontSize: 13.5, marginBottom: 10,
   }
 
   return (
@@ -281,8 +285,8 @@ function PayoutSetupPanel({ initial }: { initial: PayoutSetupView | null }) {
         Where your booking earnings get sent once a booking is complete — you receive your full listed price; the platform's fee is added on top of what the student pays, not deducted from your payout.
       </p>
 
-      {error && <div style={{ background: '#FDEAEA', color: '#9B1C1C', padding: '8px 12px', borderRadius: 8, fontSize: 12.5, marginBottom: 12 }}>{error}</div>}
-      {success && <div style={{ background: ACCENT_LIGHT, color: '#0A5E3F', padding: '8px 12px', borderRadius: 8, fontSize: 12.5, marginBottom: 12 }}>{success}</div>}
+      {error && <div className="clay-raised-sm" style={{ background: '#FDEAEA', color: '#9B1C1C', padding: '8px 12px', fontSize: 12.5, marginBottom: 12 }}>{error}</div>}
+      {success && <div className="clay-raised-sm" style={{ background: ACCENT_LIGHT, color: '#0A5E3F', padding: '8px 12px', fontSize: 12.5, marginBottom: 12 }}>{success}</div>}
 
       <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 24 : 20 }}>
         <div>
@@ -297,14 +301,14 @@ function PayoutSetupPanel({ initial }: { initial: PayoutSetupView | null }) {
           <input placeholder="Account holder name" value={bankName} onChange={e => setBankName(e.target.value)} style={inputStyle} />
           <input placeholder="Account number" value={bankAccount} onChange={e => setBankAccount(e.target.value)} style={inputStyle} />
           <input placeholder="IFSC code" value={bankIfsc} onChange={e => setBankIfsc(e.target.value)} style={inputStyle} />
-          <button disabled={isPending || !bankName || !bankAccount || !bankIfsc} onClick={submitBank} style={{
-            padding: '9px 16px', borderRadius: 8, border: 'none', background: ACCENT, color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer',
+          <button className="clay-btn-primary" disabled={isPending || !bankName || !bankAccount || !bankIfsc} onClick={submitBank} style={{
+            padding: '9px 16px', border: 'none', background: `linear-gradient(155deg, #22B37C, ${ACCENT}, #0A5E3F)`, fontWeight: 700, fontSize: 13, cursor: 'pointer',
           }}>
             {setup?.hasBankAccount ? 'Update bank account' : 'Save bank account'}
           </button>
           {setup?.hasBankAccount && setup.payoutDefaultMethod !== 'bank_account' && (
-            <button onClick={() => setDefault('bank_account')} style={{
-              marginLeft: 8, padding: '9px 14px', borderRadius: 8, border: '1.5px solid #E2DDD4', background: '#fff', color: '#3A4A5C', fontWeight: 600, fontSize: 13, cursor: 'pointer',
+            <button className="clay-raised-sm clay-interactive" onClick={() => setDefault('bank_account')} style={{
+              marginLeft: 8, padding: '9px 14px', border: 'none', color: '#3A4A5C', fontWeight: 600, fontSize: 13, cursor: 'pointer',
             }}>
               Make default
             </button>
@@ -319,14 +323,14 @@ function PayoutSetupPanel({ initial }: { initial: PayoutSetupView | null }) {
             <p style={{ fontSize: 12.5, color: '#6B7689', margin: '0 0 10px' }}>{setup.payoutVpa}</p>
           )}
           <input placeholder="yourname@bank" value={vpa} onChange={e => setVpa(e.target.value)} style={inputStyle} />
-          <button disabled={isPending || !vpa} onClick={submitVpa} style={{
-            padding: '9px 16px', borderRadius: 8, border: 'none', background: ACCENT, color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer',
+          <button className="clay-btn-primary" disabled={isPending || !vpa} onClick={submitVpa} style={{
+            padding: '9px 16px', border: 'none', background: `linear-gradient(155deg, #22B37C, ${ACCENT}, #0A5E3F)`, fontWeight: 700, fontSize: 13, cursor: 'pointer',
           }}>
             {setup?.hasVpa ? 'Update UPI ID' : 'Save UPI ID'}
           </button>
           {setup?.hasVpa && setup.payoutDefaultMethod !== 'vpa' && (
-            <button onClick={() => setDefault('vpa')} style={{
-              marginLeft: 8, padding: '9px 14px', borderRadius: 8, border: '1.5px solid #E2DDD4', background: '#fff', color: '#3A4A5C', fontWeight: 600, fontSize: 13, cursor: 'pointer',
+            <button className="clay-raised-sm clay-interactive" onClick={() => setDefault('vpa')} style={{
+              marginLeft: 8, padding: '9px 14px', border: 'none', color: '#3A4A5C', fontWeight: 600, fontSize: 13, cursor: 'pointer',
             }}>
               Make default
             </button>
@@ -345,7 +349,7 @@ function PayoutSetupPanel({ initial }: { initial: PayoutSetupView | null }) {
 
 export default function BillingClient({ libraries, payoutSetup }: { libraries: OwnerLibrary[]; payoutSetup: PayoutSetupView | null }) {
   return (
-    <div style={{padding: '28px 32px', maxWidth: 1000, fontFamily: 'DM Sans, sans-serif' }}>
+    <div style={{ fontFamily: 'DM Sans, sans-serif', padding: '8px 4px', maxWidth: 880 }}>
       <h1 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 24, margin: '0 0 6px' }}>Billing & Payouts</h1>
       <p style={{ fontSize: 13.5, color: '#6B7689', margin: '0 0 24px' }}>
         Manage your platform subscriptions and where your booking earnings get paid out.

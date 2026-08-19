@@ -4,7 +4,7 @@
 import type { PaymentRecord } from '@/lib/actions/students/student-profile'
 import { Receipt, CheckCircle2, XCircle, Clock3, ExternalLink, Copy } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { ClayCard, ClayChip, ClayIconBadge } from '@/components/ui/Clay'
+import { ClayCard, ClayChip, ClayIconBadge } from '@/components/ui/clay'
 import { fmtIST } from '@/lib/ist'
 import { toast } from 'sonner'
 

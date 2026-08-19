@@ -112,19 +112,19 @@ export default function CatalogTab({ libraryId, isSenior, catalog, onCatalogChan
           style={{ ...inputStyle, flex: 1 }}
         />
         {isSenior && (
-          <button className="press"
+          <button className="clay-raised-sm clay-interactive"
             onClick={() => { setShowAdd(!showAdd); setAddError(null) }}
             style={{
-              background:   showAdd ? '#F4F7FB' : ACCENT,
+              background:   showAdd ? 'var(--clay-surface)' : undefined,
               color:        showAdd ? '#6B7689' : '#fff',
-              border:       showAdd ? '1px solid #E2DDD4' : 'none',
-              borderRadius: 8,
+              border:       'none',
               padding:      '9px 14px',
               fontSize:     12,
               fontWeight:   700,
               cursor:       'pointer',
               fontFamily:   'DM Sans, sans-serif',
               whiteSpace:   'nowrap',
+              ...(!showAdd ? { background: `linear-gradient(155deg, #22D9EA, ${ACCENT}, #05707D)`, boxShadow: '3px 3px 8px rgba(5,151,167,.3), -2px -2px 6px rgba(255,255,255,.4)' } : {}),
             }}
           >
             {showAdd ? 'Cancel' : '+ Add Book'}
@@ -134,10 +134,8 @@ export default function CatalogTab({ libraryId, isSenior, catalog, onCatalogChan
 
       {/* Add book form */}
       {showAdd && isSenior && (
-        <div style={{
-          background:   '#F4F7FB',
-          border:       '1px solid #E2DDD4',
-          borderRadius: 10,
+        <div className="clay-raised-sm" style={{
+          background:   'var(--clay-surface)',
           padding:      '14px',
           display:      'flex',
           flexDirection: 'column',
@@ -171,19 +169,17 @@ export default function CatalogTab({ libraryId, isSenior, catalog, onCatalogChan
           </div>
 
           {addError && (
-            <div style={{ fontSize: 12, color: '#DC2626', background: '#FEF2F2', padding: '7px 10px', borderRadius: 7 }}>
+            <div className="clay-raised-sm" style={{ fontSize: 12, color: '#DC2626', background: '#FEF2F2', padding: '7px 10px' }}>
               {addError}
             </div>
           )}
 
-          <button className="press"
+          <button className="clay-btn-primary"
             onClick={handleAddBook}
             disabled={adding}
             style={{
-              background:   ACCENT,
-              color:        '#fff',
+              background:   `linear-gradient(155deg, #22D9EA, ${ACCENT}, #05707D)`,
               border:       'none',
-              borderRadius: 8,
               padding:      '10px 0',
               fontSize:     13,
               fontWeight:   700,
@@ -197,7 +193,7 @@ export default function CatalogTab({ libraryId, isSenior, catalog, onCatalogChan
       )}
 
       {actionError && (
-        <div style={{ fontSize: 12, color: '#DC2626', background: '#FEF2F2', padding: '8px 12px', borderRadius: 8, fontFamily: 'DM Sans, sans-serif' }}>
+        <div className="clay-raised-sm" style={{ fontSize: 12, color: '#DC2626', background: '#FEF2F2', padding: '8px 12px', fontFamily: 'DM Sans, sans-serif' }}>
           {actionError}
         </div>
       )}
@@ -215,10 +211,7 @@ export default function CatalogTab({ libraryId, isSenior, catalog, onCatalogChan
           {filtered.map(book => {
             const busy = actionState[book.bookId]
             return (
-              <div key={book.bookId} style={{
-                background:   '#FDFCF9',
-                border:       '1px solid #E2DDD4',
-                borderRadius: 10,
+              <div key={book.bookId} className="clay-raised" style={{
                 padding:      '12px 14px',
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
@@ -233,11 +226,9 @@ export default function CatalogTab({ libraryId, isSenior, catalog, onCatalogChan
 
                   {/* Copy counts */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                    <span style={{
-                      fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 20,
+                    <span className="dash-badge" style={{
                       background: book.availableCopies > 0 ? '#ECFDF5' : '#FEF2F2',
                       color:      book.availableCopies > 0 ? '#059669' : '#DC2626',
-                      fontFamily: 'DM Sans, sans-serif',
                     }}>
                       {book.availableCopies}/{book.totalCopies}
                     </span>
@@ -247,25 +238,23 @@ export default function CatalogTab({ libraryId, isSenior, catalog, onCatalogChan
                 {/* Senior staff actions */}
                 {isSenior && (
                   <div style={{ marginTop: 10, display: 'flex', gap: 7 }}>
-                    <button className="press"
+                    <button className="clay-raised-sm clay-interactive"
                       onClick={() => handleAddCopy(book)}
                       disabled={!!busy}
                       style={{
                         ...ghostBtn,
                         color: ACCENT,
-                        borderColor: ACCENT,
                         opacity: busy ? 0.5 : 1,
                       }}
                     >
                       {busy === 'addCopy' ? '…' : '+ Copy'}
                     </button>
-                    <button className="press"
+                    <button className="clay-raised-sm clay-interactive"
                       onClick={() => handleDelete(book)}
                       disabled={!!busy || book.issuedCopies > 0}
                       style={{
                         ...ghostBtn,
                         color: '#DC2626',
-                        borderColor: '#FECACA',
                         opacity: (busy || book.issuedCopies > 0) ? 0.4 : 1,
                       }}
                       title={book.issuedCopies > 0 ? 'Cannot delete — copies are issued' : 'Delete book'}
@@ -318,9 +307,10 @@ const inputStyle: React.CSSProperties = {
   width:        '100%',
   boxSizing:    'border-box',
   padding:      '9px 12px',
-  borderRadius: 8,
-  border:       '1px solid #E2DDD4',
-  background:   '#FDFCF9',
+  borderRadius: 12,
+  border:       'none',
+  background:   'var(--clay-surface)',
+  boxShadow:    'inset 3px 3px 7px rgba(163,177,198,.3), inset -2px -2px 6px rgba(255,255,255,.6)',
   fontSize:     13,
   color:        '#0A0D12',
   fontFamily:   'DM Sans, sans-serif',
@@ -329,8 +319,7 @@ const inputStyle: React.CSSProperties = {
 
 const ghostBtn: React.CSSProperties = {
   background:   'transparent',
-  border:       '1px solid',
-  borderRadius: 7,
+  border:       'none',
   padding:      '5px 12px',
   fontSize:     11,
   fontWeight:   700,

@@ -20,7 +20,7 @@ import { effectiveSlotRate } from '@/lib/booking/types'
 import { Navigation2, MapPin, ExternalLink, Loader2, AlertCircle, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
-import { ClayCard, ClayChip, ClayIconBadge } from '@/components/ui/Clay'
+import { ClayCard, ClayChip, ClayIconBadge } from '@/components/ui/clay'
 
 declare global {
   interface Window {

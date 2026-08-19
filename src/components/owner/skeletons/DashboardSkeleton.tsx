@@ -41,8 +41,9 @@ export function DashboardSkeleton() {
 }
 
 const cardBase: React.CSSProperties = {
-  background: '#FDFCF9', border: '1px solid #E2DDD4',
-  borderRadius: 14, padding: '18px 20px',
+  background: 'var(--clay-surface, #F6F8FC)', border: 'none',
+  borderRadius: 20, padding: '18px 20px',
+  boxShadow: '6px 6px 14px rgba(163,177,198,.3), -5px -5px 12px rgba(255,255,255,.7)',
 }
 
 function Bone({ width, height, borderRadius = 6, style }: {
