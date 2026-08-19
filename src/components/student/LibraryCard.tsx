@@ -6,7 +6,7 @@ import type { LibraryCard } from '@/lib/actions/students/student-discovery'
 import { effectiveSlotRate } from '@/lib/booking/types'
 import { MapPin, Star, Clock, Navigation2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { ClayCard, ClayChip } from '@/components/ui/clay'
+import { ClayCard, ClayChip } from '@/components/ui/Clay'
 
 const AMENITY_ICON: Record<string, string> = {
   WiFi: '📶', AC: '❄️', Parking: '🅿️', Cafeteria: '☕',

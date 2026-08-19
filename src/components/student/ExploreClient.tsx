@@ -15,7 +15,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useGeolocation } from '@/hooks/useGeolocation'
-import { ClayButton, ClayChip, ClayIconBadge, ClayInput, ClaySelect, ClayToggleChip } from '@/components/ui/clay'
+import { ClayButton, ClayChip, ClayIconBadge, ClayInput, ClaySelect, ClayToggleChip } from '@/components/ui/Clay'
 
 const MapView = lazy(() => import('./MapView'))
 

@@ -19,7 +19,7 @@
 
 import { cn } from '@/lib/utils'
 import type { SeatAvailability } from '@/lib/actions/students/student-discovery'
-import { ClayIconBadge, ClayChip } from '@/components/ui/clay'
+import { ClayIconBadge, ClayChip } from '@/components/ui/Clay'
 
 interface Props {
   seats:      SeatAvailability[]

@@ -16,7 +16,7 @@ import { toast } from 'sonner'
 import { fmtIST, fmtISTTime } from '@/lib/ist'
 import { getInitials, avatarGradient } from '@/lib/utils'
 import { createBrowserSupabaseClient } from '@/lib/supabase/client'
-import { ClayCard, ClayChip, ClayIconBadge, ClaySelect, ClayInput } from '@/components/ui/clay'
+import { ClayCard, ClayChip, ClayIconBadge, ClaySelect, ClayInput } from '@/components/ui/Clay'
 
 const INDIAN_STATES = [
   'Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa',

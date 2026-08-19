@@ -28,7 +28,7 @@ import {
   Menu, X, ChevronRight,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { ClayIconBadge } from '@/components/ui/clay'
+import { ClayIconBadge } from '@/components/ui/Clay'
 import { getInitials, avatarGradient } from '@/lib/utils'
 import NotificationBell from './NotificationBell'
 import { StudentNavProgressBar } from './NavProgressBar'

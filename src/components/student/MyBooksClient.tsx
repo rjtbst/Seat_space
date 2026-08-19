@@ -6,7 +6,7 @@ import type { BookIssue } from '@/lib/actions/students/student-books'
 import { BookOpen, Calendar, CheckCircle2, AlertCircle, Clock, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { fmtIST } from '@/lib/ist'
-import { ClayCard, ClayChip, ClayIconBadge, ClayButton } from '@/components/ui/clay'
+import { ClayCard, ClayChip, ClayIconBadge, ClayButton } from '@/components/ui/Clay'
 
 function BookIssueCard({ issue }: { issue: BookIssue }) {
   const returned  = !!issue.returned_at
